@@ -1,0 +1,2225 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2f5d62">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="VitriTrack">
+<link rel="manifest" href='data:application/manifest+json,{"name":"VitriTrack","short_name":"VitriTrack","display":"standalone","background_color":"%232f5d62","theme_color":"%232f5d62","start_url":".","icons":[{"src":"%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%20512%20512%27%3E%3Crect%20width=%27512%27%20height=%27512%27%20rx=%2796%27%20fill=%27%232f5d62%27/%3E%3Cpath%20d=%27M140%20140l116%20240%20116-240%27%20stroke=%27%23fff%27%20stroke-width=%2744%27%20fill=%27none%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27/%3E%3C/svg%3E","sizes":"512x512","type":"image/svg+xml"}]}'>
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='96' fill='%232f5d62'/%3E%3Cpath d='M140 140l116 240 116-240' stroke='%23fff' stroke-width='44' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='96' fill='%232f5d62'/%3E%3Cpath d='M140 140l116 240 116-240' stroke='%23fff' stroke-width='44' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<title>VitriTrack — Gestion Location Vitrines</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: sidebar + main, bottom-nav mobile. Données réelles Excel client. État persisté en localStorage. */
+:root {
+  --bg:#F4F6F9; --surface:#FFFFFF; --surface-alt:#EDF1F5; --surface-deep:#E4E9F0;
+  --fg:#1A2332; --fg-muted:#5E6E82; --fg-faint:#8E9AAE;
+  --border:#DDE3EC; --border-light:#EDF1F5;
+  --accent:#0E8C7F; --accent-hover:#0A6E64; --accent-bg:#E6F5F3; --accent-fg:#0B6B60;
+  --warn:#B45309; --warn-bg:#FEF3E0; --warn-fg:#92510A;
+  --success:#15803D; --success-bg:#E4F6EC; --success-fg:#14693A;
+  --danger:#B91C1C; --danger-bg:#FDE8E8; --danger-fg:#9A2E2E;
+  --info:#1D4ED8; --info-bg:#E8EEFC; --info-fg:#1E40AF;
+  --radius:10px; --radius-sm:6px;
+  --font-display:'Outfit',system-ui,sans-serif;
+  --font-body:'DM Sans',system-ui,sans-serif;
+  --shadow-sm:0 1px 3px rgba(20,30,50,.06);
+  --shadow-md:0 4px 12px rgba(20,30,50,.08);
+  --sidebar-w:230px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1117;--surface:#161B22;--surface-alt:#1C2430;--surface-deep:#232D3C;
+    --fg:#E2E8F0;--fg-muted:#8B9AB5;--fg-faint:#556275;
+    --border:#2A3444;--border-light:#1E2838;
+    --accent:#2DD4BF;--accent-hover:#5EEAD4;--accent-bg:#0D2D2A;--accent-fg:#5EEAD4;
+    --warn:#FBBF24;--warn-bg:#2A2210;--warn-fg:#FCD34D;
+    --success:#34D399;--success-bg:#0D2A1F;--success-fg:#6EE7B7;
+    --danger:#F87171;--danger-bg:#2A1515;--danger-fg:#FCA5A5;
+    --info:#60A5FA;--info-bg:#14213D;--info-fg:#93C5FD;
+    --shadow-sm:0 1px 3px rgba(0,0,0,.3);--shadow-md:0 4px 12px rgba(0,0,0,.4);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1117;--surface:#161B22;--surface-alt:#1C2430;--surface-deep:#232D3C;
+  --fg:#E2E8F0;--fg-muted:#8B9AB5;--fg-faint:#556275;
+  --border:#2A3444;--border-light:#1E2838;
+  --accent:#2DD4BF;--accent-hover:#5EEAD4;--accent-bg:#0D2D2A;--accent-fg:#5EEAD4;
+  --warn:#FBBF24;--warn-bg:#2A2210;--warn-fg:#FCD34D;
+  --success:#34D399;--success-bg:#0D2A1F;--success-fg:#6EE7B7;
+  --danger:#F87171;--danger-bg:#2A1515;--danger-fg:#FCA5A5;
+  --info:#60A5FA;--info-bg:#14213D;--info-fg:#93C5FD;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.3);--shadow-md:0 4px 12px rgba(0,0,0,.4);
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);margin:0;min-height:100vh}
+h1,h2,h3,h4{font-family:var(--font-display);margin:0;font-weight:600}
+
+.sidebar{position:fixed;inset:0 auto 0 0;width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+.sidebar-logo{padding:20px 20px 16px;display:flex;align-items:center;gap:10px}
+.sidebar-logo svg{flex-shrink:0}
+.sidebar-logo span{font-family:var(--font-display);font-weight:700;font-size:1.25rem;color:var(--accent)}
+.sidebar-nav{flex:1;padding:8px 12px;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);color:var(--fg-muted);font-size:.875rem;font-weight:500;cursor:pointer;transition:background .15s,color .15s;border:none;background:none;width:100%;text-align:left;font-family:var(--font-body)}
+.nav-item:hover{background:var(--surface-alt);color:var(--fg)}
+.nav-item.active{background:var(--accent-bg);color:var(--accent-fg);font-weight:600}
+.nav-item svg{flex-shrink:0;width:20px;height:20px}
+.nav-badge{margin-left:auto;background:var(--danger);color:#fff;font-size:.625rem;font-weight:700;border-radius:10px;padding:1px 6px;min-width:16px;text-align:center}
+.sidebar-footer{padding:12px 20px;border-top:1px solid var(--border)}
+.sidebar-avatar{width:32px;height:32px;border-radius:50%;background:var(--accent-bg);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.75rem;color:var(--accent-fg);flex-shrink:0}
+.sidebar-user{display:flex;align-items:center;gap:10px}
+.sidebar-user-name{font-size:.8125rem;font-weight:600;white-space:nowrap}
+.sidebar-user-role{font-size:.6875rem;color:var(--fg-muted)}
+.reset-link{display:block;width:100%;text-align:left;font-size:.6875rem;color:var(--fg-faint);background:none;border:none;cursor:pointer;margin-top:8px;text-decoration:underline;font-family:var(--font-body);padding:0}
+.reset-link:hover{color:var(--danger)}
+
+.main{margin-left:var(--sidebar-w);min-height:100vh}
+.page-header{padding:24px 28px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.page-title{font-size:1.5rem}
+.page-sub{font-size:.875rem;color:var(--fg-muted);margin-top:2px}
+.page-content{padding:20px 28px 48px}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm)}
+.card-title{font-size:.875rem;font-weight:600;margin-bottom:16px;font-family:var(--font-display)}
+
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:22px}
+.kpi{padding:16px 18px}
+.kpi-label{font-size:.6875rem;text-transform:uppercase;letter-spacing:.05em;color:var(--fg-muted);margin-bottom:6px;font-weight:600}
+.kpi-value{font-family:var(--font-display);font-size:1.6rem;font-weight:700;font-variant-numeric:tabular-nums}
+.kpi-sub{font-size:.75rem;color:var(--fg-muted);margin-top:3px}
+
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:600;white-space:nowrap}
+.badge-louee{background:var(--accent-bg);color:var(--accent-fg)}
+.badge-dispo{background:var(--success-bg);color:var(--success-fg)}
+.badge-maintenance{background:var(--warn-bg);color:var(--warn-fg)}
+.badge-hs{background:var(--danger-bg);color:var(--danger-fg)}
+.badge-vendu{background:var(--surface-deep);color:var(--fg-muted)}
+.badge-info{background:var(--info-bg);color:var(--info-fg)}
+
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.8125rem}
+thead th{text-align:left;padding:9px 12px;font-size:.65rem;text-transform:uppercase;letter-spacing:.06em;color:var(--fg-muted);border-bottom:2px solid var(--border);font-weight:600;white-space:nowrap;font-family:var(--font-body)}
+tbody td{padding:10px 12px;border-bottom:1px solid var(--border-light);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr.clickable{cursor:pointer;transition:background .1s}
+tbody tr.clickable:hover{background:var(--surface-alt)}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-sm);font-size:.8125rem;font-weight:600;border:none;cursor:pointer;transition:background .15s;font-family:var(--font-body)}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-hover)}
+.btn-secondary{background:var(--surface-alt);color:var(--fg);border:1px solid var(--border)}
+.btn-secondary:hover{background:var(--surface-deep)}
+.btn-sm{padding:5px 10px;font-size:.75rem}
+.btn-danger{background:none;border:1px solid var(--danger);color:var(--danger)}
+.btn-danger:hover{background:var(--danger-bg)}
+
+.toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.search-wrap{position:relative;flex:1;min-width:180px}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--fg-faint);pointer-events:none}
+.search-input{width:100%;padding:8px 12px 8px 34px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.875rem;background:var(--surface);color:var(--fg);font-family:var(--font-body);outline:none}
+.search-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-bg)}
+select{padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.8125rem;background:var(--surface);color:var(--fg);font-family:var(--font-body)}
+
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px}
+.grid-2>*{min-width:0}
+.alert-item{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:var(--radius-sm);margin-bottom:8px}
+.alert-item.warn{background:var(--warn-bg)}
+.alert-item.danger{background:var(--danger-bg)}
+.alert-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.alert-item.warn .alert-dot{background:var(--warn)}
+.alert-item.danger .alert-dot{background:var(--danger)}
+.alert-text{font-size:.8125rem;font-weight:600}
+.alert-sub{font-size:.75rem;color:var(--fg-muted);margin-top:2px}
+
+.back-btn{display:inline-flex;align-items:center;gap:6px;color:var(--fg-muted);font-size:.8125rem;font-weight:500;background:none;border:none;cursor:pointer;padding:4px 0;margin-bottom:12px;font-family:var(--font-body)}
+.back-btn:hover{color:var(--fg)}
+
+.timeline{position:relative;padding-left:24px}
+.timeline::before{content:'';position:absolute;left:7px;top:4px;bottom:4px;width:2px;background:var(--border)}
+.timeline-item{position:relative;padding-bottom:16px}
+.timeline-item::before{content:'';position:absolute;left:-24px;top:5px;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid var(--surface)}
+.timeline-date{font-size:.6875rem;color:var(--fg-muted);margin-bottom:2px}
+.timeline-text{font-size:.8125rem}
+
+.page-section{display:none}
+.page-section.active{display:block}
+
+.progress{height:8px;border-radius:4px;background:var(--surface-deep);overflow:hidden}
+.progress-fill{height:100%;border-radius:4px;background:var(--accent)}
+
+.stat-row{display:flex;justify-content:space-between;align-items:baseline;padding:8px 0;border-bottom:1px solid var(--border-light);font-size:.8125rem;gap:12px}
+.stat-row:last-child{border-bottom:none}
+.stat-row .label{color:var(--fg-muted)}
+.stat-row .value{font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+
+/* Planning Gantt */
+.gantt{overflow-x:auto;padding-bottom:8px}
+.gantt-inner{min-width:900px}
+.gantt-header{display:grid;grid-template-columns:200px repeat(12,1fr);gap:2px;margin-bottom:6px}
+.gantt-header div{font-size:.625rem;text-transform:uppercase;letter-spacing:.04em;color:var(--fg-muted);text-align:center;font-weight:600}
+.gantt-header div:first-child{text-align:left}
+.gantt-row{display:grid;grid-template-columns:200px repeat(12,1fr);gap:2px;align-items:center;margin-bottom:6px}
+.gantt-label{font-size:.75rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:24px;position:relative}
+.gantt-track{position:relative;height:22px;border-radius:4px;background:var(--surface-alt);grid-column:2 / -1}
+.gantt-seg{position:absolute;top:2px;bottom:2px;border-radius:3px;min-width:8px}
+.gantt-del{position:absolute;right:0;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--fg-faint);cursor:pointer;font-size:.9rem;padding:0 2px;line-height:1}
+.gantt-del:hover{color:var(--danger)}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(10,15,25,.55);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:var(--surface);border-radius:var(--radius);max-width:460px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-md)}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface)}
+.modal-title{font-family:var(--font-display);font-size:1rem;font-weight:600}
+.modal-close{background:none;border:none;font-size:1.4rem;color:var(--fg-muted);cursor:pointer;line-height:1;padding:0 4px}
+.modal-close:hover{color:var(--fg)}
+.modal-body{padding:20px}
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:.6875rem;font-weight:600;color:var(--fg-muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em}
+.form-input,.form-select,.form-textarea{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.875rem;background:var(--bg);color:var(--fg);font-family:var(--font-body);outline:none}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-bg)}
+.form-textarea{resize:vertical;min-height:64px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-check{display:flex;align-items:center;gap:8px;font-size:.8125rem;font-weight:500}
+.form-check input{width:16px;height:16px;accent-color:var(--accent)}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(8px);background:var(--fg);color:var(--bg);padding:10px 20px;border-radius:8px;font-size:.8125rem;font-weight:600;z-index:300;box-shadow:var(--shadow-md);opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.row-del{background:none;border:none;color:var(--fg-faint);cursor:pointer;font-size:1rem;padding:2px 6px;border-radius:4px;line-height:1}
+.row-del:hover{color:var(--danger);background:var(--danger-bg)}
+
+/* Mobile : anti double-tap zoom */
+button,.btn,.nav-item,.seg-btn,.chip{touch-action:manipulation}
+
+/* Focus visible clavier (desktop) — coût nul en mobile */
+.btn:focus-visible,.nav-item:focus-visible,.seg-btn:focus-visible,.back-btn:focus-visible,.vit-card:focus-visible,.m-card:focus-visible,.dash-tap:focus-visible,.pl-line:focus-visible,.row-del:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* Fiche vitrine : pile d'actions mobile (les 5 btn-sm empilés pleine largeur) */
+.vd-actions{display:flex;gap:8px;flex-wrap:wrap}
+.vd-actions .btn-danger{margin-left:0}
+.vd-nfc{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+/* Fiche vitrine : réservations en cartes (mobile) */
+.vd-res-desktop{display:block}
+.vd-res-mobile{display:none}
+.vd-res-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px;min-height:48px;display:flex;flex-direction:column;gap:6px;cursor:pointer;font-family:var(--font-body);text-align:left;width:100%}
+.vd-res-card:active{background:var(--surface-alt)}
+.vd-res-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.vd-res-client{font-size:.875rem;font-weight:600}
+.vd-res-sub{font-size:.75rem;color:var(--fg-muted)}
+.vd-res-bottom{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+
+/* Bottom sheet « Plus » (mobile) */
+#more-overlay{position:fixed;inset:0;background:rgba(10,15,25,.45);z-index:150;opacity:0;transition:opacity .2s}
+#more-overlay.show{opacity:1}
+#more-sheet{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-radius:14px 14px 0 0;box-shadow:0 -4px 24px rgba(0,0,0,.2);z-index:200;transform:translateY(100%);transition:transform .2s ease-out;padding:8px 0 calc(12px + env(safe-area-inset-bottom,0px));max-height:80vh;overflow-y:auto}
+#more-sheet.show{transform:translateY(0)}
+#more-sheet{display:none}
+@media (max-width:768px){#more-sheet{display:block}}
+.sheet-grabber{width:36px;height:4px;border-radius:2px;background:var(--border);margin:4px auto 10px}
+.sheet-title{font-family:var(--font-display);font-size:.875rem;font-weight:600;color:var(--fg-muted);text-transform:uppercase;letter-spacing:.04em;padding:6px 20px}
+.sheet-item{display:flex;align-items:center;gap:12px;min-height:48px;width:100%;padding:10px 20px;background:none;border:none;font-size:.9375rem;font-weight:500;color:var(--fg);font-family:var(--font-body);cursor:pointer;text-align:left}
+.sheet-item svg{flex-shrink:0;width:20px;height:20px;color:var(--fg-muted)}
+.sheet-item:hover{background:var(--surface-alt)}
+.sheet-sep{height:1px;background:var(--border);margin:8px 20px}
+.sheet-user{display:flex;align-items:center;gap:12px;padding:10px 20px}
+.sheet-user .sidebar-avatar{width:36px;height:36px;font-size:.875rem}
+.sheet-user-name{font-size:.875rem;font-weight:600}
+.sheet-user-role{font-size:.6875rem;color:var(--fg-muted)}
+.sheet-danger{color:var(--danger)}
+@media (min-width:769px){#more-overlay{display:none!important}}
+
+/* Responsive */
+@media (max-width:768px){
+  .sidebar{position:fixed;top:auto;bottom:0;left:0;right:0;width:100%;flex-direction:row;border-right:none;border-top:1px solid var(--border);padding:0 0 env(safe-area-inset-bottom,0px)}
+  .sidebar-logo,.sidebar-footer{display:none}
+  .sidebar-nav{flex-direction:row;padding:0;justify-content:space-around;gap:0;overflow-x:auto}
+  .nav-item{flex-direction:column;padding:8px 6px;font-size:.625rem;gap:2px;text-align:center;justify-content:center;position:relative}
+  .nav-item svg{width:22px;height:22px}
+  .nav-badge{position:absolute;top:2px;right:2px;margin:0}
+  .main{margin-left:0;padding-bottom:76px}
+  .page-header{padding:16px 16px 0}
+  .page-content{padding:16px 16px 32px}
+  .grid-2{grid-template-columns:1fr}
+  .kpi-grid{grid-template-columns:1fr 1fr}
+  .kanban{grid-template-columns:1fr}
+  #nfc-search-row{grid-template-columns:1fr}
+  /* Bottom-bar : 4 pages + Plus ; les 3 autres passent dans le sheet */
+  .nav-item.nav-extra{display:none}
+  .sidebar-nav{overflow-x:hidden}
+  /* Cibles tactiles ≥44px */
+  .btn{min-height:44px}
+  .nav-item{min-height:48px}
+  .seg-btn{min-height:44px}
+  input,select,textarea{font-size:16px}
+  .form-input,.form-select,.form-textarea{font-size:16px}
+  .row-del,.gantt-del{min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;font-size:1.1rem}
+  /* Modales : hauteur dynamique + actions sticky bottom (clavier iOS) */
+  .modal{max-height:90vh;max-height:100dvh;padding-top:env(safe-area-inset-top,0px)}
+  .modal-actions{position:sticky;bottom:0;background:var(--surface);border-top:1px solid var(--border);margin-top:18px;padding:12px 0 calc(12px + env(safe-area-inset-bottom,0px));border-radius:0 0 var(--radius) var(--radius)}
+  .modal-close{min-width:44px;min-height:44px}
+  /* Toast au-dessus de la bottom-bar (et du sheet : z-300 > z-200) */
+  .toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+  /* Bannière install : compacte, sous le sheet, au-dessus de la bottom-bar */
+  #install-banner{flex-wrap:wrap;gap:8px;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px))!important;font-size:.8125rem;z-index:120!important;bottom:calc(76px + env(safe-area-inset-bottom,0px))!important;box-shadow:0 -2px 8px rgba(0,0,0,.25)}
+  #install-banner button{min-height:44px;padding:8px 14px}
+  /* Planning mobile : cartes par mois à la place du Gantt */
+  .planning-desktop{display:none}
+  .planning-mobile{display:flex;flex-direction:column}
+  /* Parc vitrines mobile : cartes à la place de la table */
+  .vitrines-desktop{display:none}
+  .vitrines-mobile{display:flex;flex-direction:column;gap:10px}
+  /* Zone NFC/série repliée par défaut en mobile */
+  #nfc-toggle{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:48px;padding:10px 14px;margin-bottom:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:.875rem;font-weight:600;font-family:var(--font-body);color:var(--fg)}
+  #nfc-zone[hidden]{display:none}
+  #nfc-search-row[hidden]{display:none}
+  /* Résultats recherche-série : cartes à la place de la table */
+  .serial-desktop{display:none}
+  .serial-mobile{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+  /* Trésorerie / Ventes / Lieux / Dernières opérations : cartes à la place des tables */
+  .treso-desktop,.ventes-desktop,.lieux-desktop,.dashflux-desktop{display:none}
+  .treso-mobile,.ventes-mobile,.lieux-mobile,.dashflux-mobile{display:flex;flex-direction:column;gap:10px}
+  .treso-mobile,.ventes-mobile,.lieux-mobile{padding:12px 16px}
+  /* Alertes + résas tappables : cible tactile ≥44px */
+  button.alert-item,.dash-tap{min-height:48px}
+  /* Fiche vitrine : Retour ≥44px */
+  .back-btn{min-height:44px;padding:10px 0;margin-bottom:8px}
+  /* Fiche vitrine : 5 boutons empilés pleine largeur, Supprimer séparé */
+  .vd-actions{display:grid;grid-template-columns:1fr;gap:10px;flex-wrap:nowrap}
+  .vd-actions .btn{width:100%;min-height:48px;justify-content:center}
+  .vd-actions .btn-danger{margin-top:14px}
+  /* Fiche vitrine : carte NFC compacte en ligne (ne pousse pas l'historique sous le fold) */
+  .vd-nfc{flex-direction:row;gap:14px;justify-content:flex-start;text-align:left;padding:2px 0}
+  .vd-nfc svg{width:40px;height:40px;flex-shrink:0}
+  .vd-nfc-title{font-family:var(--font-display);font-size:1.25rem;font-weight:700;color:var(--accent-fg)}
+  /* Fiche vitrine : réservations en cartes tappables → showBooking */
+  .vd-res-desktop{display:none}
+  .vd-res-mobile{display:flex;flex-direction:column;gap:10px}
+  .vd-res-card .row-del{align-self:flex-end}
+  /* Actions : checkbox Fait en cible ≥44px (label = texte de l'action) */
+  #actionsTable label.act-check{display:flex;align-items:center;gap:10px;min-height:48px;cursor:pointer;padding:4px 0}
+  #actionsTable input.act-box{width:20px;height:20px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+}
+@media (max-width:400px){
+  .kpi-grid{grid-template-columns:1fr}
+  .toolbar{flex-direction:column;align-items:stretch}
+}
+
+/* Statuts auto (réservations) */
+.badge-reservee{background:var(--info-bg);color:var(--info-fg)}
+
+/* Badges compte encaisseur */
+.qui-b{background:var(--info-bg);color:var(--info-fg)}
+.qui-o{background:var(--warn-bg);color:var(--warn-fg)}
+
+/* Planning : vue desktop (Gantt) vs mobile (cartes par mois) */
+@media (min-width:769px){
+.planning-desktop{display:block}
+.planning-mobile{display:none}
+}
+.pl-month{padding:14px 16px;margin-bottom:12px}
+.pl-month.is-now{border-color:var(--accent)}
+.pl-month-title{font-family:var(--font-display);font-size:.8125rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--fg-muted);margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pl-line{display:flex;align-items:center;gap:10px;width:100%;min-height:48px;padding:10px 0;background:none;border:none;text-align:left;font-family:var(--font-body);cursor:pointer}
+.pl-line + .pl-line{border-top:1px solid var(--border-light)}
+.pl-line-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.pl-line-vitrine{font-size:.875rem;font-weight:600;color:var(--accent-fg);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pl-line-client{font-size:.75rem;color:var(--fg-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pl-line-right{text-align:right;flex-shrink:0;display:flex;flex-direction:column;gap:4px;align-items:flex-end}
+.pl-line-montant{font-size:.875rem;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pl-line-badges{display:flex;gap:4px;justify-content:flex-end;flex-wrap:wrap}
+
+/* Parc vitrines : vue desktop (table) vs mobile (cartes) */
+@media (min-width:769px){
+.vitrines-desktop,.serial-desktop{display:block}
+.vitrines-mobile,.serial-mobile{display:none}
+}
+.vit-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px;min-height:48px;display:flex;flex-direction:column;gap:4px;cursor:pointer;font-family:var(--font-body);text-align:left;width:100%}
+.vit-card:active{background:var(--surface-alt)}
+.vit-card-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.vit-card-id{font-family:monospace;font-weight:600;color:var(--accent-fg);font-size:.875rem}
+.vit-card-model{font-size:.875rem;color:var(--fg);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vit-card-sub{font-size:.75rem;color:var(--fg-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* Tables desktop vs cartes mobile : trésorerie / ventes / lieux / dashboard-flux */
+@media (min-width:769px){
+.treso-desktop,.ventes-desktop,.lieux-desktop,.dashflux-desktop{display:block}
+.treso-mobile,.ventes-mobile,.lieux-mobile,.dashflux-mobile{display:none}
+}
+/* Alertes + résas du dashboard tappables (les 2 vues) */
+button.alert-item{border:none;background:none;cursor:pointer;text-align:left;font-family:var(--font-body);color:var(--fg);width:100%}
+.dash-tap{width:100%;text-align:left;cursor:pointer;background:none;border:none;border-bottom:1px solid var(--border-light);font-family:var(--font-body);color:var(--fg)}
+.dash-tap:last-child{border-bottom:none}
+.dash-tap:hover{background:var(--surface-alt)}
+.m-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px;min-height:48px;display:flex;flex-direction:column;gap:6px}
+.m-card-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.m-card-title{font-size:.875rem;font-weight:600;color:var(--fg);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.m-card-sub{font-size:.75rem;color:var(--fg-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.m-card-amount{font-size:1rem;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.m-actions{display:flex;gap:8px;margin-top:4px}
+.m-actions .btn{flex:1}
+/* Zone NFC/série repliable en mobile */
+#nfc-toggle{display:none}
+
+/* Erreur in-modal (conflits de réservation) */
+.form-error{background:var(--danger-bg);color:var(--danger-fg);border-radius:var(--radius-sm);padding:10px 12px;font-size:.8125rem;font-weight:500;margin-top:12px}
+
+/* Toggle Ma caisse / Toutes les caisses */
+.seg-toggle{display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--surface)}
+.seg-btn{padding:8px 18px;background:none;border:none;font-size:.8125rem;font-weight:600;cursor:pointer;color:var(--fg-muted);font-family:var(--font-body)}
+.seg-btn:hover{color:var(--fg)}
+.seg-btn.active{background:var(--accent);color:#fff}
+
+/* Écran de connexion */
+.login-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-md);padding:28px 24px;width:100%;max-width:400px;margin:auto}
+.login-btn{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);cursor:pointer;font-size:.9375rem;font-family:var(--font-body);color:var(--fg);margin-bottom:10px;text-align:left;transition:border-color .15s,background .15s}
+.login-btn:hover{border-color:var(--accent);background:var(--accent-bg)}
+.login-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;font-family:var(--font-display)}
+@media (max-width:480px){
+  .seg-toggle{width:100%}
+  .seg-btn{flex:1;padding:10px}
+  .login-card{padding:22px 16px;max-width:calc(100vw - 32px)}
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="2" y="6" width="24" height="16" rx="3" stroke="currentColor" stroke-width="2" fill="var(--accent-bg)"/><path d="M2 11h24" stroke="var(--accent)" stroke-width="1.5"/><circle cx="14" cy="17" r="2" fill="var(--accent)"/><path d="M10 4v3M18 4v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <span>VitriTrack</span>
+  </div>
+  <nav class="sidebar-nav" id="nav">
+    <button class="nav-item active" data-page="dashboard">
+      <svg viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="2" width="7" height="4" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="8" width="7" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5"/></svg>
+      Tableau de bord
+    </button>
+    <button class="nav-item" data-page="vitrines">
+      <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M3 8h14" stroke="currentColor" stroke-width="1.5"/><path d="M8 16v2M12 16v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Parc vitrines
+    </button>
+    <button class="nav-item" data-page="planning">
+      <svg viewBox="0 0 20 20" fill="none"><rect x="2" y="3" width="16" height="15" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M2 8h16M7 2v3M13 2v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Planning
+    </button>
+    <button class="nav-item" data-page="tresorerie">
+      <svg viewBox="0 0 20 20" fill="none"><rect x="2" y="5" width="16" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M5 8v4M15 8v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Trésorerie
+    </button>
+    <button class="nav-item nav-extra" data-page="ventes">
+      <svg viewBox="0 0 20 20" fill="none"><path d="M10 2l2.4 4.9 5.4.8-3.9 3.8.9 5.4L10 14.4l-4.8 2.5.9-5.4L2.2 7.7l5.4-.8L10 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      Ventes
+    </button>
+    <button class="nav-item nav-extra" data-page="lieux">
+      <svg viewBox="0 0 20 20" fill="none"><path d="M10 18s6-5.2 6-10a6 6 0 10-12 0c0 4.8 6 10 6 10z" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="8" r="2.2" stroke="currentColor" stroke-width="1.5"/></svg>
+      Lieux de stockage
+    </button>
+    <button class="nav-item nav-extra" data-page="actions">
+      <svg viewBox="0 0 20 20" fill="none"><path d="M4 3h12v14H4z" stroke="currentColor" stroke-width="1.5"/><path d="M7 7h6M7 10h6M7 13h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Actions
+    </button>
+    <button class="nav-item" id="nav-more" type="button" aria-label="Plus d'options" style="display:none">
+      <svg viewBox="0 0 20 20" fill="none"><circle cx="5" cy="10" r="1.6" fill="currentColor"/><circle cx="10" cy="10" r="1.6" fill="currentColor"/><circle cx="15" cy="10" r="1.6" fill="currentColor"/></svg>
+      Plus
+    </button>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="user-avatar">B</div>
+      <div>
+        <div class="sidebar-user-name" id="user-name">Bilel</div>
+        <div class="sidebar-user-role" id="user-role">Associé</div>
+      </div>
+      <button class="btn btn-secondary btn-sm" style="margin-left:auto" onclick="logout()" title="Se déconnecter">Déconnexion</button>
+    </div>
+    <button class="btn btn-primary" onclick="showInstallBanner()" style="width:100%;margin-bottom:8px;padding:10px;font-size:.8125rem">
+      <svg width="16" height="16" viewBox="0 0 20 20" fill="none" style="vertical-align:-3px;margin-right:4px"><path d="M10 3v10M6 9l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 15h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Installer l'app
+    </button>
+    <button class="reset-link" onclick="resetDemo()">Réinitialiser la démo (données Excel)</button>
+  </div>
+</div>
+
+<!-- Bottom sheet « Plus » (mobile) -->
+<div id="more-overlay" hidden onclick="closeMoreSheet()"></div>
+<div id="more-sheet" role="dialog" aria-label="Plus d'options">
+  <div class="sheet-grabber"></div>
+  <button class="sheet-item" onclick="closeMoreSheet();showPage('ventes')">
+    <svg viewBox="0 0 20 20" fill="none"><path d="M10 2l2.4 4.9 5.4.8-3.9 3.8.9 5.4L10 14.4l-4.8 2.5.9-5.4L2.2 7.7l5.4-.8L10 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+    Ventes
+  </button>
+  <button class="sheet-item" onclick="closeMoreSheet();showPage('lieux')">
+    <svg viewBox="0 0 20 20" fill="none"><path d="M10 18s6-5.2 6-10a6 6 0 10-12 0c0 4.8 6 10 6 10z" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="8" r="2.2" stroke="currentColor" stroke-width="1.5"/></svg>
+    Lieux de stockage
+  </button>
+  <button class="sheet-item" onclick="closeMoreSheet();showPage('actions')">
+    <svg viewBox="0 0 20 20" fill="none"><path d="M4 3h12v14H4z" stroke="currentColor" stroke-width="1.5"/><path d="M7 7h6M7 10h6M7 13h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    Actions
+  </button>
+  <div class="sheet-sep"></div>
+  <div class="sheet-user">
+    <div class="sidebar-avatar" id="sheet-avatar">B</div>
+    <div>
+      <div class="sheet-user-name" id="sheet-name">Bilel</div>
+      <div class="sheet-user-role" id="sheet-role">Associé</div>
+    </div>
+  </div>
+  <button class="sheet-item" onclick="closeMoreSheet();showInstallBanner()">
+    <svg viewBox="0 0 20 20" fill="none"><path d="M10 3v10M6 9l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 15h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    Installer l'app
+  </button>
+  <button class="sheet-item" onclick="closeMoreSheet();resetDemo()">
+    <svg viewBox="0 0 20 20" fill="none"><path d="M4 12a8 8 0 1 1 1.5 4.7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M4 17v-4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Réinitialiser la démo
+  </button>
+  <button class="sheet-item sheet-danger" onclick="closeMoreSheet();logout()">
+    <svg viewBox="0 0 20 20" fill="none"><path d="M12 3H5v14h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 10h8M14 6.5L17.5 10 14 13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Déconnexion
+  </button>
+</div>
+
+<!-- Install banner -->
+<div id="install-banner" hidden style="position:fixed;bottom:0;left:0;right:0;z-index:999;background:var(--accent);color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:center;gap:12px;font-size:.875rem;font-weight:500;box-shadow:0 -2px 12px rgba(0,0,0,.3)">
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 3v10M6 9l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 15h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+  <span>Installez VitriTrack sur votre iPhone pour accéder au scan NFC</span>
+  <button onclick="document.getElementById('install-banner').hidden=true" style="background:rgba(255,255,255,.2);border:none;color:#fff;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:.8125rem">Plus tard</button>
+  <button onclick="showInstallHelp()" style="background:#fff;border:none;color:var(--accent);padding:6px 14px;border-radius:6px;cursor:pointer;font-weight:600;font-size:.8125rem">Installer</button>
+</div>
+
+<div class="main">
+
+<!-- DASHBOARD -->
+<div class="page-section active" id="page-dashboard">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Tableau de bord</h1>
+      <div class="page-sub">Saison 2026-2027 · données réelles</div>
+    </div>
+  </div>
+  <div class="page-content">
+    <div class="kpi-grid">
+      <div class="card kpi">
+        <div class="kpi-label">CA Location (objectif 70k)</div>
+        <div class="kpi-value" id="kpi-ca">—</div>
+        <div class="progress" style="margin-top:6px"><div class="progress-fill" id="kpi-ca-bar"></div></div>
+        <div class="kpi-sub" id="kpi-ca-sub">—</div>
+      </div>
+      <div class="card kpi">
+        <div class="kpi-label">Trésorerie de la saison</div>
+        <div class="kpi-value" id="kpi-treso">—</div>
+        <div class="kpi-sub" id="kpi-treso-sub">—</div>
+      </div>
+      <div class="card kpi">
+        <div class="kpi-label">Vitrines en vacance</div>
+        <div class="kpi-value" id="kpi-vacance">—</div>
+        <div class="kpi-sub" id="kpi-vacance-sub">sur le parc total</div>
+      </div>
+      <div class="card kpi">
+        <div class="kpi-label">Valeur du parc</div>
+        <div class="kpi-value" id="kpi-parc">—</div>
+        <div class="kpi-sub" id="kpi-parc-sub">—</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Trésorerie par associé</div>
+        <div id="dash-associes"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Prochaines réservations</div>
+        <div id="dash-bookings"></div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Dernières opérations</div>
+        <div class="table-wrap dashflux-desktop"><table><tbody id="dash-flux"></tbody></table></div>
+        <div class="dashflux-mobile" id="dashflux-mobile"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Répartition du parc par lieu</div>
+        <div id="dash-lieux"></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Alertes &amp; points d'attention</div>
+        <div id="dash-alerts"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VITRINES -->
+<div class="page-section" id="page-vitrines">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Parc vitrines</h1>
+      <div class="page-sub" id="parc-count">—</div>
+    </div>
+    <button class="btn btn-primary" onclick="formVitrine()">+ Ajouter une vitrine</button>
+  </div>
+  <div class="page-content">
+    <div class="toolbar">
+      <div class="search-wrap">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <input class="search-input" type="text" placeholder="Modèle, lieu, commentaire..." id="vitrineSearch" oninput="filterVitrines()">
+      </div>
+      <select id="lieuFilter" onchange="filterVitrines()"><option value="">Tous les lieux</option></select>
+      <select id="etatFilter" onchange="filterVitrines()">
+        <option value="">Tous les états</option>
+        <option value="fonctionnelle">Fonctionnelle</option>
+        <option value="hs">Hors service</option>
+        <option value="vendu">Vendu</option>
+      </select>
+    </div>
+
+    <!-- Recherche par série + Scan NFC (repliable en mobile) -->
+    <button type="button" id="nfc-toggle" onclick="toggleNfcZone()" aria-expanded="false">Scanner / chercher par série<svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px" id="nfc-search-row" class="nfc-zone" data-zone="nfc">
+      <div class="card" style="margin:0">
+        <div class="card-title">Recherche par n° de série</div>
+        <div class="search-wrap" style="min-width:0">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <input class="search-input" type="text" placeholder="V-001, série, NFC-..." id="serialSearch" oninput="searchSerial()">
+        </div>
+        <div id="serial-results" style="margin-top:12px"></div>
+      </div>
+      <div class="card" id="scan-container" style="margin:0;display:flex;flex-direction:column;align-items:center;text-align:center;justify-content:center">
+        <svg width="48" height="48" viewBox="0 0 60 60" fill="none" style="color:var(--accent);margin-bottom:8px">
+          <rect x="8" y="12" width="44" height="36" rx="4" stroke="currentColor" stroke-width="2.5"/>
+          <path d="M8 22h44" stroke="currentColor" stroke-width="2"/>
+          <circle cx="30" cy="34" r="6" stroke="currentColor" stroke-width="2"/>
+          <path d="M20 6v8M40 6v8" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <div style="font-family:var(--font-display);font-size:1rem;font-weight:600;margin-bottom:4px">Scan NFC</div>
+        <div style="font-size:.8125rem;color:var(--fg-muted);margin-bottom:12px">Approchez le badge NFC :</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+          <button class="btn btn-primary" onclick="simulateScan(false)" style="padding:10px 16px;font-size:.8125rem">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" style="vertical-align:-2px"><rect x="3" y="4" width="14" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M3 8h14" stroke="currentColor" stroke-width="1.5"/></svg>
+            Existante
+          </button>
+          <button class="btn btn-secondary" onclick="simulateScan(true)" style="padding:10px 16px;font-size:.8125rem;border:2px dashed var(--accent);color:var(--accent-fg)">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" style="vertical-align:-2px"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Nouveau batch
+          </button>
+        </div>
+      </div>
+    </div>
+    <div id="scan-result" hidden style="margin-bottom:16px"></div>
+
+    <div class="card vitrines-desktop" style="padding:0;overflow:hidden">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>N° série</th><th>Modèle</th><th>Valeur</th><th>Lieu actuel</th><th>État</th><th></th></tr></thead>
+          <tbody id="vitrinesTable"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="vitrines-mobile" id="vitrines-mobile"></div>
+  </div>
+</div>
+
+<!-- VITRINE DETAIL -->
+<div class="page-section" id="page-vitrine-detail">
+  <div class="page-header"><h1 class="page-title" id="detail-title">Vitrine</h1></div>
+  <div class="page-content">
+    <button class="back-btn" onclick="showPage('vitrines')">&#8592; Retour au parc</button>
+    <div id="vitrine-detail-content"></div>
+  </div>
+</div>
+
+<!-- PLANNING -->
+<div class="page-section" id="page-planning">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Planning réservations</h1>
+      <div class="page-sub">Occupation du parc · sept 2026 → août 2027</div>
+    </div>
+    <button class="btn btn-primary" onclick="formBooking()">+ Nouvelle réservation</button>
+  </div>
+  <div class="page-content">
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title" style="margin-bottom:10px">Légende</div>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:.75rem;align-items:center">
+        <span style="display:inline-flex;align-items:center;gap:6px"><span class="gantt-seg" style="position:static;display:inline-block;width:14px;background:var(--accent)"></span> Réservé</span>
+        <span style="display:inline-flex;align-items:center;gap:6px"><span class="gantt-seg" style="position:static;display:inline-block;width:14px;background:var(--warn)"></span> Maintenance</span>
+      </div>
+    </div>
+    <div class="card planning-desktop">
+      <div class="gantt"><div class="gantt-inner" id="gantt"></div></div>
+    </div>
+    <div class="planning-mobile" id="planning-mobile"></div>
+  </div>
+</div>
+
+<!-- TRÉSORERIE -->
+<div class="page-section" id="page-tresorerie">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Trésorerie — Entrées / Sorties</h1>
+      <div class="page-sub">Suivi par associé · Bilel &amp; Oussama</div>
+    </div>
+    <button class="btn btn-primary" onclick="formFlux()">+ Nouvelle opération</button>
+  </div>
+  <div class="page-content">
+    <div class="toolbar" style="margin-bottom:16px">
+      <div class="seg-toggle" role="tablist">
+        <button class="seg-btn active" id="treso-tab-mine" onclick="setTresoView('mine')">Ma caisse</button>
+        <button class="seg-btn" id="treso-tab-all" onclick="setTresoView('all')">Toutes les caisses</button>
+      </div>
+      <select id="treso-qui-filter" onchange="renderTresorerie()">
+        <option value="">Tous les comptes</option>
+        <option value="Bilel">Bilel</option>
+        <option value="Oussama">Oussama</option>
+      </select>
+    </div>
+    <div class="kpi-grid" id="treso-kpis"></div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+        <div class="card-title" style="margin:0" id="treso-journal-title">Journal des opérations</div>
+        <div style="font-size:.75rem;color:var(--fg-muted)" id="treso-journal-sub"></div>
+      </div>
+      <div class="table-wrap treso-desktop">
+        <table>
+          <thead><tr><th>Entrée</th><th>Sortie</th><th>Qui</th><th>Client / Fournisseur</th><th>Mois</th><th>Commentaire</th><th></th></tr></thead>
+          <tbody id="fluxTable"></tbody>
+        </table>
+      </div>
+      <div class="treso-mobile" id="treso-mobile"></div>
+    </div>
+  </div>
+</div>
+
+<!-- VENTES -->
+<div class="page-section" id="page-ventes">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Ventes de vitrines</h1>
+      <div class="page-sub">Achat / revente · plus-values dégagées</div>
+    </div>
+    <button class="btn btn-primary" onclick="formVente()">+ Enregistrer une vente</button>
+  </div>
+  <div class="page-content">
+    <div class="kpi-grid">
+      <div class="card kpi"><div class="kpi-label">CA Vente (objectif 20k)</div><div class="kpi-value" id="vente-ca">—</div></div>
+      <div class="card kpi"><div class="kpi-label">Plus-value totale</div><div class="kpi-value" style="color:var(--success)" id="vente-gain">—</div></div>
+      <div class="card kpi"><div class="kpi-label">Vitrines vendues</div><div class="kpi-value" id="vente-n">—</div></div>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <div class="table-wrap ventes-desktop">
+        <table>
+          <thead><tr><th>Vitrine</th><th>Acheté</th><th>Revendu</th><th>Dépenses</th><th>Plus-value</th><th>Marge</th><th>Encaissé par</th><th></th></tr></thead>
+          <tbody id="ventesTable"></tbody>
+        </table>
+      </div>
+      <div class="ventes-mobile" id="ventes-mobile"></div>
+    </div>
+  </div>
+</div>
+
+<!-- LIEUX -->
+<div class="page-section" id="page-lieux">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Lieux de stockage</h1>
+      <div class="page-sub" id="lieux-count">—</div>
+    </div>
+    <button class="btn btn-primary" onclick="formLieu()">+ Ajouter un lieu</button>
+  </div>
+  <div class="page-content">
+    <div class="card" style="padding:0;overflow:hidden">
+      <div class="table-wrap lieux-desktop">
+        <table>
+          <thead><tr><th>Lieu</th><th>Type</th><th>Vitrines rangées</th><th>Note</th><th></th></tr></thead>
+          <tbody id="lieuxTable"></tbody>
+        </table>
+      </div>
+      <div class="lieux-mobile" id="lieux-mobile"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ACTIONS -->
+<div class="page-section" id="page-actions">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Liste des actions</h1>
+      <div class="page-sub">Tâches opérationnelles du parc</div>
+    </div>
+    <button class="btn btn-primary" onclick="formAction()">+ Nouvelle action</button>
+  </div>
+  <div class="page-content">
+    <div class="card" style="padding:0;overflow:hidden">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th style="width:36px"></th><th>Action</th><th>Commentaire</th><th>Statut</th><th></th></tr></thead>
+          <tbody id="actionsTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCAN NFC -->
+
+</div>
+
+<!-- Modal + toast -->
+<div class="modal-overlay" id="modal-overlay" hidden onclick="if(event.target===this)closeModal()">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <div class="modal-title" id="modal-title"></div>
+      <button class="modal-close" onclick="closeModal()" aria-label="Fermer">&times;</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<!-- Écran de connexion -->
+<div id="login-overlay" hidden style="position:fixed;inset:0;z-index:500;background:var(--bg);display:flex;overflow-y:auto;padding:24px 16px">
+  <div class="login-card">
+    <div style="display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:8px">
+      <svg width="40" height="40" viewBox="0 0 28 28" fill="none"><rect x="2" y="6" width="24" height="16" rx="3" stroke="currentColor" stroke-width="2" fill="var(--accent-bg)"/><path d="M2 11h24" stroke="var(--accent)" stroke-width="1.5"/><circle cx="14" cy="17" r="2" fill="var(--accent)"/><path d="M10 4v3M18 4v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span style="font-family:var(--font-display);font-weight:700;font-size:1.75rem;color:var(--accent)">VitriTrack</span>
+    </div>
+    <div style="text-align:center;font-size:.8125rem;color:var(--fg-muted);margin-bottom:22px">Gestion des vitrines réfrigérantes · Bilel &amp; Oussama</div>
+    <button class="login-btn" onclick="loginAs('Bilel')">
+      <span class="login-avatar" style="background:var(--info-bg);color:var(--info-fg)">B</span>
+      <span><strong style="display:block">Se connecter en tant que Bilel</strong><span style="font-size:.75rem;color:var(--fg-muted)">bilel@vitritrack.fr</span></span>
+    </button>
+    <button class="login-btn" onclick="loginAs('Oussama')">
+      <span class="login-avatar" style="background:var(--warn-bg);color:var(--warn-fg)">O</span>
+      <span><strong style="display:block">Se connecter en tant que Oussama</strong><span style="font-size:.75rem;color:var(--fg-muted)">oussama@vitritrack.fr</span></span>
+    </button>
+    <div style="text-align:center;font-size:.75rem;color:var(--fg-faint);margin:18px 0 12px;display:flex;align-items:center;gap:10px"><span style="flex:1;height:1px;background:var(--border)"></span>ou par email<span style="flex:1;height:1px;background:var(--border)"></span></div>
+    <form onsubmit="loginByEmail(event)">
+      <div class="form-group"><label class="form-label" for="login-email">Email</label>
+      <input class="form-input" id="login-email" type="email" required placeholder="bilel@vitritrack.fr"></div>
+      <div class="form-group"><label class="form-label" for="login-pass">Mot de passe</label>
+      <input class="form-input" id="login-pass" type="password" required placeholder="••••••••"></div>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center">Se connecter</button>
+    </form>
+  </div>
+</div>
+
+<script>
+const DATA = {"vitrines":[{"id":"V-001","model":"vitrine non pliante pedro 1","reparation":0,"prix":300,"commentaire":"fonctionnelle","fonctionnelle":null,"lieu":"local orsay"},{"id":"V-002","model":"vitrine non pliante pedro 2","reparation":0,"prix":300,"commentaire":"fonctionnelle","fonctionnelle":null,"lieu":"local orsay"},{"id":"V-003","model":"vitrine non pliante pedro 3","reparation":0,"prix":300,"commentaire":"fonctionnelle","fonctionnelle":null,"lieu":"local orsay"},{"id":"V-004","model":"vitrine non pliante pedro 4","reparation":0,"prix":300,"commentaire":"fonctionnelle","fonctionnelle":null,"lieu":"local orsay"},{"id":"V-005","model":"vitrine non pliante pedro 5","reparation":0,"prix":300,"commentaire":"fonctionnelle","fonctionnelle":null,"lieu":"local orsay"},{"id":"V-006","model":"vitrine non pliante marocain","reparation":0,"prix":400,"commentaire":"fonctionnelle","fonctionnelle":null,"lieu":"local orsay"},{"id":"V-007","model":"Vitrine Elite Froid 2m (bougival)","reparation":0,"prix":1500,"commentaire":"souffle 2 degrés","fonctionnelle":true,"lieu":"local trappes"},{"id":"V-008","model":"Vitrine Elite Froid 2m bache rouge 1","reparation":0,"prix":null,"commentaire":"","fonctionnelle":true,"lieu":"mairie massy"},{"id":"V-009","model":"Vitrine Elite Froid 2m bache rouge 2","reparation":0,"prix":null,"commentaire":"","fonctionnelle":true,"lieu":"mairie massy"},{"id":"V-010","model":"Vitrine Elite Froid 2m bache rouge 3","reparation":1500,"prix":null,"commentaire":"","fonctionnelle":true,"lieu":"lola"},{"id":"V-011","model":"Vitrine Elite Froid 2m (marseille)","reparation":0,"prix":1500,"commentaire":"²","fonctionnelle":true,"lieu":"local trappes"},{"id":"V-012","model":"Vitrine Elite Froid 2m (Pedro)","reparation":0,"prix":1000,"commentaire":"","fonctionnelle":true,"lieu":"local trappes"},{"id":"V-013","model":"Vitrine Elite Froid 2m (sans vitre)","reparation":0,"prix":1500,"commentaire":"","fonctionnelle":null,"lieu":"chez kouzinah"},{"id":"V-014","model":"Vitrine Elite Froid 2m (sans vitre)","reparation":0,"prix":1500,"commentaire":"","fonctionnelle":null,"lieu":"chez kouzinah"},{"id":"V-015","model":"Vitrine verticale (1m)","reparation":0,"prix":280,"commentaire":"","fonctionnelle":null,"lieu":"non rendu azalé"},{"id":"V-016","model":"Vitrine verticale ronde (1m)","reparation":0,"prix":300,"commentaire":"","fonctionnelle":true,"lieu":"local trappes"},{"id":"V-017","model":"Vitrine verticale ronde (1m)","reparation":0,"prix":300,"commentaire":"","fonctionnelle":null,"lieu":"local orsay"},{"id":"V-018","model":"Vitrine Elite froid 1.5 m","reparation":0,"prix":1600,"commentaire":"","fonctionnelle":null,"lieu":"massy?"},{"id":"V-019","model":"Vitrine Elite froid 1 m rouge","reparation":0,"prix":null,"commentaire":"","fonctionnelle":true,"lieu":"local orsay"},{"id":"V-020","model":"Vitrine Elite froid 1 m","reparation":0,"prix":500,"commentaire":"","fonctionnelle":true,"lieu":"local trappes"},{"id":"V-021","model":"Vitrine PSV marocain 1","reparation":0,"prix":1250,"commentaire":"condenseur à changer, 12 degrés","fonctionnelle":false,"lieu":"local trappes"},{"id":"V-022","model":"Vitrine PSV marocain 2","reparation":0,"prix":1250,"commentaire":"condenseur neuf, 3 degrés en vente pour libanais souheile","fonctionnelle":true,"lieu":"local trappes"},{"id":"V-023","model":"Vitrine PSV portugais 1","reparation":0,"prix":1000,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-024","model":"Vitrine PSV portugais 2","reparation":0,"prix":1000,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-025","model":"Vitrine PSV portugais 3 (ex KO)","reparation":0,"prix":1000,"commentaire":"condenseur neuf 7 degrés, manque vitre, vitre remise et temperature 3 degré en vente pour souheil le libanais","fonctionnelle":true,"lieu":"local trappes"},{"id":"V-026","model":"vitrine poisson vendu 1800","reparation":0,"prix":1750,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-027","model":"vitrine poisson vendu 1800","reparation":0,"prix":1750,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-028","model":"Vitrine Elite froid 2m frigoriste","reparation":0,"prix":2200,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-029","model":"Vitrine Elite froid 2m Martiniquaise","reparation":0,"prix":1600,"commentaire":"manque pied 6 degrés","fonctionnelle":null,"lieu":"local trappes"},{"id":"V-030","model":"PSV 2021 ITALIEN","reparation":0,"prix":1400,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-031","model":"PSV 2021 ITALIEN","reparation":0,"prix":1400,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-032","model":"PSV 2015 ITALIEN","reparation":0,"prix":1400,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-033","model":"PSV ITALIEN (vitre + compresseur) vendu 2200","reparation":0,"prix":1400,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-034","model":"PSV ITALIEN (vitre + compresseur) vendu 2200","reparation":0,"prix":1400,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-035","model":"PSV 1","reparation":0,"prix":1500,"commentaire":"","fonctionnelle":null,"lieu":"Adeline"},{"id":"V-036","model":"PSV 2","reparation":0,"prix":1500,"commentaire":"","fonctionnelle":null,"lieu":"Adeline"},{"id":"V-037","model":"PSV 3","reparation":0,"prix":1500,"commentaire":"","fonctionnelle":null,"lieu":"Adeline"},{"id":"V-038","model":"PSV 4","reparation":0,"prix":1500,"commentaire":"","fonctionnelle":null,"lieu":"Adeline"},{"id":"V-039","model":"PSV 5","reparation":0,"prix":1500,"commentaire":"","fonctionnelle":null,"lieu":"Adeline"},{"id":"V-040","model":"PSV 6","reparation":0,"prix":1500,"commentaire":"","fonctionnelle":null,"lieu":"Adeline"},{"id":"V-041","model":"PSV ancienne digital","reparation":0,"prix":500,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-042","model":"PSV ancienne digital","reparation":0,"prix":500,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-043","model":"PSV Chanteloup 1","reparation":0,"prix":500,"commentaire":"condenseur à changer, viens de massy","fonctionnelle":false,"lieu":"local trappes"},{"id":"V-044","model":"PSV Chanteloup 2","reparation":0,"prix":500,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-045","model":"PSV Chanteloup 3","reparation":0,"prix":500,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-046","model":"PSV soudé","reparation":0,"prix":1000,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-047","model":"Elite froid boisy st leger 1","reparation":0,"prix":2250,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-048","model":"Elite froid boisy st leger 2","reparation":0,"prix":2250,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-049","model":"Vitrine PSV Boulanger reil","reparation":0,"prix":1550,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-050","model":"Vitrine 1,5m Stéfanon Libanais","reparation":0,"prix":1950,"commentaire":"","fonctionnelle":null,"lieu":"massy? Ou vendu?"},{"id":"V-051","model":"Vitrine 2m Antillaise (compresseur Ko)","reparation":0,"prix":900,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-052","model":"Vitrine 2m De bougival","reparation":0,"prix":2200,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-053","model":"Vitrine 2m EF De normandie","reparation":0,"prix":900,"commentaire":"souffle -1 degrés","fonctionnelle":true,"lieu":"local trappes"},{"id":"V-054","model":"Vitrine 2m EF De normandie","reparation":0,"prix":900,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-055","model":"Vitrine 2m EF De normandie","reparation":0,"prix":900,"commentaire":"3 degré","fonctionnelle":true,"lieu":"local trappes"},{"id":"V-056","model":"Vitrine 1,5m PSV","reparation":0,"prix":1200,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-057","model":"PSV 2m Kamel (vendu)","reparation":0,"prix":400,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-058","model":"PSV 2m Kamel","reparation":0,"prix":400,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-059","model":"Ancienne EF modele 1","reparation":0,"prix":400,"commentaire":"","fonctionnelle":null,"lieu":"ou? Vendu?"},{"id":"V-060","model":"Ancienne EF modele 1","reparation":0,"prix":0,"commentaire":"","fonctionnelle":true,"lieu":"local trappes"},{"id":"V-061","model":"PSV neuf trappes 1","reparation":0,"prix":1500,"commentaire":"","fonctionnelle":null,"lieu":"dreux alexandre"},{"id":"V-062","model":"PSV neuf trappes 2","reparation":0,"prix":1500,"commentaire":"","fonctionnelle":null,"lieu":"dreux alexandre"},{"id":"V-063","model":"PSV neuf trappes 3","reparation":0,"prix":1500,"commentaire":"","fonctionnelle":null,"lieu":"dreux alexandre"},{"id":"V-064","model":"Ancienne EF modele 1 à vendre cassé","reparation":0,"prix":0,"commentaire":"","fonctionnelle":true,"lieu":"local trappes"}],"flux":[{"in":null,"out":120,"qui":"Oussama","client":"Sabrina","isTransport":false,"isAchat":false,"mois":"Septembre","comm":"Nettoyage pour salon du mariage + d'autres vitrines"},{"in":null,"out":180,"qui":"Oussama","client":"Total essence","isTransport":false,"isAchat":false,"mois":"Septembre","comm":"Plein camion Bleue"},{"in":null,"out":40,"qui":"Oussama","client":"Mécano","isTransport":false,"isAchat":false,"mois":"Septembre","comm":"Diagnostic camion blanc"},{"in":400,"out":null,"qui":"Oussama","client":"Ekolo (traiteur congolaise)","isTransport":false,"isAchat":false,"mois":"Septembre","comm":"Salon de la gastronomie (Traiteur congolais)"},{"in":420,"out":null,"qui":"Oussama","client":"Lecoguic","isTransport":false,"isAchat":false,"mois":"Septembre","comm":"Foire d'Antony"},{"in":383,"out":null,"qui":"Oussama","client":"Saumonerie","isTransport":false,"isAchat":false,"mois":"Septembre","comm":"Salon dans le 77, livré chez lui dans le 91480"},{"in":500,"out":null,"qui":"Bilel","client":"sarah lee","isTransport":false,"isAchat":false,"mois":"Septembre","comm":"salon mariage espece"},{"in":650,"out":null,"qui":"Oussama","client":"Sofyia Patisserie","isTransport":false,"isAchat":false,"mois":"Septembre","comm":"Salon du mariage (facture)"},{"in":null,"out":200,"qui":"Bilel","client":"salon mariage","isTransport":true,"isAchat":false,"mois":"","comm":"trappes orsay jour 1 plaisir pour essais, jour 2 trappe salon / jour 3"},{"in":200,"out":null,"qui":"Bilel","client":"stefano houdan","isTransport":false,"isAchat":false,"mois":"Septembre","comm":"fête annuelle d'houdan"},{"in":null,"out":580,"qui":"Bilel","client":"fourriere camion bleu","isTransport":false,"isAchat":false,"mois":"Septembre","comm":"fourriere 150 + transporteur 140 + pièce 150 + mecano 100 + plaque 30"},{"in":null,"out":35,"qui":"Bilel","client":"fourriere camion bleu","isTransport":false,"isAchat":false,"mois":"Septembre","comm":"amende"},{"in":null,"out":1100,"qui":"Bilel","client":"","isTransport":true,"isAchat":true,"mois":"octobre","comm":"vitrine 27"},{"in":null,"out":70,"qui":"Bilel","client":"salon antille","isTransport":false,"isAchat":false,"mois":"octobre","comm":"transport vitrine 27"},{"in":null,"out":70,"qui":"Bilel","client":"","isTransport":true,"isAchat":false,"mois":"octobre","comm":"transport vitrine rond SALON ANTILLE"},{"in":null,"out":150,"qui":"Bilel","client":"Gasoil","isTransport":false,"isAchat":false,"mois":"octobre","comm":"Gasoil camion bleu"},{"in":320,"out":null,"qui":"Bilel","client":"atelier dolce","isTransport":false,"isAchat":false,"mois":"octobre","comm":""},{"in":50,"out":null,"qui":"Bilel","client":"Zouhir","isTransport":false,"isAchat":false,"mois":"octobre","comm":"prèt vitr à massy (transport)"},{"in":null,"out":160,"qui":"Bilel","client":"","isTransport":true,"isAchat":false,"mois":"octobre","comm":"transport: matin: trapps massy aulnay puis l soir, trapps aulnay paris"},{"in":null,"out":50,"qui":"Bilel","client":"NAAMN","isTransport":false,"isAchat":false,"mois":"octobre","comm":"aid naamn journ&*é aunla massy paris + Nttoyag camion"},{"in":380,"out":null,"qui":"Oussama","client":"Sagasdom","isTransport":false,"isAchat":false,"mois":"octobre","comm":"Resto Polio"},{"in":380,"out":null,"qui":"Oussama","client":"Sagasdom","isTransport":false,"isAchat":false,"mois":"octobre","comm":"Resto Polio"},{"in":null,"out":70,"qui":"Oussama","client":"Sagasdom","isTransport":true,"isAchat":false,"mois":"octobre","comm":"Livraison à Sagasdom"}],"prospection":[{"qui":"Oh oui","quand":"30 nov-03 oct","ou":"Salon du chocolat  : Porte de Versailles","combien":600,"concretise":true},{"qui":"Ladbloue","quand":"29 - 30 Juin","ou":"Mairie de Clichy","combien":270,"concretise":true},{"qui":"Nicolas Patrick","quand":"25-28 Juillet","ou":"?","combien":890,"concretise":false},{"qui":"Cheeseroad","quand":"Longue durée","ou":"Nogent sur marnes","combien":700,"concretise":false},{"qui":"Aggeria","quand":"4 nov- 2 déc","ou":"?","combien":700,"concretise":true},{"qui":"Sandra Vitrine","quand":"Aout-??","ou":"Montpellier","combien":250,"concretise":false},{"qui":"Sarah (Sugar free)","quand":"13-22 décembre","ou":"Saint denis","combien":450,"concretise":false},{"qui":"Younes","quand":"A partir de sept / Long durée","ou":"","combien":250,"concretise":false}],"ventes":[{"vitrine":"Kabile 2m","achete":400,"vendu":2000,"depense":25},{"vitrine":"Vitrine Portugais","achete":1400,"vendu":2200,"depense":450},{"vitrine":"Vitrine Portugais","achete":1400,"vendu":2200,"depense":450},{"vitrine":"Vitrine poissonier","achete":0,"vendu":1900,"depense":0},{"vitrine":"Vitrine poissonier","achete":null,"vendu":1900,"depense":0}],"actions":[{"action":"Récupérer les barres de jonction de Nassim","comm":"Oublie dans l'enlèvement des vitrines, les barres de jonctions","statut":"Fait"},{"action":"Récupérer les LED de Yassin","comm":"Oublie dans l'enlèvement des vitrines, les LED","statut":"Fait"},{"action":"Achat de Jupe pour les 1,5m des salons de Mai et Juin","comm":"Préparer les vitrines le weekend du 27,28 Mai","statut":"Fait"},{"action":"Achat des LED pour les 1,5m des salons de Mai et Juin","comm":"Préparer les vitrines le weekend du 27,28 Mai","statut":"Fait"},{"action":"Installation des jupes de Laundry  au marché de Massy + Roue des vitrines","comm":"Préparer les jupes en amont","statut":"Fait"},{"action":"Installation des jupes de Kouzinah au marché du 15ème","comm":"Préparer les jupes en amont","statut":"Non réalisé"},{"action":"Trouver un forgeron pour fabrication de plateaux","comm":"Poster sur alloVoisin aussi ... Contacter TMIC en région parisienne","statut":"Fait"},{"action":"Acheter des roues et remplacer au moins 2 par vitrines","comm":"Pour les vitrines ayant plus 3 roues KO...","statut":"Fait"},{"action":"Acheter des vitres ELITE FROID","comm":"3 vitres Elite Froid : 2 vitres Pour la vitrine de PEDRO et 1 pour la vitrine de Erin","statut":"Non réalisé"},{"action":"Commander un compresseur","comm":"Pour la Elite froid acheter à l'antillaise","statut":"Fait"},{"action":"Préparer des jupes et LED pour vitrines de Bryan","comm":"Récupérer les barres de jonctions pour Bryan","statut":"Fait"},{"action":"Fait réviser les vitrines par Adem","comm":"Faire réviser un maximum de vitrine, en priorité les PSV de Yassin","statut":"Fait"},{"action":"Acheter plusieurs Jupe","comm":"Acheter un stock de jupe pour 2m","statut":"Fait"},{"action":"Récupérer les 2 vitrines de chez Sophie","comm":"Avec 2 plateaux et 2 LED","statut":"Fait"},{"action":"Préparer les vitrines pour le Sugar Free","comm":"Avec Plateaux et LED","statut":"Fait"},{"action":"Acheter une paire de rampe","comm":"Acheter des rampes pour le deuxième boxe","statut":"Non réalisé"},{"action":"Acheter petite vitrine pour patissière","comm":"Pour patissière et salon","statut":"Fait"},{"action":"Terminer le site internet et la page facebook","comm":"Promouvoir les 2 afin de toucher plus de potentiel client","statut":"Non réalisé"},{"action":"Investissement S2 2024","comm":"Acheter petite vitrine pour patissière","statut":"2"}]};
+
+// ===== State (localStorage) =====
+const LS_KEY = 'vitritrack_state_v1';
+let state = null;
+const COMPTES = ['Bilel','Oussama'];
+let tresoView = 'mine'; // 'mine' | 'all'
+
+function seedBookings() {
+  return [
+    {name:'Ekolo — Salon gastronomie', start:0, len:3},
+    {name:"Lecoguic — Foire d'Antony", start:0, len:1},
+    {name:'Saumonerie — Salon 77', start:0, len:1},
+    {name:'Sofyia — Salon mariage', start:0, len:1},
+    {name:'Stefano — Fête Houdan', start:0, len:1},
+    {name:'Oh oui — Salon chocolat', start:2, len:1},
+    {name:'Aggeria (longue durée)', start:2, len:2},
+    {name:'Sarah — Sugar free (déc)', start:3, len:1},
+    {name:'Laundry — Marché Massy', start:8, len:2},
+    {name:'Kouzinah — Marché 15e', start:8, len:1},
+    {name:'Maintenance préventive hivernale', start:4, len:2, maint:true},
+  ];
+}
+
+function seedLieux() {
+  return [
+    {nom:'local trappes', type:'Local associé', note:''},
+    {nom:'local orsay', type:'Local associé', note:''},
+    {nom:'Adeline', type:'Dépôt partenaire', note:''},
+    {nom:'dreux alexandre', type:'Dépôt partenaire', note:''},
+    {nom:'mairie massy', type:'Dépôt partenaire', note:'Mairie de Massy'},
+    {nom:'chez kouzinah', type:'Dépôt partenaire', note:''},
+    {nom:'lola', type:'Dépôt partenaire', note:''},
+    {nom:'non rendu azalé', type:'Incertain', note:'À récupérer'},
+    {nom:'massy?', type:'Incertain', note:''},
+    {nom:'ou? Vendu?', type:'Incertain', note:''},
+  ];
+}
+function loadState() {
+  try {
+    const s = localStorage.getItem(LS_KEY);
+    state = s ? JSON.parse(s) : JSON.parse(JSON.stringify(DATA));
+  } catch(e) {
+    state = JSON.parse(JSON.stringify(DATA));
+  }
+  if (!state.bookings) state.bookings = seedBookings();
+  if (!state.lieux) state.lieux = seedLieux();
+  if (state.user === undefined) state.user = null;
+  // Backfill : rattache chaque réservation à une vitrine + compte encaisseur
+  if (state.bookings.some(b => !b.vitrineId || !b.montant || !b.qui)) {
+    const dispo = state.vitrines.filter(v => !/vendu/i.test(v.model) && v.fonctionnelle !== false);
+    let vi = 0, qi = 0;
+    state.bookings.forEach(b => {
+      if (!b.vitrineId) {
+        const v = dispo[vi % dispo.length];
+        b.vitrineId = v ? v.id : (state.vitrines[0] && state.vitrines[0].id);
+        vi++;
+      }
+      if (b.montant == null) {
+        const v = state.vitrines.find(x => x.id === b.vitrineId);
+        b.montant = v && v.prix ? v.prix : 300;
+      }
+      if (!b.qui) b.qui = (qi++ % 2 === 0) ? 'Bilel' : 'Oussama';
+      if (b.client === undefined) b.client = b.name || '';
+    });
+  }
+}
+function saveState() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch(e) {}
+}
+function resetDemo() {
+  try { localStorage.removeItem(LS_KEY); } catch(e) {}
+  loadState();
+  initVitrineFilters();
+  renderAll();
+  toast('Démo réinitialisée aux données Excel');
+}
+
+function showInstallBanner() {
+  document.getElementById('install-banner').hidden = false;
+}
+
+function showInstallHelp() {
+  document.getElementById('install-banner').hidden = true;
+  openModal('Installer VitriTrack',
+    '<div style="text-align:center;padding:12px 0">' +
+    '<svg width="64" height="64" viewBox="0 0 60 60" fill="none" style="color:var(--accent);margin-bottom:16px"><rect x="16" y="6" width="28" height="48" rx="4" stroke="currentColor" stroke-width="2.5"/><path d="M24 6h12" stroke="currentColor" stroke-width="2"/><circle cx="30" cy="48" r="2" fill="currentColor"/><path d="M30 20v14M26 28l4 6 4-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+    '<div style="font-family:var(--font-display);font-size:1.125rem;font-weight:600;margin-bottom:16px">Sur iPhone Safari :</div>' +
+    '<div style="text-align:left;max-width:320px;margin:0 auto;font-size:.9375rem;line-height:1.8">' +
+    '<div style="margin-bottom:8px"><strong>1.</strong> Appuyez sur le bouton <strong>Partager</strong> <span style="display:inline-block;border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-size:.75rem">↑</span> en bas de Safari</div>' +
+    '<div style="margin-bottom:8px"><strong>2.</strong> Faites défiler et appuyez sur <strong>« Sur l\'écran d\'accueil »</strong></div>' +
+    '<div style="margin-bottom:8px"><strong>3.</strong> Appuyez sur <strong>Ajouter</strong></div>' +
+    '</div>' +
+    '<div style="margin-top:20px;padding:14px;background:var(--bg-card);border-radius:8px;border:1px solid var(--border);font-size:.8125rem;color:var(--fg-muted)">' +
+    '💡 Pour le <strong>scan NFC</strong>, installez l\'app native via le lien TestFlight que Bilel vous enverra.' +
+    '</div>' +
+    '</div>'
+  );
+}
+
+// ===== Helpers =====
+const eur = n => (n||0).toLocaleString('fr-FR') + ' €';
+const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+
+let toastTimer = null;
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 3500);
+}
+
+// ===== Modal =====
+function openModal(title, bodyHTML) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = bodyHTML;
+  document.getElementById('modal-overlay').hidden = false;
+}
+function closeModal() { document.getElementById('modal-overlay').hidden = true; }
+function fv(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+function fn(id) { const v = fv(id); const n = parseFloat(v.replace(',', '.')); return isNaN(n) ? null : n; }
+const MONTHS = ['Septembre','Octobre','Novembre','Décembre','Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août'];
+
+// ===== Connexion (Bilel / Oussama) =====
+function loginAs(name) {
+  state.user = name;
+  saveState();
+  applyUser();
+  toast('Connecté en tant que ' + name);
+}
+function loginByEmail(ev) {
+  ev.preventDefault();
+  const email = fv('login-email').toLowerCase();
+  if (email === 'bilel@vitritrack.fr') loginAs('Bilel');
+  else if (email === 'oussama@vitritrack.fr') loginAs('Oussama');
+  else toast('Email inconnu — utilisez bilel@vitritrack.fr ou oussama@vitritrack.fr');
+}
+function logout() {
+  state.user = null;
+  saveState();
+  applyUser();
+  toast('Déconnecté');
+}
+function applyUser() {
+  const logged = !!state.user;
+  document.getElementById('login-overlay').hidden = logged;
+  document.getElementById('user-name').textContent = logged ? state.user : 'Non connecté';
+  document.getElementById('user-role').textContent = logged ? 'Associé' : 'Choisissez un compte';
+  document.getElementById('user-avatar').textContent = logged ? state.user[0] : '?';
+  document.getElementById('sheet-name').textContent = logged ? state.user : 'Non connecté';
+  document.getElementById('sheet-role').textContent = logged ? 'Associé' : 'Choisissez un compte';
+  document.getElementById('sheet-avatar').textContent = logged ? state.user[0] : '?';
+  renderAll();
+}
+
+// ===== Statuts auto depuis les réservations =====
+// "Mois courant" : index réel (new Date()) mappé sur le cycle Septembre(0) → Août(11)
+function currentMonthIndex() {
+  const now = new Date();
+  const m = now.getMonth(); // 0=janv
+  // Septembre = 8 → index cycle 0 ; formule : (m - 8 + 12) % 12
+  return (m - 8 + 12) % 12;
+}
+function bookingConflict(vitrineId, start, len, ignoreIdx) {
+  return state.bookings.find((b,i) =>
+    i !== ignoreIdx && b.vitrineId === vitrineId &&
+    start < (b.start + b.len) && b.start < (start + len)
+  );
+}
+function etatResa(v) {
+  if (/vendu/i.test(v.model)) return null; // vendu prime, géré par etatVitrine
+  const cur = currentMonthIndex();
+  const actif = state.bookings.find(b => b.vitrineId === v.id && !b.maint && b.start <= cur && cur < b.start + b.len);
+  if (actif) return {label:'Louée', cls:'badge-louee', booking:actif};
+  const futur = state.bookings.find(b => b.vitrineId === v.id && !b.maint && b.start > cur);
+  if (futur) return {label:'Réservée', cls:'badge-reservee', booking:futur};
+  return null;
+}
+function etatAuto(v) {
+  if (/vendu/i.test(v.model)) return {label:'Vendu', cls:'badge-vendu'};
+  const resa = etatResa(v);
+  if (resa) return resa;
+  if (v.fonctionnelle === false) return {label:'Hors service', cls:'badge-hs'};
+  if (v.fonctionnelle === true) return {label:'Fonctionnelle', cls:'badge-dispo'};
+  if (/cass|ko/i.test(v.commentaire||'')) return {label:'À vérifier', cls:'badge-maintenance'};
+  return {label:'Non renseigné', cls:'badge-info'};
+}
+function quiBadge(name) {
+  return '<span class="badge '+(name==='Oussama'?'qui-o':'qui-b')+'">'+esc(name||'')+'</span>';
+}
+function soldeCompte(name) {
+  return state.flux.filter(f => f.qui === name).reduce((s,f)=>s+(f.in||0)-(f.out||0),0);
+}
+function periodeBooking(b) {
+  const mShort = ['Sep','Oct','Nov','Déc','Jan','Fév','Mar','Avr','Mai','Juin','Juil','Août'];
+  const annee = i => i <= 3 ? 2026 : 2027;
+  return mShort[b.start] + ' ' + annee(b.start) + ' · ' + b.len + ' mois';
+}
+
+// ===== Renders =====
+function renderDashboard() {
+  const flux = state.flux;
+  const totalIn = flux.reduce((s,f)=>s+(f.in||0),0);
+  const totalOut = flux.reduce((s,f)=>s+(f.out||0),0);
+  const solde = totalIn - totalOut;
+  const associes = COMPTES.map(name => ({name: name, cash: soldeCompte(name)}));
+
+  document.getElementById('kpi-ca').textContent = eur(totalIn);
+  const pct = Math.min(100, Math.round(totalIn/70000*100));
+  document.getElementById('kpi-ca-bar').style.width = pct+'%';
+  document.getElementById('kpi-ca-sub').textContent = pct + "% de l'objectif annuel (70 000 €)";
+
+  document.getElementById('kpi-treso').textContent = eur(solde);
+  document.getElementById('kpi-treso').style.color = solde >= 0 ? 'var(--success)' : 'var(--danger)';
+  document.getElementById('kpi-treso-sub').textContent = eur(totalIn) + ' entrées · ' + eur(totalOut) + ' sorties';
+
+  const atDepot = state.vitrines.filter(v => /local|entrep/i.test(v.lieu||'')).length;
+  const vendu = state.vitrines.filter(v => /vendu/i.test(v.model)).length;
+  const total = state.vitrines.length;
+  document.getElementById('kpi-vacance').textContent = atDepot;
+  document.getElementById('kpi-vacance-sub').textContent = 'sur ' + total + ' vitrines · ' + vendu + ' vendues';
+
+  const valeur = state.vitrines.reduce((s,v)=>s+(v.prix||0),0);
+  document.getElementById('kpi-parc').textContent = eur(valeur);
+  document.getElementById('kpi-parc-sub').textContent = (total - vendu) + ' vitrines en parc';
+
+  document.getElementById('dash-associes').innerHTML = associes.map(a=>
+    '<div class="stat-row"'+(state.user===a.name?' style="background:var(--accent-bg);border-radius:6px;padding:8px 10px;margin:0 -10px"':'')+'><span class="label">'+esc(a.name)+(state.user===a.name?' — ma caisse':'')+'</span><span class="value">'+eur(a.cash)+'</span></div>'
+  ).join('') + '<div class="stat-row" style="border-top:2px solid var(--border)"><span class="label" style="font-weight:600">Total caisse</span><span class="value">'+eur(associes.reduce((s,a)=>s+a.cash,0))+'</span></div>';
+
+  // Prochaines réservations (triées par mois de début, 5 premières)
+  const curIdx = currentMonthIndex();
+  const upcoming = state.bookings
+    .filter(b => !b.maint)
+    .slice()
+    .sort((a,b) => a.start - b.start)
+    .slice(0,5);
+  document.getElementById('dash-bookings').innerHTML = upcoming.length ? upcoming.map(b => {
+    const v = state.vitrines.find(x => x.id === b.vitrineId);
+    const bi = state.bookings.indexOf(b); // index réel pour showBooking
+    return '<button type="button" class="stat-row dash-tap" onclick="gotoBooking('+bi+')" style="padding:8px 0"><span class="label" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-weight:600;color:var(--accent-fg)">'+esc(v ? v.id : '—')+'</span> '+esc(b.client || b.name || '')+' '+quiBadge(b.qui)+'</span><span class="value" style="font-size:.75rem">'+esc(periodeBooking(b))+(b.start + b.len <= curIdx ? ' <span class="badge badge-vendu">passée</span>' : '')+'</span></button>';
+  }).join('') : '<div style="color:var(--fg-muted);font-size:.875rem">Aucune réservation</div>';
+
+  document.getElementById('dash-flux').innerHTML = flux.slice(0,6).map(f=>
+    '<tr>' +
+    '<td style="color:'+(f.in?'var(--success)':'var(--fg-faint)')+';font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap">'+(f.in?'+ '+eur(f.in):'')+'</td>' +
+    '<td style="color:'+(f.out?'var(--danger)':'var(--fg-faint)')+';font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap">'+(f.out?'- '+eur(f.out):'')+'</td>' +
+    '<td>'+esc(f.qui||'')+'</td>' +
+    '<td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(f.client||'')+'</td></tr>'
+  ).join('');
+  // Vue mobile : cartes
+  document.getElementById('dashflux-mobile').innerHTML = flux.slice(0,6).map(f=>
+    '<div class="m-card">' +
+      '<div class="m-card-row">' +
+        '<span class="m-card-amount" style="color:'+(f.in?'var(--success)':'var(--danger)')+'">'+(f.in?'+ '+eur(f.in):'- '+eur(f.out||0))+'</span>' +
+        quiBadge(f.qui) +
+      '</div>' +
+      '<div class="m-card-title">'+esc(f.client||'')+'</div>' +
+      '<div class="m-card-sub">'+esc(f.mois||'')+'</div>' +
+    '</div>'
+  ).join('') || '<div style="color:var(--fg-muted);font-size:.875rem">Aucune opération</div>';
+
+  const lieux = {};
+  state.vitrines.forEach(v => { const l = v.lieu || 'non renseigné'; lieux[l] = (lieux[l]||0)+1; });
+  const sorted = Object.entries(lieux).sort((a,b)=>b[1]-a[1]);
+  const maxV = sorted.length ? sorted[0][1] : 0;
+  document.getElementById('dash-lieux').innerHTML = sorted.map(([l,c])=>
+    '<div style="padding:5px 0"><div style="font-size:.8125rem;margin-bottom:3px;display:flex;justify-content:space-between"><span>'+esc(l)+'</span><span style="color:var(--fg-muted)">'+c+'</span></div><div class="progress"><div class="progress-fill" style="width:'+Math.round(c/maxV*100)+'%;opacity:'+(0.35+0.65*c/maxV)+'"></div></div></div>'
+  ).join('');
+
+  const alerts = [];
+  state.vitrines.filter(v=>v.fonctionnelle===false).forEach(v=>alerts.push({level:'danger',t:v.id+' — Hors service',s:v.model+' · '+(v.commentaire||'')+' · lieu : '+(v.lieu||''),vitrineId:v.id}));
+  state.vitrines.filter(v=>/non rendu/i.test(v.lieu||'')||/\?\s*$/.test(v.lieu||'')).forEach(v=>alerts.push({level:'warn',t:v.id+' — Statut incertain',s:v.model+' · '+v.lieu,vitrineId:v.id}));
+  state.vitrines.filter(v=>(v.reparation||0)>0 && v.prix && v.reparation > v.prix*0.3).forEach(v=>alerts.push({level:'warn',t:v.id+' — Réparations > 30% de la valeur',s:'Réparations '+eur(v.reparation)+' sur une valeur de '+eur(v.prix),vitrineId:v.id}));
+  document.getElementById('dash-alerts').innerHTML = alerts.length ? alerts.map(a=>
+    a.vitrineId
+      ? '<button type="button" class="alert-item '+a.level+'" onclick="showVitrine(\''+esc(a.vitrineId)+'\')"><div class="alert-dot"></div><div><div class="alert-text">'+esc(a.t)+'</div><div class="alert-sub">'+esc(a.s)+'</div></div></button>'
+      : '<div class="alert-item '+a.level+'"><div class="alert-dot"></div><div><div class="alert-text">'+esc(a.t)+'</div><div class="alert-sub">'+esc(a.s)+'</div></div></div>'
+  ).join('') : '<div style="color:var(--fg-muted);font-size:.875rem">Aucune alerte</div>';
+}
+// Résa du dashboard → planning + fiche résa
+function gotoBooking(idx) {
+  const b = state.bookings[idx];
+  if (!b) return;
+  showPage('planning');
+  showBooking(idx);
+}
+
+// ===== Vitrines =====
+function etatVitrine(v) {
+  if (/vendu/i.test(v.model)) return {label:'Vendu', cls:'badge-vendu'};
+  if (v.fonctionnelle === false) return {label:'Hors service', cls:'badge-hs'};
+  if (v.fonctionnelle === true) return {label:'Fonctionnelle', cls:'badge-dispo'};
+  if (/cass|ko/i.test(v.commentaire||'')) return {label:'À vérifier', cls:'badge-maintenance'};
+  return {label:'Non renseigné', cls:'badge-info'};
+}
+function etatKey(v) {
+  return /vendu/i.test(v.model) ? 'vendu' : v.fonctionnelle===false ? 'hs' : v.fonctionnelle===true ? 'fonctionnelle' : '';
+}
+
+function currentVitrineFilter() {
+  const q = document.getElementById('vitrineSearch').value.toLowerCase();
+  const l = document.getElementById('lieuFilter').value;
+  const e = document.getElementById('etatFilter').value;
+  return state.vitrines.filter(v =>
+    (!q || v.id.toLowerCase().includes(q) || (v.serie||'').toLowerCase().includes(q) || v.model.toLowerCase().includes(q) || (v.lieu||'').toLowerCase().includes(q) || (v.commentaire||'').toLowerCase().includes(q)) &&
+    (!l || v.lieu === l) &&
+    (!e || etatKey(v) === e)
+  );
+}
+
+function vitrineCardHTML(v) {
+  const etat = etatAuto(v);
+  const model = v.model.length > 40 ? v.model.slice(0,40)+'…' : v.model;
+  return '<button type="button" class="vit-card" onclick="showVitrine(\''+v.id+'\')">' +
+    '<span class="vit-card-top"><span class="vit-card-id">'+v.id+'</span><span class="badge '+etat.cls+'">'+etat.label+'</span></span>' +
+    '<span class="vit-card-model">'+esc(model)+'</span>' +
+    '<span class="vit-card-sub">'+esc(v.lieu||'—')+(v.prix ? ' · ' + eur(v.prix) : '')+'</span>' +
+  '</button>';
+}
+
+function renderVitrines() {
+  const list = currentVitrineFilter();
+  document.getElementById('vitrinesTable').innerHTML = list.map(v => {
+    const etat = etatAuto(v);
+    return '<tr class="clickable" onclick="showVitrine(\''+v.id+'\')">' +
+      '<td style="font-weight:600;color:var(--accent-fg)">'+v.id+'</td>' +
+      '<td style="font-family:monospace;font-size:.75rem;color:var(--fg-muted)">'+(v.serie?esc(v.serie):'—')+'</td>' +
+      '<td style="max-width:220px">'+esc(v.model)+'</td>' +
+      '<td style="font-variant-numeric:tabular-nums">'+(v.prix ? eur(v.prix) : '—')+'</td>' +
+      '<td>'+esc(v.lieu)+'</td>' +
+      '<td><span class="badge '+etat.cls+'">'+etat.label+'</span></td>' +
+      '<td><button class="row-del" title="Supprimer" onclick="event.stopPropagation();deleteVitrine(\''+v.id+'\')">&times;</button></td></tr>';
+  }).join('');
+  document.getElementById('vitrines-mobile').innerHTML = list.map(vitrineCardHTML).join('') ||
+    '<div style="color:var(--fg-muted);font-size:.875rem">Aucune vitrine ne correspond aux filtres.</div>';
+  document.getElementById('parc-count').textContent = list.length + ' vitrines affichées · ' + state.vitrines.length + ' au total';
+}
+
+function filterVitrines() { renderVitrines(); }
+
+function initVitrineFilters() {
+  const lieux = [...new Set(state.vitrines.map(v=>v.lieu).filter(Boolean))].sort();
+  const sel = document.getElementById('lieuFilter');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">Tous les lieux</option>';
+  lieux.forEach(l => { const o=document.createElement('option'); o.value=l; o.textContent=l; sel.appendChild(o); });
+  sel.value = cur;
+}
+
+function nextVitrineId() {
+  let max = 0;
+  state.vitrines.forEach(v => { const m = /^V-(\d+)$/.exec(v.id); if (m) max = Math.max(max, parseInt(m[1],10)); });
+  return 'V-' + String(max+1).padStart(3,'0');
+}
+
+function formVitrine(existingId) {
+  const v = existingId ? state.vitrines.find(x=>x.id===existingId) : null;
+  const lieux = state.lieux.map(l=>l.nom);
+  openModal(v ? 'Modifier '+v.id : 'Ajouter une vitrine',
+    '<form id="f-vitrine" onsubmit="saveVitrine(event,\''+(v?v.id:'')+'\')">' +
+    '<div class="form-group"><label class="form-label" for="fv-model">Modèle *</label>' +
+    '<input class="form-input" id="fv-model" required maxlength="80" value="'+esc(v?v.model:'')+'" placeholder="Ex : Vitrine Elite Froid 2m"></div>' +
+    '<div class="form-group"><label class="form-label" for="fv-serie">N° de série</label>' +
+    '<input class="form-input" id="fv-serie" maxlength="40" value="'+esc(v&&v.serie?v.serie:'')+'" placeholder="Ex : EF-2024-00142"></div>' +
+    '<div class="form-row">' +
+      '<div class="form-group"><label class="form-label" for="fv-prix">Valeur (€)</label>' +
+      '<input class="form-input" id="fv-prix" inputmode="decimal" value="'+(v&&v.prix?v.prix:'')+'" placeholder="Ex : 1500"></div>' +
+      '<div class="form-group"><label class="form-label" for="fv-rep">Réparations (€)</label>' +
+      '<input class="form-input" id="fv-rep" inputmode="decimal" value="'+(v&&v.reparation?v.reparation:'')+'" placeholder="0"></div>' +
+    '</div>' +
+    '<div class="form-row">' +
+      '<div class="form-group"><label class="form-label" for="fv-lieu">Lieu</label>' +
+      '<input class="form-input" id="fv-lieu" list="lieux-list" value="'+esc(v?v.lieu:'')+'" placeholder="Ex : local trappes">' +
+      '<datalist id="lieux-list">'+lieux.map(l=>'<option value="'+esc(l)+'">').join('')+'</datalist></div>' +
+      '<div class="form-group"><label class="form-label" for="fv-fonc">État</label>' +
+      '<select class="form-select" id="fv-fonc">' +
+        '<option value=""'+(v&&v.fonctionnelle==null?' selected':'')+'>Non renseigné</option>' +
+        '<option value="oui"'+(v&&v.fonctionnelle===true?' selected':'')+'>Fonctionnelle</option>' +
+        '<option value="non"'+(v&&v.fonctionnelle===false?' selected':'')+'>Hors service</option>' +
+      '</select></div>' +
+    '</div>' +
+    '<div class="form-group"><label class="form-label" for="fv-comm">Commentaire</label>' +
+    '<textarea class="form-textarea" id="fv-comm" maxlength="200" placeholder="Ex : vitre cassée, souffle 2 degrés...">'+esc(v?v.commentaire:'')+'</textarea></div>' +
+    '<div class="modal-actions">' +
+      '<button type="button" class="btn btn-secondary" onclick="closeModal()">Annuler</button>' +
+      '<button type="submit" class="btn btn-primary">'+(v?'Enregistrer':'Ajouter')+'</button>' +
+    '</div></form>'
+  );
+}
+
+function saveVitrine(ev, id) {
+  ev.preventDefault();
+  const data = {
+    model: fv('fv-model'),
+    serie: fv('fv-serie'),
+    prix: fn('fv-prix'),
+    reparation: fn('fv-rep') || 0,
+    lieu: fv('fv-lieu') || 'non renseigné',
+    fonctionnelle: fv('fv-fonc') === 'oui' ? true : fv('fv-fonc') === 'non' ? false : null,
+    commentaire: fv('fv-comm'),
+  };
+  if (id) {
+    const v = state.vitrines.find(x=>x.id===id);
+    Object.assign(v, data);
+    toast(id + ' mise à jour');
+    closeModal(); saveState(); renderAll(); showVitrine(id);
+  } else {
+    const v = Object.assign({id: nextVitrineId()}, data);
+    state.vitrines.push(v);
+    toast(v.id + ' ajoutée au parc');
+    closeModal(); saveState(); renderAll();
+  }
+}
+
+function deleteVitrine(id) {
+  if (!confirm('Supprimer la vitrine ' + id + ' ?')) return;
+  state.vitrines = state.vitrines.filter(v=>v.id!==id);
+  toast(id + ' supprimée');
+  saveState(); renderAll(); showPage('vitrines');
+}
+
+function showVitrine(id) {
+  const v = state.vitrines.find(x=>x.id===id);
+  if (!v) return;
+  document.getElementById('detail-title').textContent = v.id;
+  const etat = etatAuto(v);
+  const resas = state.bookings.filter(b => b.vitrineId === v.id);
+  document.getElementById('vitrine-detail-content').innerHTML =
+  '<div class="grid-2">' +
+    '<div class="card">' +
+      '<div class="card-title">'+esc(v.model)+'</div>' +
+      (v.serie ? '<div class="stat-row"><span class="label">N° de série</span><span class="value" style="font-family:monospace">'+esc(v.serie)+'</span></div>' : '') +
+      '<div class="stat-row"><span class="label">État</span><span><span class="badge '+etat.cls+'">'+etat.label+'</span></span></div>' +
+      '<div class="stat-row"><span class="label">Lieu actuel</span><span class="value">'+esc(v.lieu)+'</span></div>' +
+      '<div class="stat-row"><span class="label">Valeur estimée</span><span class="value">'+(v.prix ? eur(v.prix) : '—')+'</span></div>' +
+      '<div class="stat-row"><span class="label">Réparations cumulées</span><span class="value">'+(v.reparation ? eur(v.reparation) : '—')+'</span></div>' +
+      (v.commentaire ? '<div class="stat-row"><span class="label">Commentaire</span><span style="text-align:right">'+esc(v.commentaire)+'</span></div>' : '') +
+      '<div class="vd-actions" style="margin-top:16px">' +
+        '<button class="btn btn-primary btn-sm" onclick="formVitrine(\''+v.id+'\')">Modifier</button>' +
+        '<button class="btn btn-secondary btn-sm" onclick="formLouer(\''+v.id+'\')">Marquer en location</button>' +
+        '<button class="btn btn-secondary btn-sm" onclick="formPanne(\''+v.id+'\')">Signaler une panne</button>' +
+        '<button class="btn btn-secondary btn-sm" onclick="formDeplacer(\''+v.id+'\')">Déplacer</button>' +
+        '<button class="btn btn-danger btn-sm" onclick="deleteVitrine(\''+v.id+'\')">Supprimer</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="card vd-nfc">' +
+      '<svg width="90" height="90" viewBox="0 0 80 80" fill="none">' +
+        '<rect x="10" y="18" width="60" height="44" rx="6" stroke="var(--accent)" stroke-width="2.5" fill="var(--accent-bg)"/>' +
+        '<path d="M10 30h60" stroke="var(--accent)" stroke-width="2"/>' +
+        '<circle cx="40" cy="44" r="5" fill="var(--accent)" opacity=".5"/>' +
+        '<path d="M28 12v8M52 12v8" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/>' +
+      '</svg>' +
+      '<div>' +
+        '<div class="vd-nfc-title" style="font-family:var(--font-display);font-size:1.5rem;font-weight:700;margin-top:0;color:var(--accent-fg)">'+v.id+'</div>' +
+        '<div style="font-size:.75rem;color:var(--fg-muted)">ID vitrine · badge NFC associé</div>' +
+      '</div>' +
+    '</div>' +
+  '</div>' +
+  '<div class="card">' +
+    '<div class="card-title">Historique</div>' +
+    '<div class="timeline">' +
+      '<div class="timeline-item"><div class="timeline-date">Saison en cours</div><div class="timeline-text">Enregistrement dans le parc · lieu : '+esc(v.lieu)+'</div></div>' +
+      (v.reparation ? '<div class="timeline-item"><div class="timeline-date">Réparations</div><div class="timeline-text">'+eur(v.reparation)+' de réparations cumulées</div></div>' : '') +
+      (v.commentaire ? '<div class="timeline-item"><div class="timeline-date">Note</div><div class="timeline-text">'+esc(v.commentaire)+'</div></div>' : '') +
+    '</div>' +
+  '</div>' +
+  '<div class="card" style="margin-top:16px">' +
+    '<div class="card-title">Réservations de cette vitrine</div>' +
+    (resas.length ?
+      '<div class="table-wrap vd-res-desktop"><table><thead><tr><th>Client</th><th>Période</th><th>Montant</th><th>Encaissé par</th><th></th></tr></thead><tbody>' +
+      resas.map(b => {
+        const bi = state.bookings.indexOf(b);
+        return '<tr class="clickable" onclick="showBooking('+bi+')">' +
+          '<td style="font-weight:500">'+esc(b.client || b.name || '')+(b.maint?' <span class="badge badge-maintenance">Maintenance</span>':'')+'</td>' +
+          '<td>'+esc(periodeBooking(b))+'</td>' +
+          '<td style="font-variant-numeric:tabular-nums">'+(b.montant ? eur(b.montant) : '—')+'</td>' +
+          '<td>'+quiBadge(b.qui)+'</td>' +
+          '<td><button class="row-del" title="Supprimer" onclick="deleteBooking('+bi+')">&times;</button></td></tr>';
+      }).join('') + '</tbody></table></div>' +
+      '<div class="vd-res-mobile">' +
+      resas.map(b => {
+        const bi = state.bookings.indexOf(b);
+        return '<button type="button" class="vd-res-card" onclick="showBooking('+bi+')">' +
+          '<div class="vd-res-top"><span class="vd-res-client">'+esc(b.client || b.name || '')+'</span>'+(b.maint?'<span class="badge badge-maintenance">Maintenance</span>':'')+'</div>' +
+          '<div class="vd-res-sub">'+esc(periodeBooking(b))+'</div>' +
+          '<div class="vd-res-bottom">' +
+            '<span style="font-size:.875rem;font-weight:600;font-variant-numeric:tabular-nums">'+(b.montant ? eur(b.montant) : '—')+'</span>' +
+            quiBadge(b.qui) +
+            '<span class="row-del" role="button" title="Supprimer" onclick="event.stopPropagation();deleteBooking('+bi+')">&times;</span>' +
+          '</div>' +
+        '</button>';
+      }).join('') + '</div>'
+    : '<div style="color:var(--fg-muted);font-size:.875rem">Aucune réservation — vitrine disponible</div>') +
+  '</div>';
+  showPage('vitrine-detail', true);
+}
+
+function formLouer(id) {
+  const v = state.vitrines.find(x=>x.id===id);
+  openModal('Marquer en location — ' + id,
+    '<form id="f-louer" onsubmit="saveLouer(event,\''+id+'\')">' +
+    '<div class="form-group"><label class="form-label" for="fl-client">Nom du client / événement *</label>' +
+    '<input class="form-input" id="fl-client" required maxlength="60" placeholder="Ex : Ekolo, salon gastronomie"></div>' +
+    '<div class="form-row">' +
+      '<div class="form-group"><label class="form-label" for="fl-mois">Mois de début</label>' +
+      '<select class="form-select" id="fl-mois">'+MONTHS.map((m,i)=>'<option value="'+i+'"'+(i===currentMonthIndex()?' selected':'')+'>'+m+' '+(i>=4?2027:2026)+'</option>').join('')+'</select></div>' +
+      '<div class="form-group"><label class="form-label" for="fl-duree">Durée (mois)</label>' +
+      '<input class="form-input" id="fl-duree" type="number" min="1" max="12" value="1"></div>' +
+    '</div>' +
+    '<div class="form-row">' +
+      '<div class="form-group"><label class="form-label" for="fl-montant">Montant location (€)</label>' +
+      '<input class="form-input" id="fl-montant" inputmode="decimal" value="'+(v&&v.prix?v.prix:'')+'" placeholder="Ex : 450"></div>' +
+      '<div class="form-group"><label class="form-label" for="fl-qui">Encaissé par</label>' +
+      '<select class="form-select" id="fl-qui">'+COMPTES.map(c=>'<option'+((state.user||'Bilel')===c?' selected':'')+'>'+c+'</option>').join('')+'</select></div>' +
+    '</div>' +
+    '<div id="fl-error"></div>' +
+    '<div class="modal-actions">' +
+      '<button type="button" class="btn btn-secondary" onclick="closeModal()">Annuler</button>' +
+      '<button type="submit" class="btn btn-primary">Valider</button>' +
+    '</div></form>'
+  );
+}
+function saveLouer(ev, id) {
+  ev.preventDefault();
+  const v = state.vitrines.find(x=>x.id===id);
+  const client = fv('fl-client');
+  const start = parseInt(fv('fl-mois'),10)||0;
+  const len = Math.max(1, parseInt(fv('fl-duree'),10)||1);
+  const montant = fn('fl-montant');
+  const qui = fv('fl-qui') || state.user || 'Bilel';
+  const errEl = document.getElementById('fl-error');
+  if (errEl) errEl.innerHTML = '';
+  const conflit = bookingConflict(id, start, len, -1);
+  if (conflit) {
+    const msg = 'Conflit : ' + id + ' déjà réservée par ' + (conflit.client || conflit.name || 'un client') + ' du ' + periodeBooking(conflit);
+    if (errEl) errEl.innerHTML = '<div class="form-error">'+esc(msg)+'</div>';
+    toast(msg);
+    return;
+  }
+  v.lieu = 'chez ' + client;
+  v.fonctionnelle = v.fonctionnelle === false ? false : true;
+  state.bookings.push({
+    name: client + ' — ' + v.model.slice(0,20),
+    client: client,
+    vitrineId: id,
+    montant: montant != null ? montant : (v.prix || null),
+    qui: qui,
+    start: start,
+    len: len
+  });
+  toast(id + ' en location chez ' + client);
+  closeModal(); saveState(); renderAll(); showVitrine(id);
+}
+
+function formPanne(id) {
+  openModal('Signaler une panne — ' + id,
+    '<form id="f-panne" onsubmit="savePanne(event,\''+id+'\')">' +
+    '<div class="form-group"><label class="form-label" for="fp-desc">Description de la panne *</label>' +
+    '<textarea class="form-textarea" id="fp-desc" required maxlength="200" placeholder="Ex : compresseur HS, ne refroidit plus"></textarea></div>' +
+    '<div class="form-group"><label class="form-label" for="fp-cout">Coût de réparation estimé (€)</label>' +
+    '<input class="form-input" id="fp-cout" inputmode="decimal" placeholder="Ex : 220"></div>' +
+    '<div class="modal-actions">' +
+      '<button type="button" class="btn btn-secondary" onclick="closeModal()">Annuler</button>' +
+      '<button type="submit" class="btn btn-primary">Signaler</button>' +
+    '</div></form>'
+  );
+}
+function savePanne(ev, id) {
+  ev.preventDefault();
+  const v = state.vitrines.find(x=>x.id===id);
+  const desc = fv('fp-desc');
+  const cout = fn('fp-cout') || 0;
+  v.fonctionnelle = false;
+  v.commentaire = 'PANNE : ' + desc;
+  v.reparation = (v.reparation||0) + cout;
+  state.actions.unshift({action:'Réparer '+id+' — '+desc, comm:'Panne signalée depuis la fiche vitrine', statut:'Non réalisé', _new:true});
+  toast('Panne signalée sur ' + id + ' · action créée');
+  closeModal(); saveState(); renderAll(); showVitrine(id);
+}
+
+function formDeplacer(id) {
+  const v = state.vitrines.find(x=>x.id===id);
+  const lieux = state.lieux.map(l=>l.nom);
+  openModal('Déplacer — ' + id,
+    '<form id="f-dep" onsubmit="saveDeplacer(event,\''+id+'\')">' +
+    '<div class="form-group"><label class="form-label" for="fd-lieu">Nouveau lieu *</label>' +
+    '<input class="form-input" id="fd-lieu" required list="lieux-list2" value="'+esc(v.lieu)+'">' +
+    '<datalist id="lieux-list2">'+lieux.map(l=>'<option value="'+esc(l)+'">').join('')+'</datalist></div>' +
+    '<div class="modal-actions">' +
+      '<button type="button" class="btn btn-secondary" onclick="closeModal()">Annuler</button>' +
+      '<button type="submit" class="btn btn-primary">Déplacer</button>' +
+    '</div></form>'
+  );
+}
+function saveDeplacer(ev, id) {
+  ev.preventDefault();
+  const v = state.vitrines.find(x=>x.id===id);
+  v.lieu = fv('fd-lieu');
+  toast(id + ' déplacée vers ' + v.lieu);
+  closeModal(); saveState(); renderAll(); showVitrine(id);
+}
+
+// ===== Planning =====
+function renderPlanning() {
+  const months = ['Sep','Oct','Nov','Déc','Jan','Fév','Mar','Avr','Mai','Juin','Juil','Août'];
+  let html = '<div class="gantt-header"><div>Vitrine</div>'+months.map(m=>'<div>'+m+'</div>').join('')+'</div>';
+  // Une ligne par vitrine ayant des réservations
+  const parVitrine = {};
+  state.bookings.forEach(b => { const k = b.vitrineId || '—'; (parVitrine[k] = parVitrine[k] || []).push(b); });
+  const vitrineIds = Object.keys(parVitrine).sort();
+  if (!vitrineIds.length) {
+    html += '<div style="color:var(--fg-muted);font-size:.875rem;padding:12px 0">Aucune réservation enregistrée</div>';
+  }
+  vitrineIds.forEach(vid => {
+    const v = state.vitrines.find(x => x.id === vid);
+    const label = v ? (v.id + ' — ' + v.model.slice(0,24)) : vid;
+    html += '<div class="gantt-row">' +
+      '<div class="gantt-label" title="'+esc(label)+'">'+esc(label)+'</div>' +
+      '<div class="gantt-track">' +
+      parVitrine[vid].map(b => {
+        const bi = state.bookings.indexOf(b);
+        const tip = esc((b.client || b.name || 'Réservation') + ' · ' + periodeBooking(b) + ' · ' + (b.montant ? eur(b.montant) : 'montant non défini') + ' · ' + (b.qui || '?'));
+        return '<div class="gantt-seg" style="left:'+(b.start/12*100)+'%;width:'+(b.len/12*100)+'%;background:'+(b.maint?'var(--warn)':'var(--accent)')+';cursor:pointer" title="'+tip+'" onclick="showBooking('+bi+')"></div>';
+      }).join('') +
+      '</div>' +
+    '</div>';
+  });
+  document.getElementById('gantt').innerHTML = html;
+  renderPlanningMobile();
+}
+function renderPlanningMobile() {
+  const cur = currentMonthIndex();
+  const annee = i => i <= 3 ? 2026 : 2027;
+  let mhtml = '';
+  // Mois courant d'abord, puis suivants, puis passés (cycle sept→août)
+  const ordre = [];
+  for (let k = 0; k < 12; k++) ordre.push((cur + k) % 12);
+  ordre.forEach(i => {
+    const resas = state.bookings.filter(b => b.start <= i && i < b.start + b.len);
+    if (!resas.length) return; // mois vide : pas de carte
+    mhtml += '<div class="card pl-month'+(i===cur?' is-now':'')+'">' +
+      '<div class="pl-month-title">'+MONTHS[i]+' '+annee(i)+(i===cur?' <span class="badge badge-louee">En cours</span>':'')+'</div>' +
+      resas.map(b => {
+        const bi = state.bookings.indexOf(b);
+        const v = state.vitrines.find(x => x.id === b.vitrineId);
+        const active = b.start <= cur && cur < b.start + b.len;
+        return '<button type="button" class="pl-line" onclick="showBooking('+bi+')">' +
+          '<div class="pl-line-main">' +
+            '<div class="pl-line-vitrine">'+esc(v ? v.id + ' — ' + v.model.slice(0,24) : 'Vitrine supprimée')+'</div>' +
+            '<div class="pl-line-client">'+esc(b.client || b.name || '')+(active?' · en cours':'')+'</div>' +
+          '</div>' +
+          '<div class="pl-line-right">' +
+            '<div class="pl-line-montant">'+(b.maint ? '' : (b.montant ? esc(eur(b.montant)) : '—'))+'</div>' +
+            '<div class="pl-line-badges">'+quiBadge(b.qui)+(b.maint?' <span class="badge badge-maintenance">Maintenance</span>':'')+'</div>' +
+          '</div>' +
+        '</button>';
+      }).join('') +
+    '</div>';
+  });
+  document.getElementById('planning-mobile').innerHTML = mhtml || '<div style="color:var(--fg-muted);font-size:.875rem;padding:12px 0">Aucune réservation enregistrée</div>';
+}
+
+function formBooking() {
+  const louables = state.vitrines.filter(v => !/vendu/i.test(v.model) && v.fonctionnelle !== false);
+  if (!louables.length) { toast('Aucune vitrine disponible à la réservation'); return; }
+  const moi = state.user || 'Bilel';
+  openModal('Nouvelle réservation',
+    '<form id="f-book" onsubmit="saveBooking(event)">' +
+    '<div class="form-group"><label class="form-label" for="fb-vitrine">Vitrine *</label>' +
+    '<select class="form-select" id="fb-vitrine" onchange="onBookingVitrineChange()">' +
+      louables.map(v => {
+        const st = etatAuto(v);
+        return '<option value="'+v.id+'">'+v.id+' — '+esc(v.model.slice(0,30))+' ('+st.label+')</option>';
+      }).join('') +
+    '</select></div>' +
+    '<div class="form-group"><label class="form-label" for="fb-name">Client / événement *</label>' +
+    '<input class="form-input" id="fb-name" required maxlength="60" placeholder="Ex : Salon du chocolat"></div>' +
+    '<div class="form-row">' +
+      '<div class="form-group"><label class="form-label" for="fb-mois">Mois de début</label>' +
+      '<select class="form-select" id="fb-mois">'+MONTHS.map((m,i)=>'<option value="'+i+'"'+(i===currentMonthIndex()?' selected':'')+'>'+m+'</option>').join('')+'</select></div>' +
+      '<div class="form-group"><label class="form-label" for="fb-duree">Durée (mois)</label>' +
+      '<input class="form-input" id="fb-duree" type="number" min="1" max="12" value="1"></div>' +
+    '</div>' +
+    '<div class="form-row">' +
+      '<div class="form-group"><label class="form-label" for="fb-montant">Montant location (€)</label>' +
+      '<input class="form-input" id="fb-montant" inputmode="decimal" placeholder="Ex : 450"></div>' +
+      '<div class="form-group"><label class="form-label" for="fb-qui">Encaissé par</label>' +
+      '<select class="form-select" id="fb-qui">'+COMPTES.map(c=>'<option'+(moi===c?' selected':'')+'>'+c+'</option>').join('')+'</select></div>' +
+    '</div>' +
+    '<div class="form-group form-check"><input type="checkbox" id="fb-maint"><label for="fb-maint" style="text-transform:none;letter-spacing:0;font-size:.8125rem">Créneau de maintenance (pas une location)</label></div>' +
+    '<div id="fb-error"></div>' +
+    '<div class="modal-actions">' +
+      '<button type="button" class="btn btn-secondary" onclick="closeModal()">Annuler</button>' +
+      '<button type="submit" class="btn btn-primary">Ajouter</button>' +
+    '</div></form>'
+  );
+  onBookingVitrineChange();
+}
+function onBookingVitrineChange() {
+  const v = state.vitrines.find(x => x.id === fv('fb-vitrine'));
+  const el = document.getElementById('fb-montant');
+  if (v && el && !el.value) el.value = v.prix || '';
+}
+function saveBooking(ev) {
+  ev.preventDefault();
+  const vitrineId = fv('fb-vitrine');
+  const v = state.vitrines.find(x => x.id === vitrineId);
+  const start = parseInt(fv('fb-mois'),10)||0;
+  const len = Math.max(1, parseInt(fv('fb-duree'),10)||1);
+  const errEl = document.getElementById('fb-error');
+  if (errEl) errEl.innerHTML = '';
+  const conflit = bookingConflict(vitrineId, start, len, -1);
+  if (conflit) {
+    const msg = 'Conflit : ' + (v ? v.id : vitrineId) + ' déjà réservée par ' + (conflit.client || conflit.name || 'un client') + ' du ' + periodeBooking(conflit);
+    if (errEl) errEl.innerHTML = '<div class="form-error">'+esc(msg)+'</div>';
+    toast(msg);
+    return;
+  }
+  state.bookings.push({
+    name: fv('fb-name'),
+    client: fv('fb-name'),
+    vitrineId: vitrineId,
+    montant: fn('fb-montant') != null ? fn('fb-montant') : (v && v.prix ? v.prix : null),
+    qui: fv('fb-qui') || state.user || 'Bilel',
+    start: start,
+    len: len,
+    maint: document.getElementById('fb-maint').checked
+  });
+  toast('Réservation ajoutée au planning');
+  closeModal(); saveState(); renderAll();
+}
+function deleteBooking(i) {
+  if (!confirm('Supprimer cette réservation ?')) return;
+  const vid = state.bookings[i] && state.bookings[i].vitrineId;
+  state.bookings.splice(i,1);
+  toast('Réservation supprimée');
+  saveState(); renderAll();
+  // Rafraîchir la fiche vitrine si elle est affichée
+  if (vid && document.getElementById('page-vitrine-detail').classList.contains('active')) showVitrine(vid);
+}
+
+// Détail d'une réservation (tap mobile sur carte, clic segment Gantt desktop)
+function showBooking(idx) {
+  const b = state.bookings[idx];
+  if (!b) return;
+  const v = state.vitrines.find(x => x.id === b.vitrineId);
+  const cur = currentMonthIndex();
+  const statut = b.start + b.len <= cur
+    ? '<span class="badge badge-vendu">Passée</span>'
+    : (b.start <= cur
+      ? '<span class="badge badge-louee">En cours</span>'
+      : '<span class="badge badge-reservee">À venir</span>');
+  openModal('Réservation — ' + (b.client || b.name || 'sans nom'),
+    '<div class="stat-row"><span class="label">Vitrine</span><span class="value">'+esc(v ? v.id : '—')+(v ? ' · ' + esc(v.model.slice(0,30)) : '')+'</span></div>' +
+    '<div class="stat-row"><span class="label">Lieu</span><span class="value">'+esc(v ? (v.lieu || 'non renseigné') : '—')+'</span></div>' +
+    '<div class="stat-row"><span class="label">Client / événement</span><span class="value">'+esc(b.client || b.name || '')+'</span></div>' +
+    '<div class="stat-row"><span class="label">Période</span><span class="value">'+esc(periodeBooking(b))+'</span></div>' +
+    '<div class="stat-row"><span class="label">Montant</span><span class="value">'+(b.maint ? '—' : (b.montant ? esc(eur(b.montant)) : 'non défini'))+'</span></div>' +
+    '<div class="stat-row"><span class="label">Encaissé par</span><span class="value">'+quiBadge(b.qui)+'</span></div>' +
+    '<div class="stat-row"><span class="label">Maintenance</span><span class="value">'+(b.maint ? 'Oui' : 'Non')+'</span></div>' +
+    '<div class="stat-row"><span class="label">Statut</span><span class="value">'+statut+'</span></div>' +
+    '<div class="modal-actions">' +
+      '<button type="button" class="btn btn-danger" onclick="deleteFromBooking('+idx+')">Supprimer</button>' +
+      '<button type="button" class="btn btn-secondary" onclick="formEditBooking('+idx+')">Modifier</button>' +
+      '<button type="button" class="btn btn-primary" onclick="closeModal()">Fermer</button>' +
+    '</div>'
+  );
+}
+function deleteFromBooking(idx) {
+  const b = state.bookings[idx];
+  if (!b) return;
+  if (!confirm('Supprimer cette réservation ?')) return;
+  const i = state.bookings.indexOf(b); // re-trouve l'index au moment de l'action
+  if (i > -1) state.bookings.splice(i,1);
+  toast('Réservation supprimée');
+  closeModal(); saveState(); renderAll();
+}
+
+// Édition : réutilise le formulaire formBooking pré-rempli (mêmes ids fb-*)
+function formEditBooking(idx) {
+  const b = state.bookings[idx];
+  if (!b) return;
+  // La vitrine réservée est peut-être vendue/HS aujourd'hui : l'inclure malgré tout
+  const louables = state.vitrines.filter(v => v.id === b.vitrineId || (!/vendu/i.test(v.model) && v.fonctionnelle !== false));
+  if (!louables.length) { toast('Aucune vitrine disponible'); return; }
+  openModal('Modifier la réservation',
+    '<form id="f-book" onsubmit="saveEditBooking(event,'+idx+')">' +
+    '<div class="form-group"><label class="form-label" for="fb-vitrine">Vitrine *</label>' +
+    '<select class="form-select" id="fb-vitrine" onchange="onBookingVitrineChange()">' +
+      louables.map(v => '<option value="'+v.id+'"'+(v.id===b.vitrineId?' selected':'')+'>'+v.id+' — '+esc(v.model.slice(0,30))+' ('+etatAuto(v).label+')</option>').join('') +
+    '</select></div>' +
+    '<div class="form-group"><label class="form-label" for="fb-name">Client / événement *</label>' +
+    '<input class="form-input" id="fb-name" required maxlength="60" value="'+esc(b.client || b.name || '')+'"></div>' +
+    '<div class="form-row">' +
+      '<div class="form-group"><label class="form-label" for="fb-mois">Mois de début</label>' +
+      '<select class="form-select" id="fb-mois">'+MONTHS.map((m,i)=>'<option value="'+i+'"'+(i===b.start?' selected':'')+'>'+m+'</option>').join('')+'</select></div>' +
+      '<div class="form-group"><label class="form-label" for="fb-duree">Durée (mois)</label>' +
+      '<input class="form-input" id="fb-duree" type="number" min="1" max="12" value="'+b.len+'"></div>' +
+    '</div>' +
+    '<div class="form-row">' +
+      '<div class="form-group"><label class="form-label" for="fb-montant">Montant location (€)</label>' +
+      '<input class="form-input" id="fb-montant" inputmode="decimal" value="'+(b.montant!=null?b.montant:'')+'"></div>' +
+      '<div class="form-group"><label class="form-label" for="fb-qui">Encaissé par</label>' +
+      '<select class="form-select" id="fb-qui">'+COMPTES.map(c=>'<option'+(c===(b.qui||state.user||'Bilel')?' selected':'')+'>'+c+'</option>').join('')+'</select></div>' +
+    '</div>' +
+    '<div class="form-group form-check"><input type="checkbox" id="fb-maint"'+(b.maint?' checked':'')+'><label for="fb-maint" style="text-transform:none;letter-spacing:0;font-size:.8125rem">Créneau de maintenance (pas une location)</label></div>' +
+    '<div id="fb-error"></div>' +
+    '<div class="modal-actions">' +
+      '<button type="button" class="btn btn-secondary" onclick="closeModal()">Annuler</button>' +
+      '<button type="submit" class="btn btn-primary">Enregistrer</button>' +
+    '</div></form>'
+  );
+}
+function saveEditBooking(ev, idx) {
+  ev.preventDefault();
+  const b = state.bookings[idx];
+  if (!b) return;
+  const i = state.bookings.indexOf(b); // index au moment de l'action
+  const vitrineId = fv('fb-vitrine');
+  const v = state.vitrines.find(x => x.id === vitrineId);
+  const start = parseInt(fv('fb-mois'),10)||0;
+  const len = Math.max(1, parseInt(fv('fb-duree'),10)||1);
+  const errEl = document.getElementById('fb-error');
+  if (errEl) errEl.innerHTML = '';
+  const conflit = bookingConflict(vitrineId, start, len, i);
+  if (conflit) {
+    const msg = 'Conflit : ' + (v ? v.id : vitrineId) + ' déjà réservée par ' + (conflit.client || conflit.name || 'un client') + ' du ' + periodeBooking(conflit);
+    if (errEl) errEl.innerHTML = '<div class="form-error">'+esc(msg)+'</div>';
+    toast(msg);
+    return;
+  }
+  b.name = fv('fb-name');
+  b.client = fv('fb-name');
+  b.vitrineId = vitrineId;
+  b.montant = fn('fb-montant') != null ? fn('fb-montant') : (v && v.prix ? v.prix : null);
+  b.qui = fv('fb-qui') || state.user || 'Bilel';
+  b.start = start;
+  b.len = len;
+  b.maint = document.getElementById('fb-maint').checked;
+  toast('Réservation modifiée');
+  closeModal(); saveState(); renderAll();
+}
+
+// ===== Trésorerie =====
+function setTresoView(view) {
+  tresoView = view;
+  renderTresorerie();
+}
+function renderTresorerie() {
+  const moi = state.user || 'Bilel';
+  // Toggle actif
+  const tabMine = document.getElementById('treso-tab-mine');
+  const tabAll = document.getElementById('treso-tab-all');
+  tabMine.classList.toggle('active', tresoView === 'mine');
+  tabAll.classList.toggle('active', tresoView === 'all');
+  // Filtre par compte visible seulement en vue "Toutes les caisses"
+  const quiFilter = document.getElementById('treso-qui-filter');
+  quiFilter.style.display = tresoView === 'all' ? '' : 'none';
+  if (tresoView === 'mine') quiFilter.value = '';
+
+  const soldes = {};
+  COMPTES.forEach(c => soldes[c] = soldeCompte(c));
+  const totalGeneral = soldes['Bilel'] + soldes['Oussama'];
+
+  let kpis = '';
+  if (tresoView === 'mine') {
+    const fluxMoi = state.flux.filter(f => f.qui === moi);
+    const inMoi = fluxMoi.reduce((s,f)=>s+(f.in||0),0);
+    const outMoi = fluxMoi.reduce((s,f)=>s+(f.out||0),0);
+    kpis =
+      '<div class="card kpi"><div class="kpi-label">Entrées — '+esc(moi)+'</div><div class="kpi-value" style="color:var(--success)">'+eur(inMoi)+'</div></div>' +
+      '<div class="card kpi"><div class="kpi-label">Sorties — '+esc(moi)+'</div><div class="kpi-value" style="color:var(--danger)">'+eur(outMoi)+'</div></div>' +
+      '<div class="card kpi"><div class="kpi-label">Solde ma caisse</div><div class="kpi-value" style="color:'+(soldes[moi]>=0?'var(--success)':'var(--danger)')+'">'+eur(soldes[moi])+'</div></div>' +
+      '<div class="card kpi" style="border:1px dashed var(--border)"><div class="kpi-label">Solde général (2 caisses)</div><div class="kpi-value">'+eur(totalGeneral)+'</div><div class="kpi-sub">Bilel '+eur(soldes['Bilel'])+' · Oussama '+eur(soldes['Oussama'])+'</div></div>';
+  } else {
+    kpis =
+      '<div class="card kpi" style="border:2px solid var(--info)"><div class="kpi-label">Solde Bilel</div><div class="kpi-value" style="color:'+(soldes['Bilel']>=0?'var(--success)':'var(--danger)')+'">'+eur(soldes['Bilel'])+'</div><div class="kpi-sub">'+state.flux.filter(f=>f.qui==='Bilel').length+' opérations</div></div>' +
+      '<div class="card kpi" style="border:2px solid var(--warn)"><div class="kpi-label">Solde Oussama</div><div class="kpi-value" style="color:'+(soldes['Oussama']>=0?'var(--success)':'var(--danger)')+'">'+eur(soldes['Oussama'])+'</div><div class="kpi-sub">'+state.flux.filter(f=>f.qui==='Oussama').length+' opérations</div></div>' +
+      '<div class="card kpi"><div class="kpi-label">Total général</div><div class="kpi-value">'+eur(totalGeneral)+'</div><div class="kpi-sub">inclut les plus-values de ventes</div></div>';
+  }
+  document.getElementById('treso-kpis').innerHTML = kpis;
+
+  // Journal filtré
+  const filtre = tresoView === 'mine' ? moi : quiFilter.value;
+  const journal = filtre ? state.flux.filter(f => f.qui === filtre) : state.flux;
+  const idxMap = journal.map(f => state.flux.indexOf(f));
+  document.getElementById('treso-journal-title').textContent = tresoView === 'mine' ? 'Journal — ma caisse (' + moi + ')' : 'Journal — toutes les caisses';
+  document.getElementById('treso-journal-sub').textContent = journal.length + ' opération' + (journal.length>1?'s':'');
+
+  document.getElementById('fluxTable').innerHTML = journal.map((f,k)=>
+    '<tr>' +
+    '<td style="color:var(--success);font-weight:600;font-variant-numeric:tabular-nums">'+(f.in?'+'+eur(f.in):'')+'</td>' +
+    '<td style="color:var(--danger);font-weight:600;font-variant-numeric:tabular-nums">'+(f.out?'-'+eur(f.out):'')+'</td>' +
+    '<td>'+quiBadge(f.qui)+'</td>' +
+    '<td style="font-weight:500">'+esc(f.client||'')+'</td>' +
+    '<td>'+esc(f.mois||'')+'</td>' +
+    '<td style="max-width:260px;font-size:.75rem;color:var(--fg-muted)">'+esc(f.comm||'')+'</td>' +
+    '<td><button class="row-del" title="Supprimer" onclick="deleteFlux('+idxMap[k]+')">&times;</button></td></tr>'
+  ).join('');
+  // Vue mobile : cartes (idxMap[k] = index réel dans state.flux, même filtré)
+  document.getElementById('treso-mobile').innerHTML = journal.map((f,k)=>
+    '<div class="m-card">' +
+      '<div class="m-card-row">' +
+        '<span class="m-card-amount" style="color:'+(f.in?'var(--success)':'var(--danger)')+'">'+(f.in?'+ '+eur(f.in):'- '+eur(f.out||0))+'</span>' +
+        quiBadge(f.qui) +
+      '</div>' +
+      '<div class="m-card-title">'+esc(f.client||'')+'</div>' +
+      '<div class="m-card-sub">'+esc(f.mois||'')+(f.comm?' · '+esc(f.comm.length>50?f.comm.slice(0,50)+'…':f.comm):'')+'</div>' +
+      '<div class="m-actions"><button type="button" class="btn btn-secondary" style="min-width:44px;flex:0 0 44px" title="Supprimer" onclick="deleteFlux('+idxMap[k]+')">&times;</button></div>' +
+    '</div>'
+  ).join('') || '<div style="color:var(--fg-muted);font-size:.875rem">Aucune opération</div>';
+}
+
+function formFlux() {
+  openModal('Nouvelle opération',
+    '<form id="f-flux" onsubmit="saveFlux(event)">' +
+    '<div class="form-row">' +
+      '<div class="form-group"><label class="form-label" for="ff-type">Type *</label>' +
+      '<select class="form-select" id="ff-type"><option value="in">Entrée (revenu)</option><option value="out">Sortie (dépense)</option></select></div>' +
+      '<div class="form-group"><label class="form-label" for="ff-montant">Montant (€) *</label>' +
+      '<input class="form-input" id="ff-montant" required inputmode="decimal" placeholder="Ex : 450"></div>' +
+    '</div>' +
+    '<div class="form-row">' +
+      '<div class="form-group"><label class="form-label" for="ff-mois">Mois</label>' +
+      '<select class="form-select" id="ff-mois">'+MONTHS.map(m=>'<option'+(m==='Octobre'?' selected':'')+'>'+m+'</option>').join('')+'</select></div>' +
+    '</div>' +
+    '<div class="form-group"><label class="form-label" for="ff-client">Client / Fournisseur *</label>' +
+    '<input class="form-input" id="ff-client" required maxlength="60" placeholder="Ex : Fromagerie Dupont"></div>' +
+    '<div class="form-group"><label class="form-label" for="ff-comm">Commentaire</label>' +
+    '<input class="form-input" id="ff-comm" maxlength="120" placeholder="Ex : Foire d\'Antony"></div>' +
+    '<div class="form-check"><input type="checkbox" id="ff-transport"><label for="ff-transport" style="font-size:.8125rem;font-weight:500">Dépense de transport</label></div>' +
+    '<div class="modal-actions">' +
+      '<button type="button" class="btn btn-secondary" onclick="closeModal()">Annuler</button>' +
+      '<button type="submit" class="btn btn-primary">Enregistrer</button>' +
+    '</div></form>'
+  );
+}
+function saveFlux(ev) {
+  ev.preventDefault();
+  const type = fv('ff-type');
+  const montant = fn('ff-montant');
+  if (!montant) return;
+  state.flux.unshift({
+    in: type==='in' ? montant : null,
+    out: type==='out' ? montant : null,
+    qui: state.user || 'Bilel',
+    client: fv('ff-client'),
+    isTransport: type==='out' && document.getElementById('ff-transport').checked,
+    isAchat: false,
+    mois: fv('ff-mois'),
+    comm: fv('ff-comm')
+  });
+  toast('Opération enregistrée : ' + eur(montant));
+  closeModal(); saveState(); renderAll();
+}
+function deleteFlux(i) {
+  if (!confirm('Supprimer cette opération ?')) return;
+  state.flux.splice(i,1);
+  toast('Opération supprimée');
+  saveState(); renderAll();
+}
+
+// ===== Ventes =====
+function renderVentes() {
+  const ventes = state.ventes.filter(v=>v.vendu);
+  const ca = ventes.reduce((s,v)=>s+(v.vendu||0),0);
+  const gains = ventes.reduce((s,v)=>s+((v.vendu||0)-(v.achete||0)-(v.depense||0)),0);
+  document.getElementById('vente-ca').textContent = eur(ca);
+  document.getElementById('vente-gain').textContent = eur(gains);
+  document.getElementById('vente-n').textContent = ventes.length;
+
+  document.getElementById('ventesTable').innerHTML = ventes.map(v=>{
+    const gain = (v.vendu||0)-(v.achete||0)-(v.depense||0);
+    const marge = v.vendu ? Math.round(gain/(v.vendu||1)*100) : 0;
+    const ri = state.ventes.indexOf(v); // index réel dans state.ventes, pas l'index filtré
+    return '<tr>' +
+      '<td style="font-weight:500">'+esc(v.vitrine)+'</td>' +
+      '<td style="font-variant-numeric:tabular-nums">'+(v.achete?eur(v.achete):'—')+'</td>' +
+      '<td style="font-variant-numeric:tabular-nums">'+eur(v.vendu)+'</td>' +
+      '<td style="font-variant-numeric:tabular-nums">'+(v.depense?eur(v.depense):'—')+'</td>' +
+      '<td style="font-variant-numeric:tabular-nums;font-weight:600;color:'+(gain>=0?'var(--success)':'var(--danger)')+'">'+eur(gain)+'</td>' +
+      '<td><span class="badge badge-dispo">'+marge+'%</span></td>' +
+      '<td>'+(v.qui ? quiBadge(v.qui) : '<span style="color:var(--fg-faint);font-size:.75rem">non défini</span>')+'</td>' +
+      '<td><button class="row-del" title="Supprimer" onclick="deleteVente('+ri+')">&times;</button></td></tr>';
+  }).join('');
+  // Vue mobile : cartes (bénéfice = vendu − acheté − dépenses)
+  document.getElementById('ventes-mobile').innerHTML = ventes.map(v=>{
+    const gain = (v.vendu||0)-(v.achete||0)-(v.depense||0);
+    const ri = state.ventes.indexOf(v);
+    return '<div class="m-card">' +
+      '<div class="m-card-row">' +
+        '<span class="m-card-title">'+esc(v.vitrine)+'</span>' +
+        (v.qui ? quiBadge(v.qui) : '') +
+      '</div>' +
+      '<div class="m-card-row">' +
+        '<span class="m-card-sub">Vendu '+eur(v.vendu)+(v.achete?' · Acheté '+eur(v.achete):'')+(v.depense?' · Dép. '+eur(v.depense):'')+'</span>' +
+        '<span class="m-card-amount" style="font-size:.875rem;color:'+(gain>=0?'var(--success)':'var(--danger)')+'">'+eur(gain)+'</span>' +
+      '</div>' +
+      '<div class="m-actions"><button type="button" class="btn btn-secondary" style="min-width:44px;flex:0 0 44px" title="Supprimer" onclick="deleteVente('+ri+')">&times;</button></div>' +
+    '</div>';
+  }).join('') || '<div style="color:var(--fg-muted);font-size:.875rem">Aucune vente enregistrée</div>';
+}
+
+function formVente() {
+  openModal('Enregistrer une vente',
+    '<form id="f-vente" onsubmit="saveVente(event)">' +
+    '<div class="form-group"><label class="form-label" for="fve-name">Vitrine vendue *</label>' +
+    '<input class="form-input" id="fve-name" required maxlength="60" placeholder="Ex : Vitrine Portugais"></div>' +
+    '<div class="form-row">' +
+      '<div class="form-group"><label class="form-label" for="fve-achete">Prix d\'achat (€)</label>' +
+      '<input class="form-input" id="fve-achete" inputmode="decimal" placeholder="Ex : 1400"></div>' +
+      '<div class="form-group"><label class="form-label" for="fve-vendu">Prix de vente (€) *</label>' +
+      '<input class="form-input" id="fve-vendu" required inputmode="decimal" placeholder="Ex : 2200"></div>' +
+    '</div>' +
+    '<div class="form-group"><label class="form-label" for="fve-dep">Dépenses liées (€)</label>' +
+    '<input class="form-input" id="fve-dep" inputmode="decimal" placeholder="Ex : 450"></div>' +
+    '<div class="form-group"><label class="form-label" for="fve-qui">Encaissé par</label>' +
+    '<select class="form-select" id="fve-qui">'+COMPTES.map(c=>'<option'+((state.user||'Bilel')===c?' selected':'')+'>'+c+'</option>').join('')+'</select></div>' +
+    '<div style="font-size:.75rem;color:var(--fg-muted);margin-top:2px">Une entrée est créée automatiquement en trésorerie au nom du compte sélectionné.</div>' +
+    '<div class="modal-actions">' +
+      '<button type="button" class="btn btn-secondary" onclick="closeModal()">Annuler</button>' +
+      '<button type="submit" class="btn btn-primary">Enregistrer</button>' +
+    '</div></form>'
+  );
+}
+function saveVente(ev) {
+  ev.preventDefault();
+  const qui = fv('fve-qui') || state.user || 'Bilel';
+  const nom = fv('fve-name');
+  const vendu = fn('fve-vendu');
+  state.ventes.unshift({
+    vitrine: nom,
+    achete: fn('fve-achete'),
+    vendu: vendu,
+    depense: fn('fve-dep') || 0,
+    qui: qui
+  });
+  // Flux d'entrée automatique au nom du compte encaisseur
+  if (vendu) {
+    state.flux.unshift({
+      in: vendu,
+      out: null,
+      qui: qui,
+      client: nom,
+      isTransport: false,
+      isAchat: false,
+      mois: MONTHS[currentMonthIndex()],
+      comm: 'Vente vitrine : ' + nom
+    });
+  }
+  toast('Vente enregistrée — entrée trésorerie créée');
+  closeModal(); saveState(); renderAll();
+}
+function deleteVente(i) {
+  if (!confirm('Supprimer cette vente ?')) return;
+  const idx = Number(i);
+  if (!Number.isInteger(idx) || idx < 0 || idx >= state.ventes.length) return;
+  state.ventes.splice(idx,1); // i = index réel dans state.ventes (calculé par indexOf au rendu)
+  toast('Vente supprimée');
+  saveState(); renderAll();
+}
+
+// ===== Lieux de stockage =====
+function renderLieux() {
+  document.getElementById('lieuxTable').innerHTML = state.lieux.map((l,i)=>{
+    const n = state.vitrines.filter(v=>v.lieu===l.nom).length;
+    const badgeCls = l.type==='Incertain' ? 'badge-maintenance' : l.type==='Local associé' ? 'badge-info' : 'badge-dispo';
+    return '<tr>' +
+      '<td style="font-weight:600">'+esc(l.nom)+'</td>' +
+      '<td><span class="badge '+badgeCls+'">'+esc(l.type)+'</span></td>' +
+      '<td><span style="font-variant-numeric:tabular-nums;font-weight:600">'+n+'</span>' +
+        (n ? ' <button class="btn btn-secondary btn-sm" style="margin-left:6px" onclick="filterByLieu(\''+esc(l.nom)+'\')">Voir</button>' : '')+'</td>' +
+      '<td style="font-size:.75rem;color:var(--fg-muted)">'+esc(l.note||'')+'</td>' +
+      '<td>' +
+        '<button class="btn btn-secondary btn-sm" onclick="formLieu('+i+')">Modifier</button> ' +
+        '<button class="row-del" title="Supprimer" onclick="deleteLieu('+i+')">&times;</button>' +
+      '</td></tr>';
+  }).join('');
+  document.getElementById('lieux-count').textContent = state.lieux.length + ' lieux · ' + state.vitrines.filter(v=>state.lieux.some(l=>l.nom===v.lieu)).length + ' vitrines localisées';
+  // Vue mobile : cartes avec boutons pleine largeur ≥44px
+  document.getElementById('lieux-mobile').innerHTML = state.lieux.map((l,i)=>{
+    const n = state.vitrines.filter(v=>v.lieu===l.nom).length;
+    const badgeCls = l.type==='Incertain' ? 'badge-maintenance' : l.type==='Local associé' ? 'badge-info' : 'badge-dispo';
+    return '<div class="m-card">' +
+      '<div class="m-card-row">' +
+        '<span class="m-card-title">'+esc(l.nom)+'</span>' +
+        '<span class="badge '+badgeCls+'">'+esc(l.type)+'</span>' +
+      '</div>' +
+      '<div class="m-card-sub">'+n+' vitrine'+(n>1?'s':'')+(l.note?' · '+esc(l.note):'')+'</div>' +
+      '<div class="m-actions">' +
+        '<button type="button" class="btn btn-secondary" onclick="formLieu('+i+')">Modifier</button>' +
+        (n ? '<button type="button" class="btn btn-primary" onclick="filterByLieu(\''+esc(l.nom)+'\')">Voir les vitrines</button>' : '') +
+      '</div>' +
+    '</div>';
+  }).join('') || '<div style="color:var(--fg-muted);font-size:.875rem">Aucun lieu</div>';
+}
+
+function filterByLieu(nom) {
+  showPage('vitrines');
+  document.getElementById('vitrineSearch').value = '';
+  document.getElementById('etatFilter').value = '';
+  const sel = document.getElementById('lieuFilter');
+  if ([...sel.options].some(o=>o.value===nom)) sel.value = nom;
+  renderVitrines();
+}
+
+const LIEU_TYPES = ['Local associé','Dépôt partenaire','Incertain'];
+
+function formLieu(idx) {
+  const l = idx!=null ? state.lieux[idx] : null;
+  openModal(l ? 'Modifier le lieu' : 'Ajouter un lieu',
+    '<form id="f-lieu" onsubmit="saveLieu(event,'+(idx!=null?idx:'null')+')">' +
+    '<div class="form-group"><label class="form-label" for="fl-nom">Nom du lieu *</label>' +
+    '<input class="form-input" id="fl-nom" required maxlength="50" value="'+esc(l?l.nom:'')+'" placeholder="Ex : local trappes"></div>' +
+    '<div class="form-group"><label class="form-label" for="fl-type">Type</label>' +
+    '<select class="form-select" id="fl-type">'+LIEU_TYPES.map(t=>'<option'+(l&&l.type===t?' selected':'')+'>'+t+'</option>').join('')+'</select></div>' +
+    '<div class="form-group"><label class="form-label" for="fl-note">Note</label>' +
+    '<input class="form-input" id="fl-note" maxlength="100" value="'+esc(l?l.note:'')+'" placeholder="Ex : clé chez le gardien"></div>' +
+    '<div class="modal-actions">' +
+      '<button type="button" class="btn btn-secondary" onclick="closeModal()">Annuler</button>' +
+      '<button type="submit" class="btn btn-primary">'+(l?'Enregistrer':'Ajouter')+'</button>' +
+    '</div></form>'
+  );
+}
+function saveLieu(ev, idx) {
+  ev.preventDefault();
+  const data = {nom: fv('fl-nom'), type: fv('fl-type'), note: fv('fl-note')};
+  if (idx!=null) {
+    const old = state.lieux[idx].nom;
+    state.lieux[idx] = data;
+    if (old !== data.nom) state.vitrines.forEach(v => { if (v.lieu===old) v.lieu = data.nom; });
+    toast('Lieu mis à jour' + (old!==data.nom ? ' · vitrines relogées' : ''));
+  } else {
+    if (state.lieux.some(l=>l.nom.toLowerCase()===data.nom.toLowerCase())) { toast('Ce lieu existe déjà'); return; }
+    state.lieux.push(data);
+    toast('Lieu ajouté');
+  }
+  closeModal(); saveState(); renderAll();
+}
+function deleteLieu(i) {
+  const l = state.lieux[i];
+  const n = state.vitrines.filter(v=>v.lieu===l.nom).length;
+  if (!confirm('Supprimer le lieu "'+l.nom+'" ?'+(n ? '\n\n'+n+' vitrine(s) y sont rangées : elles passeront à "non renseigné".' : ''))) return;
+  state.vitrines.forEach(v => { if (v.lieu===l.nom) v.lieu = 'non renseigné'; });
+  state.lieux.splice(i,1);
+  toast('Lieu supprimé');
+  saveState(); renderAll();
+}
+
+// ===== Actions =====
+function renderActions() {
+  document.getElementById('actionsTable').innerHTML = state.actions.map((a,i)=>{
+    const fait = /fait/i.test(a.statut||'');
+    return '<tr style="'+(fait?'opacity:.55':'')+'">' +
+      '<td colspan="2"><label class="act-check"><input type="checkbox" class="act-box" '+(fait?'checked':'')+' onchange="toggleAction('+i+',this.checked)">' +
+      '<span style="font-weight:'+(fait?'400':'500')+';text-decoration:'+(fait?'line-through':'none')+'">'+esc(a.action)+'</span></label></td>' +
+      '<td style="font-size:.75rem;color:var(--fg-muted);max-width:280px">'+esc(a.comm||'')+'</td>' +
+      '<td><span class="badge '+(fait?'badge-dispo':'badge-maintenance')+'">'+(fait?'Fait':(a.statut&&!fait&&a.statut!=='Non réalisé'?esc(a.statut):'À faire'))+'</span></td>' +
+      '<td><button class="row-del" title="Supprimer" onclick="deleteAction('+i+')">&times;</button></td></tr>';
+  }).join('');
+}
+
+function formAction() {
+  openModal('Nouvelle action',
+    '<form id="f-act" onsubmit="saveAction(event)">' +
+    '<div class="form-group"><label class="form-label" for="fa-action">Action *</label>' +
+    '<input class="form-input" id="fa-action" required maxlength="100" placeholder="Ex : Acheter des roues pour les PSV"></div>' +
+    '<div class="form-group"><label class="form-label" for="fa-comm">Commentaire</label>' +
+    '<input class="form-input" id="fa-comm" maxlength="150" placeholder="Ex : pour les vitrines ayant des roues HS"></div>' +
+    '<div class="modal-actions">' +
+      '<button type="button" class="btn btn-secondary" onclick="closeModal()">Annuler</button>' +
+      '<button type="submit" class="btn btn-primary">Ajouter</button>' +
+    '</div></form>'
+  );
+}
+function saveAction(ev) {
+  ev.preventDefault();
+  state.actions.unshift({action: fv('fa-action'), comm: fv('fa-comm'), statut: 'Non réalisé'});
+  toast('Action ajoutée');
+  closeModal(); saveState(); renderAll();
+}
+function toggleAction(i, checked) {
+  state.actions[i].statut = checked ? 'Fait' : 'Non réalisé';
+  saveState();
+  // Préserver la position de scroll pendant le re-render complet
+  const mainEl = document.querySelector('.main');
+  const y = window.scrollY, mt = mainEl ? mainEl.scrollTop : 0;
+  renderAll();
+  window.scrollTo(0, y);
+  if (mainEl) mainEl.scrollTop = mt;
+}
+function deleteAction(i) {
+  if (!confirm('Supprimer cette action ?')) return;
+  state.actions.splice(i,1);
+  toast('Action supprimée');
+  saveState(); renderAll();
+}
+
+// ===== Scan NFC =====
+function searchSerial() {
+  const q = (document.getElementById('serialSearch').value||'').trim().toLowerCase();
+  const box = document.getElementById('serial-results');
+  if (!q || q.length < 2) { box.innerHTML = ''; return; }
+  const hits = state.vitrines.filter(v =>
+    v.id.toLowerCase().includes(q) ||
+    (v.serie||'').toLowerCase().includes(q) ||
+    v.model.toLowerCase().includes(q) ||
+    (v.commentaire||'').toLowerCase().includes(q)
+  );
+  if (!hits.length) {
+    box.innerHTML = '<div style="color:var(--fg-muted);font-size:.8125rem">Aucune vitrine trouvée pour "'+esc(q)+'"</div>';
+    return;
+  }
+  box.innerHTML = '<div class="table-wrap serial-desktop"><table><thead><tr><th>ID</th><th>N° série</th><th>Modèle</th><th>Lieu</th><th>État</th><th></th></tr></thead><tbody>' +
+    hits.slice(0,10).map(v => {
+      const etat = etatAuto(v);
+      return '<tr class="clickable" onclick="showVitrine(\''+v.id+'\')">' +
+        '<td style="font-weight:600;color:var(--accent-fg)">'+v.id+'</td>' +
+        '<td style="font-family:monospace;font-size:.75rem">'+(v.serie?esc(v.serie):'—')+'</td>' +
+        '<td>'+esc(v.model)+'</td>' +
+        '<td>'+esc(v.lieu)+'</td>' +
+        '<td><span class="badge '+etat.cls+'">'+etat.label+'</span></td>' +
+        '<td><button class="btn btn-primary btn-sm" onclick="event.stopPropagation();showVitrine(\''+v.id+'\')">Fiche</button></td></tr>';
+    }).join('') +
+    '</tbody></table></div>' +
+    '<div class="serial-mobile">' +
+      hits.slice(0,10).map(vitrineCardHTML).join('') +
+    '</div>' +
+    (hits.length > 10 ? '<div style="font-size:.75rem;color:var(--fg-muted);margin-top:6px">'+hits.length+' résultats · affinez votre recherche</div>' : '');
+}
+function simulateScan(isNew) {
+  document.getElementById('scan-container').style.opacity = '.5';
+  document.getElementById('scan-container').style.pointerEvents = 'none';
+  setTimeout(() => {
+    document.getElementById('scan-container').style.opacity = '';
+    document.getElementById('scan-container').style.pointerEvents = '';
+    document.getElementById('scan-container').hidden = true;
+    const result = document.getElementById('scan-result');
+    result.hidden = false;
+    if (isNew) {
+      const tagId = 'NFC-' + Math.random().toString(36).slice(2,8).toUpperCase();
+      result.innerHTML =
+      '<div class="card" style="max-width:480px;margin:0 auto">' +
+        '<div style="text-align:center;margin-bottom:18px">' +
+          '<div style="width:56px;height:56px;border-radius:50%;background:var(--warn-bg);display:inline-flex;align-items:center;justify-content:center">' +
+            '<svg width="26" height="26" viewBox="0 0 28 28" fill="none"><path d="M14 7v10M14 21v.5" stroke="var(--warn)" stroke-width="2.5" stroke-linecap="round"/><circle cx="14" cy="14" r="11" stroke="var(--warn)" stroke-width="2"/></svg>' +
+          '</div>' +
+          '<div style="font-family:var(--font-display);font-size:1.125rem;font-weight:600;margin-top:8px">Badge inconnu</div>' +
+          '<div style="font-size:.8125rem;color:var(--fg-muted);margin-top:2px">ID puce : '+tagId+' · cette vitrine n\'est pas encore dans le parc</div>' +
+        '</div>' +
+        '<div style="font-size:.875rem;color:var(--fg-muted);margin-bottom:14px;text-align:center">Enregistrez-la maintenant pour l\'ajouter au parc.</div>' +
+        '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">' +
+          '<button class="btn btn-primary" onclick="formVitrineFromScan(\''+tagId+'\')">Enregistrer cette vitrine</button>' +
+          '<button class="btn btn-secondary" onclick="resetScan()">Ignorer</button>' +
+        '</div>' +
+      '</div>';
+    } else {
+      const typed = (document.getElementById('serialSearch').value||'').trim().toLowerCase();
+      let v = typed ? state.vitrines.find(x => x.serie && x.serie.toLowerCase() === typed) : null;
+      if (!v && typed) v = state.vitrines.find(x => x.id.toLowerCase() === typed || (x.commentaire||'').toLowerCase().includes(typed));
+      if (!v) v = state.vitrines[Math.floor(Math.random()*state.vitrines.length)];
+      const etat = etatAuto(v);
+      result.innerHTML =
+      '<div class="card" style="max-width:480px;margin:0 auto">' +
+        '<div style="text-align:center;margin-bottom:18px">' +
+          '<div style="width:56px;height:56px;border-radius:50%;background:var(--success-bg);display:inline-flex;align-items:center;justify-content:center">' +
+            '<svg width="24" height="24" viewBox="0 0 28 28" fill="none"><path d="M7 14l5 5 9-9" stroke="var(--success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+          '</div>' +
+          '<div style="font-family:var(--font-display);font-size:1.125rem;font-weight:600;margin-top:8px">Vitrine identifiée</div>' +
+          (v.serie ? '<div style="font-size:.75rem;color:var(--fg-muted);margin-top:2px;font-family:monospace">Série '+esc(v.serie)+'</div>' : '') +
+        '</div>' +
+        '<div class="stat-row"><span class="label">ID</span><span class="value" style="color:var(--accent-fg)">'+v.id+'</span></div>' +
+        '<div class="stat-row"><span class="label">Modèle</span><span class="value">'+esc(v.model)+'</span></div>' +
+        '<div class="stat-row"><span class="label">État</span><span><span class="badge '+etat.cls+'">'+etat.label+'</span></span></div>' +
+        '<div class="stat-row"><span class="label">Lieu</span><span class="value">'+esc(v.lieu)+'</span></div>' +
+        '<div class="stat-row"><span class="label">Réparations cumulées</span><span class="value">'+(v.reparation?eur(v.reparation):'—')+'</span></div>' +
+        '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px">' +
+          '<button class="btn btn-primary" onclick="showVitrine(\''+v.id+'\')">Ouvrir la fiche</button>' +
+          '<button class="btn btn-secondary" onclick="resetScan()">Scanner une autre</button>' +
+        '</div>' +
+      '</div>';
+    }
+  }, 1800);
+}
+
+function formVitrineFromScan(tagId) {
+  const lieux = state.lieux.map(l=>l.nom);
+  openModal('Nouvelle vitrine — badge '+tagId,
+    '<form id="f-scanv" onsubmit="saveVitrineFromScan(event,\''+tagId+'\')">' +
+    '<div class="form-group"><label class="form-label">Badge NFC</label><div class="form-input" style="background:var(--surface-alt)">'+tagId+'</div></div>' +
+    '<div class="form-group"><label class="form-label" for="fs-model">Modèle *</label>' +
+    '<input class="form-input" id="fs-model" required maxlength="80" placeholder="Ex : Vitrine Elite Froid 2m"></div>' +
+    '<div class="form-group"><label class="form-label" for="fs-serie">N° de série (sur la plaque constructeur)</label>' +
+    '<input class="form-input" id="fs-serie" maxlength="40" placeholder="Ex : EF-2024-00142"></div>' +
+    '<div class="form-row">' +
+      '<div class="form-group"><label class="form-label" for="fs-prix">Valeur (€)</label>' +
+      '<input class="form-input" id="fs-prix" inputmode="decimal" placeholder="Ex : 1500"></div>' +
+      '<div class="form-group"><label class="form-label" for="fs-lieu">Lieu de rangement</label>' +
+      '<select class="form-select" id="fs-lieu">'+lieux.map(l=>'<option'+(l==='local trappes'?' selected':'')+'>'+esc(l)+'</option>').join('')+'</select></div>' +
+    '</div>' +
+    '<div class="form-row">' +
+      '<div class="form-group"><label class="form-label" for="fs-qt">Quantité (batch)</label>' +
+      '<input class="form-input" id="fs-qt" type="number" min="1" max="50" value="1"></div>' +
+      '<div class="form-group"><label class="form-label" for="fs-fonc">État</label>' +
+      '<select class="form-select" id="fs-fonc"><option value="oui" selected>Fonctionnelle</option><option value="non">Hors service</option></select></div>' +
+    '</div>' +
+    '<div class="modal-actions">' +
+      '<button type="button" class="btn btn-secondary" onclick="resetScan()">Annuler</button>' +
+      '<button type="submit" class="btn btn-primary">Enregistrer au parc</button>' +
+    '</div></form>'
+  );
+}
+function saveVitrineFromScan(ev, tagId) {
+  ev.preventDefault();
+  const qt = Math.min(50, Math.max(1, parseInt(fv('fs-qt'),10)||1));
+  const model = fv('fs-model');
+  const serie = fv('fs-serie');
+  const prix = fn('fs-prix');
+  const lieu = fv('fs-lieu');
+  const fonctionnelle = fv('fs-fonc')==='oui';
+  for (let k=0;k<qt;k++) {
+    state.vitrines.push({id: nextVitrineId(), model: model+(qt>1?' #'+(k+1):''), serie: serie?(serie+(qt>1?'-'+(k+1):'')):null, prix: prix, reparation: 0, fonctionnelle: fonctionnelle, lieu: lieu, commentaire: 'Badge NFC '+tagId+(qt>1?'-'+(k+1):'')});
+  }
+  toast(qt + ' vitrine' + (qt>1?'s':'') + ' ajoutée' + (qt>1?'s':'') + ' au parc (' + lieu + ')');
+  closeModal(); saveState(); renderAll(); resetScan();
+}
+
+function resetScan() {
+  document.getElementById('scan-container').hidden = false;
+  document.getElementById('scan-result').hidden = true;
+}
+
+function toggleNfcZone() {
+  if (window.matchMedia('(min-width:769px)').matches) return;
+  const zone = document.getElementById('nfc-search-row');
+  const btn = document.getElementById('nfc-toggle');
+  const open = zone.hasAttribute('hidden');
+  if (open) zone.removeAttribute('hidden'); else zone.setAttribute('hidden','');
+  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+function collapseNfcZoneOnMobile() {
+  if (!window.matchMedia('(max-width:768px)').matches) return;
+  document.getElementById('nfc-search-row').setAttribute('hidden','');
+  document.getElementById('nfc-toggle').setAttribute('aria-expanded','false');
+}
+
+// ===== Navigation =====
+function showPage(page, skipNav) {
+  document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+  const target = document.getElementById('page-' + page);
+  if (target) target.classList.add('active');
+  if (!skipNav) {
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.page === page));
+  }
+  window.scrollTo(0,0);
+  if (page === 'vitrines') resetScan();
+}
+
+function renderAll() {
+  renderDashboard();
+  initVitrineFilters();
+  renderVitrines();
+  renderPlanning();
+  renderTresorerie();
+  renderVentes();
+  renderLieux();
+  renderActions();
+}
+
+document.querySelectorAll('.nav-item').forEach(btn => btn.addEventListener('click', () => {
+  if (!btn.dataset.page) return; // bouton « Plus »
+  showPage(btn.dataset.page);
+}));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeMoreSheet(); } });
+
+// ===== Bottom sheet « Plus » (mobile) =====
+function openMoreSheet() {
+  document.getElementById('more-overlay').hidden = false;
+  requestAnimationFrame(() => {
+    document.getElementById('more-overlay').classList.add('show');
+    document.getElementById('more-sheet').classList.add('show');
+  });
+}
+function closeMoreSheet() {
+  document.getElementById('more-overlay').classList.remove('show');
+  document.getElementById('more-sheet').classList.remove('show');
+  setTimeout(() => { document.getElementById('more-overlay').hidden = true; }, 200);
+}
+document.getElementById('nav-more').addEventListener('click', openMoreSheet);
+// Bouton « Plus » visible seulement en mobile (nav-extra caché dans la même media query)
+(function(){
+  const mq = window.matchMedia('(max-width:768px)');
+  const sync = () => {
+    document.getElementById('nav-more').style.display = mq.matches ? 'flex' : 'none';
+    if (mq.matches) collapseNfcZoneOnMobile();
+    else { document.getElementById('nfc-search-row').removeAttribute('hidden'); document.getElementById('nfc-toggle').setAttribute('aria-expanded','false'); }
+  };
+  mq.addEventListener('change', sync);
+  sync();
+})();
+
+loadState();
+renderAll();
+applyUser();
+collapseNfcZoneOnMobile();
+</script>
+</body>
+</html>
