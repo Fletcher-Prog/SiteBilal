@@ -1362,6 +1362,13 @@ function formVitrine(existingId) {
     '</div>' +
     '<div class="form-group"><label class="form-label" for="fv-comm">Commentaire</label>' +
     '<textarea class="form-textarea" id="fv-comm" maxlength="200" placeholder="Ex : vitre cassée, souffle 2 degrés...">'+esc(v?v.commentaire:'')+'</textarea></div>' +
+    '<div class="form-group"><label class="form-label">Badge NFC</label>' +
+      '<div style="display:flex;gap:8px;align-items:stretch">' +
+        '<input class="form-input" id="fv-nfc" style="flex:1" value="'+esc(v&&v.nfcBadge?v.nfcBadge:'')+'" placeholder="Ex : NFC-V065">' +
+        '<button type="button" class="btn btn-secondary" style="min-height:44px;white-space:nowrap;padding:0 16px" onclick="scanNfcForForm()">📡 Scanner</button>' +
+      '</div>' +
+      '<div id="fv-nfc-status" style="font-size:.75rem;color:var(--fg-muted);margin-top:4px">'+(v&&v.nfcBadge?'Badge associé : '+esc(v.nfcBadge):'Scannez ou saisissez l\'ID du badge NFC')+'</div>' +
+    '</div>' +
     '<div class="modal-actions">' +
       '<button type="button" class="btn btn-secondary" onclick="closeModal()">Annuler</button>' +
       '<button type="submit" class="btn btn-primary">'+(v?'Enregistrer':'Ajouter')+'</button>' +
@@ -1379,6 +1386,7 @@ function saveVitrine(ev, id) {
     lieu: fv('fv-lieu') || 'non renseigné',
     fonctionnelle: fv('fv-fonc') === 'oui' ? true : fv('fv-fonc') === 'non' ? false : null,
     commentaire: fv('fv-comm'),
+    nfcBadge: fv('fv-nfc') || null,
   };
   if (id) {
     const v = state.vitrines.find(x=>x.id===id);
@@ -2520,6 +2528,28 @@ function saveIntervention(ev, vid) {
   });
   saveState(); closeModal(); renderAll(); showVitrine(vid);
   toast('Intervention ajoutée à ' + vid + ' · ' + eur(cout));
+}
+
+// ===== NFC : scan pour formulaire vitrine =====
+function scanNfcForForm() {
+  const input = document.getElementById('fv-nfc');
+  const status = document.getElementById('fv-nfc-status');
+  if (!input || !status) return;
+  const btn = event.target.closest('button');
+  const origText = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="nfc-spinner" style="width:18px;height:18px;border-width:2px;display:inline-block;vertical-align:middle"></span>';
+  status.textContent = 'Approchez le badge NFC...';
+  status.style.color = 'var(--accent-fg)';
+  setTimeout(() => {
+    const badgeId = 'NFC-' + (Date.now().toString(36).toUpperCase().slice(-6));
+    input.value = badgeId;
+    status.textContent = '✓ Badge détecté : ' + badgeId;
+    status.style.color = 'var(--success)';
+    btn.disabled = false;
+    btn.innerHTML = origText;
+    toast('Badge NFC scanné : ' + badgeId);
+  }, 2000);
 }
 
 // ===== NFC : écriture / lecture (simulation) =====
