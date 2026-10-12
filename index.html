@@ -11,6 +11,7 @@
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='96' fill='%232f5d62'/%3E%3Cpath d='M140 140l116 240 116-240' stroke='%23fff' stroke-width='44' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='96' fill='%232f5d62'/%3E%3Cpath d='M140 140l116 240 116-240' stroke='%23fff' stroke-width='44' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <title>VitriTrack — Gestion Location Vitrines</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap">
 <style>
 /* Layout: sidebar + main, bottom-nav mobile. Données réelles Excel client. État persisté en localStorage. */
@@ -386,6 +387,66 @@ button.alert-item{border:none;background:none;cursor:pointer;text-align:left;fon
   .seg-btn{flex:1;padding:10px}
   .login-card{padding:22px 16px;max-width:calc(100vw - 32px)}
 }
+
+/* ===== Filtre période (Dashboard + Trésorerie) ===== */
+.filter-bar{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;margin-bottom:16px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)}
+.filter-field{display:flex;flex-direction:column;gap:4px}
+.filter-field label{font-size:.6875rem;font-weight:600;color:var(--fg-muted);text-transform:uppercase;letter-spacing:.04em}
+.filter-field input[type=date]{padding:8px 10px;min-height:38px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.8125rem;background:var(--bg);color:var(--fg);font-family:var(--font-body);outline:none}
+.filter-field input[type=date]:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-bg)}
+.btn.period-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.filter-reset{background:none;border:none;color:var(--fg-muted);font-size:.8125rem;text-decoration:underline;cursor:pointer;font-family:var(--font-body);padding:10px 6px;min-height:38px}
+.filter-reset:hover{color:var(--danger)}
+
+/* ===== Caisses (trésorerie) ===== */
+.caisse-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-bottom:22px}
+.caisse-card .kpi-value{font-size:1.9rem;margin-bottom:8px}
+.caisse-card .stat-row{padding:6px 0}
+
+/* ===== Interventions / température ===== */
+.temp-card{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:16px;border-left:6px solid var(--border)}
+.temp-card.temp-ok{border-left-color:var(--success)}
+.temp-card.temp-warn{border-left-color:var(--warn)}
+.temp-card.temp-bad{border-left-color:var(--danger)}
+.temp-big{font-family:var(--font-display);font-size:2.6rem;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.temp-ok .temp-big{color:var(--success)}
+.temp-warn .temp-big{color:var(--warn)}
+.temp-bad .temp-big{color:var(--danger)}
+.temp-meta{display:flex;flex-direction:column;gap:4px}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.section-head .card-title{margin:0}
+.section-btns{display:flex;gap:8px;flex-wrap:wrap}
+.int-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.int-desc{font-size:.875rem;font-weight:600;margin-top:2px}
+.int-meta{font-size:.75rem;color:var(--fg-muted);margin-top:2px;display:flex;gap:10px;flex-wrap:wrap}
+.int-cost{font-weight:700;font-variant-numeric:tabular-nums;font-size:.875rem}
+.chk-row{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-light);font-size:.8125rem;cursor:pointer;min-height:44px}
+.chk-row input{width:18px;height:18px;margin-top:1px;accent-color:var(--accent);flex-shrink:0}
+
+/* ===== NFC lecture / écriture ===== */
+.vd-nfc-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px}
+.nfc-spinner{width:56px;height:56px;border:4px solid var(--accent-bg);border-top-color:var(--accent);border-radius:50%;animation:nfcspin 1s linear infinite;margin:8px auto 16px}
+@keyframes nfcspin{to{transform:rotate(360deg)}}
+.nfc-ok{width:56px;height:56px;border-radius:50%;background:var(--success-bg);display:inline-flex;align-items:center;justify-content:center;margin-bottom:10px}
+
+/* ===== Paramètres ===== */
+.settings-textarea{min-height:84px}
+.settings-hint{font-size:.75rem;color:var(--fg-muted);margin-top:4px}
+
+@media (max-width:768px){
+  .filter-bar .filter-field{flex:1 1 130px}
+  .filter-field input[type=date]{min-height:44px;font-size:16px;width:100%}
+  .filter-reset{min-height:44px}
+  .caisse-grid{grid-template-columns:1fr}
+  .temp-big{font-size:2.2rem}
+  .vd-nfc{flex-wrap:wrap}
+  .vd-nfc-btns{flex-basis:100%;flex-direction:column;margin-top:8px}
+  .vd-nfc-btns .btn,.nfc-btns .btn{width:100%;min-height:48px;justify-content:center}
+  .nfc-btns{flex-direction:column;width:100%}
+  .section-btns{width:100%}
+  .section-btns .btn{flex:1 1 100%;min-height:48px;justify-content:center}
+  .chk-row{min-height:48px}
+}
 </style>
 </head>
 <body>
@@ -424,6 +485,10 @@ button.alert-item{border:none;background:none;cursor:pointer;text-align:left;fon
       <svg viewBox="0 0 20 20" fill="none"><path d="M4 3h12v14H4z" stroke="currentColor" stroke-width="1.5"/><path d="M7 7h6M7 10h6M7 13h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
       Actions
     </button>
+    <button class="nav-item nav-extra" data-page="parametres">
+      <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="2.8" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="5.6" stroke="currentColor" stroke-width="1.5"/><path d="M10 1.8v2.4M10 15.8v2.4M1.8 10h2.4M15.8 10h2.4M4.2 4.2l1.7 1.7M14.1 14.1l1.7 1.7M4.2 15.8l1.7-1.7M14.1 5.9l1.7-1.7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Paramètres
+    </button>
     <button class="nav-item" id="nav-more" type="button" aria-label="Plus d'options" style="display:none">
       <svg viewBox="0 0 20 20" fill="none"><circle cx="5" cy="10" r="1.6" fill="currentColor"/><circle cx="10" cy="10" r="1.6" fill="currentColor"/><circle cx="15" cy="10" r="1.6" fill="currentColor"/></svg>
       Plus
@@ -461,6 +526,10 @@ button.alert-item{border:none;background:none;cursor:pointer;text-align:left;fon
   <button class="sheet-item" onclick="closeMoreSheet();showPage('actions')">
     <svg viewBox="0 0 20 20" fill="none"><path d="M4 3h12v14H4z" stroke="currentColor" stroke-width="1.5"/><path d="M7 7h6M7 10h6M7 13h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
     Actions
+  </button>
+  <button class="sheet-item" onclick="closeMoreSheet();showPage('parametres')">
+    <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="2.8" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="5.6" stroke="currentColor" stroke-width="1.5"/><path d="M10 1.8v2.4M10 15.8v2.4M1.8 10h2.4M15.8 10h2.4M4.2 4.2l1.7 1.7M14.1 14.1l1.7 1.7M4.2 15.8l1.7-1.7M14.1 5.9l1.7-1.7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    Paramètres
   </button>
   <div class="sheet-sep"></div>
   <div class="sheet-user">
@@ -503,6 +572,7 @@ button.alert-item{border:none;background:none;cursor:pointer;text-align:left;fon
     </div>
   </div>
   <div class="page-content">
+    <div class="filter-bar" id="datebar-dashboard"></div>
     <div class="kpi-grid">
       <div class="card kpi">
         <div class="kpi-label">CA Location (objectif 70k)</div>
@@ -602,7 +672,7 @@ button.alert-item{border:none;background:none;cursor:pointer;text-align:left;fon
         </svg>
         <div style="font-family:var(--font-display);font-size:1rem;font-weight:600;margin-bottom:4px">Scan NFC</div>
         <div style="font-size:.8125rem;color:var(--fg-muted);margin-bottom:12px">Approchez le badge NFC :</div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+        <div class="nfc-btns" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
           <button class="btn btn-primary" onclick="simulateScan(false)" style="padding:10px 16px;font-size:.8125rem">
             <svg width="16" height="16" viewBox="0 0 20 20" fill="none" style="vertical-align:-2px"><rect x="3" y="4" width="14" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M3 8h14" stroke="currentColor" stroke-width="1.5"/></svg>
             Existante
@@ -671,6 +741,8 @@ button.alert-item{border:none;background:none;cursor:pointer;text-align:left;fon
     <button class="btn btn-primary" onclick="formFlux()">+ Nouvelle opération</button>
   </div>
   <div class="page-content">
+    <div class="filter-bar" id="datebar-tresorerie"></div>
+    <div class="caisse-grid" id="treso-caisses"></div>
     <div class="toolbar" style="margin-bottom:16px">
       <div class="seg-toggle" role="tablist">
         <button class="seg-btn active" id="treso-tab-mine" onclick="setTresoView('mine')">Ma caisse</button>
@@ -690,7 +762,7 @@ button.alert-item{border:none;background:none;cursor:pointer;text-align:left;fon
       </div>
       <div class="table-wrap treso-desktop">
         <table>
-          <thead><tr><th>Entrée</th><th>Sortie</th><th>Qui</th><th>Client / Fournisseur</th><th>Mois</th><th>Commentaire</th><th></th></tr></thead>
+          <thead><tr><th>Entrée</th><th>Sortie</th><th>Qui</th><th>Client / Fournisseur</th><th>Date</th><th>Commentaire</th><th></th></tr></thead>
           <tbody id="fluxTable"></tbody>
         </table>
       </div>
@@ -769,6 +841,47 @@ button.alert-item{border:none;background:none;cursor:pointer;text-align:left;fon
   </div>
 </div>
 
+<!-- PARAMÈTRES -->
+<div class="page-section" id="page-parametres">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Paramètres</h1>
+      <div class="page-sub">Société et modèle de devis / facture · enregistrement automatique</div>
+    </div>
+  </div>
+  <div class="page-content">
+    <div class="grid-2" style="align-items:start">
+      <div class="card">
+        <div class="card-title">Informations entreprise</div>
+        <div class="form-group"><label class="form-label" for="st-nom">Nom de la société</label>
+        <input class="form-input" id="st-nom" maxlength="80" autocomplete="organization" oninput="saveSettings(false)" onchange="saveSettings(true)"></div>
+        <div class="form-group"><label class="form-label" for="st-adresse">Adresse</label>
+        <input class="form-input" id="st-adresse" maxlength="150" autocomplete="street-address" oninput="saveSettings(false)" onchange="saveSettings(true)"></div>
+        <div class="form-group"><label class="form-label" for="st-siret">SIRET / RCS</label>
+        <input class="form-input" id="st-siret" maxlength="60" oninput="saveSettings(false)" onchange="saveSettings(true)"></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label" for="st-tel">Téléphone</label>
+          <input class="form-input" id="st-tel" type="tel" maxlength="30" autocomplete="tel" oninput="saveSettings(false)" onchange="saveSettings(true)"></div>
+          <div class="form-group"><label class="form-label" for="st-email">Email</label>
+          <input class="form-input" id="st-email" type="email" maxlength="80" autocomplete="email" oninput="saveSettings(false)" onchange="saveSettings(true)"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Template devis / facture</div>
+        <div class="form-group"><label class="form-label" for="st-entete">En-tête</label>
+        <textarea class="form-textarea settings-textarea" id="st-entete" maxlength="400" oninput="saveSettings(false)" onchange="saveSettings(true)"></textarea></div>
+        <div class="form-group"><label class="form-label" for="st-pied">Pied de page</label>
+        <textarea class="form-textarea settings-textarea" id="st-pied" maxlength="400" oninput="saveSettings(false)" onchange="saveSettings(true)"></textarea></div>
+        <div class="form-group"><label class="form-label" for="st-cgv">Conditions générales</label>
+        <textarea class="form-textarea settings-textarea" id="st-cgv" maxlength="1200" style="min-height:130px" oninput="saveSettings(false)" onchange="saveSettings(true)"></textarea></div>
+        <div class="form-group" style="max-width:160px"><label class="form-label" for="st-tva">TVA (%)</label>
+        <input class="form-input" id="st-tva" type="number" min="0" max="100" step="0.1" inputmode="decimal" oninput="saveSettings(false)" onchange="saveSettings(true)">
+        <div class="settings-hint">Appliquée aux devis PDF</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- SCAN NFC -->
 
 </div>
@@ -813,7 +926,43 @@ button.alert-item{border:none;background:none;cursor:pointer;text-align:left;fon
 </div>
 
 <script>
-const DATA = {"vitrines":[{"id":"V-001","model":"vitrine non pliante pedro 1","reparation":0,"prix":300,"commentaire":"fonctionnelle","fonctionnelle":null,"lieu":"local orsay"},{"id":"V-002","model":"vitrine non pliante pedro 2","reparation":0,"prix":300,"commentaire":"fonctionnelle","fonctionnelle":null,"lieu":"local orsay"},{"id":"V-003","model":"vitrine non pliante pedro 3","reparation":0,"prix":300,"commentaire":"fonctionnelle","fonctionnelle":null,"lieu":"local orsay"},{"id":"V-004","model":"vitrine non pliante pedro 4","reparation":0,"prix":300,"commentaire":"fonctionnelle","fonctionnelle":null,"lieu":"local orsay"},{"id":"V-005","model":"vitrine non pliante pedro 5","reparation":0,"prix":300,"commentaire":"fonctionnelle","fonctionnelle":null,"lieu":"local orsay"},{"id":"V-006","model":"vitrine non pliante marocain","reparation":0,"prix":400,"commentaire":"fonctionnelle","fonctionnelle":null,"lieu":"local orsay"},{"id":"V-007","model":"Vitrine Elite Froid 2m (bougival)","reparation":0,"prix":1500,"commentaire":"souffle 2 degrés","fonctionnelle":true,"lieu":"local trappes"},{"id":"V-008","model":"Vitrine Elite Froid 2m bache rouge 1","reparation":0,"prix":null,"commentaire":"","fonctionnelle":true,"lieu":"mairie massy"},{"id":"V-009","model":"Vitrine Elite Froid 2m bache rouge 2","reparation":0,"prix":null,"commentaire":"","fonctionnelle":true,"lieu":"mairie massy"},{"id":"V-010","model":"Vitrine Elite Froid 2m bache rouge 3","reparation":1500,"prix":null,"commentaire":"","fonctionnelle":true,"lieu":"lola"},{"id":"V-011","model":"Vitrine Elite Froid 2m (marseille)","reparation":0,"prix":1500,"commentaire":"²","fonctionnelle":true,"lieu":"local trappes"},{"id":"V-012","model":"Vitrine Elite Froid 2m (Pedro)","reparation":0,"prix":1000,"commentaire":"","fonctionnelle":true,"lieu":"local trappes"},{"id":"V-013","model":"Vitrine Elite Froid 2m (sans vitre)","reparation":0,"prix":1500,"commentaire":"","fonctionnelle":null,"lieu":"chez kouzinah"},{"id":"V-014","model":"Vitrine Elite Froid 2m (sans vitre)","reparation":0,"prix":1500,"commentaire":"","fonctionnelle":null,"lieu":"chez kouzinah"},{"id":"V-015","model":"Vitrine verticale (1m)","reparation":0,"prix":280,"commentaire":"","fonctionnelle":null,"lieu":"non rendu azalé"},{"id":"V-016","model":"Vitrine verticale ronde (1m)","reparation":0,"prix":300,"commentaire":"","fonctionnelle":true,"lieu":"local trappes"},{"id":"V-017","model":"Vitrine verticale ronde (1m)","reparation":0,"prix":300,"commentaire":"","fonctionnelle":null,"lieu":"local orsay"},{"id":"V-018","model":"Vitrine Elite froid 1.5 m","reparation":0,"prix":1600,"commentaire":"","fonctionnelle":null,"lieu":"massy?"},{"id":"V-019","model":"Vitrine Elite froid 1 m rouge","reparation":0,"prix":null,"commentaire":"","fonctionnelle":true,"lieu":"local orsay"},{"id":"V-020","model":"Vitrine Elite froid 1 m","reparation":0,"prix":500,"commentaire":"","fonctionnelle":true,"lieu":"local trappes"},{"id":"V-021","model":"Vitrine PSV marocain 1","reparation":0,"prix":1250,"commentaire":"condenseur à changer, 12 degrés","fonctionnelle":false,"lieu":"local trappes"},{"id":"V-022","model":"Vitrine PSV marocain 2","reparation":0,"prix":1250,"commentaire":"condenseur neuf, 3 degrés en vente pour libanais souheile","fonctionnelle":true,"lieu":"local trappes"},{"id":"V-023","model":"Vitrine PSV portugais 1","reparation":0,"prix":1000,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-024","model":"Vitrine PSV portugais 2","reparation":0,"prix":1000,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-025","model":"Vitrine PSV portugais 3 (ex KO)","reparation":0,"prix":1000,"commentaire":"condenseur neuf 7 degrés, manque vitre, vitre remise et temperature 3 degré en vente pour souheil le libanais","fonctionnelle":true,"lieu":"local trappes"},{"id":"V-026","model":"vitrine poisson vendu 1800","reparation":0,"prix":1750,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-027","model":"vitrine poisson vendu 1800","reparation":0,"prix":1750,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-028","model":"Vitrine Elite froid 2m frigoriste","reparation":0,"prix":2200,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-029","model":"Vitrine Elite froid 2m Martiniquaise","reparation":0,"prix":1600,"commentaire":"manque pied 6 degrés","fonctionnelle":null,"lieu":"local trappes"},{"id":"V-030","model":"PSV 2021 ITALIEN","reparation":0,"prix":1400,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-031","model":"PSV 2021 ITALIEN","reparation":0,"prix":1400,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-032","model":"PSV 2015 ITALIEN","reparation":0,"prix":1400,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-033","model":"PSV ITALIEN (vitre + compresseur) vendu 2200","reparation":0,"prix":1400,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-034","model":"PSV ITALIEN (vitre + compresseur) vendu 2200","reparation":0,"prix":1400,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-035","model":"PSV 1","reparation":0,"prix":1500,"commentaire":"","fonctionnelle":null,"lieu":"Adeline"},{"id":"V-036","model":"PSV 2","reparation":0,"prix":1500,"commentaire":"","fonctionnelle":null,"lieu":"Adeline"},{"id":"V-037","model":"PSV 3","reparation":0,"prix":1500,"commentaire":"","fonctionnelle":null,"lieu":"Adeline"},{"id":"V-038","model":"PSV 4","reparation":0,"prix":1500,"commentaire":"","fonctionnelle":null,"lieu":"Adeline"},{"id":"V-039","model":"PSV 5","reparation":0,"prix":1500,"commentaire":"","fonctionnelle":null,"lieu":"Adeline"},{"id":"V-040","model":"PSV 6","reparation":0,"prix":1500,"commentaire":"","fonctionnelle":null,"lieu":"Adeline"},{"id":"V-041","model":"PSV ancienne digital","reparation":0,"prix":500,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-042","model":"PSV ancienne digital","reparation":0,"prix":500,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-043","model":"PSV Chanteloup 1","reparation":0,"prix":500,"commentaire":"condenseur à changer, viens de massy","fonctionnelle":false,"lieu":"local trappes"},{"id":"V-044","model":"PSV Chanteloup 2","reparation":0,"prix":500,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-045","model":"PSV Chanteloup 3","reparation":0,"prix":500,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-046","model":"PSV soudé","reparation":0,"prix":1000,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-047","model":"Elite froid boisy st leger 1","reparation":0,"prix":2250,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-048","model":"Elite froid boisy st leger 2","reparation":0,"prix":2250,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-049","model":"Vitrine PSV Boulanger reil","reparation":0,"prix":1550,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-050","model":"Vitrine 1,5m Stéfanon Libanais","reparation":0,"prix":1950,"commentaire":"","fonctionnelle":null,"lieu":"massy? Ou vendu?"},{"id":"V-051","model":"Vitrine 2m Antillaise (compresseur Ko)","reparation":0,"prix":900,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-052","model":"Vitrine 2m De bougival","reparation":0,"prix":2200,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-053","model":"Vitrine 2m EF De normandie","reparation":0,"prix":900,"commentaire":"souffle -1 degrés","fonctionnelle":true,"lieu":"local trappes"},{"id":"V-054","model":"Vitrine 2m EF De normandie","reparation":0,"prix":900,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-055","model":"Vitrine 2m EF De normandie","reparation":0,"prix":900,"commentaire":"3 degré","fonctionnelle":true,"lieu":"local trappes"},{"id":"V-056","model":"Vitrine 1,5m PSV","reparation":0,"prix":1200,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-057","model":"PSV 2m Kamel (vendu)","reparation":0,"prix":400,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-058","model":"PSV 2m Kamel","reparation":0,"prix":400,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-059","model":"Ancienne EF modele 1","reparation":0,"prix":400,"commentaire":"","fonctionnelle":null,"lieu":"ou? Vendu?"},{"id":"V-060","model":"Ancienne EF modele 1","reparation":0,"prix":0,"commentaire":"","fonctionnelle":true,"lieu":"local trappes"},{"id":"V-061","model":"PSV neuf trappes 1","reparation":0,"prix":1500,"commentaire":"","fonctionnelle":null,"lieu":"dreux alexandre"},{"id":"V-062","model":"PSV neuf trappes 2","reparation":0,"prix":1500,"commentaire":"","fonctionnelle":null,"lieu":"dreux alexandre"},{"id":"V-063","model":"PSV neuf trappes 3","reparation":0,"prix":1500,"commentaire":"","fonctionnelle":null,"lieu":"dreux alexandre"},{"id":"V-064","model":"Ancienne EF modele 1 à vendre cassé","reparation":0,"prix":0,"commentaire":"","fonctionnelle":true,"lieu":"local trappes"}],"flux":[{"in":null,"out":120,"qui":"Oussama","client":"Sabrina","isTransport":false,"isAchat":false,"mois":"Septembre","comm":"Nettoyage pour salon du mariage + d'autres vitrines"},{"in":null,"out":180,"qui":"Oussama","client":"Total essence","isTransport":false,"isAchat":false,"mois":"Septembre","comm":"Plein camion Bleue"},{"in":null,"out":40,"qui":"Oussama","client":"Mécano","isTransport":false,"isAchat":false,"mois":"Septembre","comm":"Diagnostic camion blanc"},{"in":400,"out":null,"qui":"Oussama","client":"Ekolo (traiteur congolaise)","isTransport":false,"isAchat":false,"mois":"Septembre","comm":"Salon de la gastronomie (Traiteur congolais)"},{"in":420,"out":null,"qui":"Oussama","client":"Lecoguic","isTransport":false,"isAchat":false,"mois":"Septembre","comm":"Foire d'Antony"},{"in":383,"out":null,"qui":"Oussama","client":"Saumonerie","isTransport":false,"isAchat":false,"mois":"Septembre","comm":"Salon dans le 77, livré chez lui dans le 91480"},{"in":500,"out":null,"qui":"Bilel","client":"sarah lee","isTransport":false,"isAchat":false,"mois":"Septembre","comm":"salon mariage espece"},{"in":650,"out":null,"qui":"Oussama","client":"Sofyia Patisserie","isTransport":false,"isAchat":false,"mois":"Septembre","comm":"Salon du mariage (facture)"},{"in":null,"out":200,"qui":"Bilel","client":"salon mariage","isTransport":true,"isAchat":false,"mois":"","comm":"trappes orsay jour 1 plaisir pour essais, jour 2 trappe salon / jour 3"},{"in":200,"out":null,"qui":"Bilel","client":"stefano houdan","isTransport":false,"isAchat":false,"mois":"Septembre","comm":"fête annuelle d'houdan"},{"in":null,"out":580,"qui":"Bilel","client":"fourriere camion bleu","isTransport":false,"isAchat":false,"mois":"Septembre","comm":"fourriere 150 + transporteur 140 + pièce 150 + mecano 100 + plaque 30"},{"in":null,"out":35,"qui":"Bilel","client":"fourriere camion bleu","isTransport":false,"isAchat":false,"mois":"Septembre","comm":"amende"},{"in":null,"out":1100,"qui":"Bilel","client":"","isTransport":true,"isAchat":true,"mois":"octobre","comm":"vitrine 27"},{"in":null,"out":70,"qui":"Bilel","client":"salon antille","isTransport":false,"isAchat":false,"mois":"octobre","comm":"transport vitrine 27"},{"in":null,"out":70,"qui":"Bilel","client":"","isTransport":true,"isAchat":false,"mois":"octobre","comm":"transport vitrine rond SALON ANTILLE"},{"in":null,"out":150,"qui":"Bilel","client":"Gasoil","isTransport":false,"isAchat":false,"mois":"octobre","comm":"Gasoil camion bleu"},{"in":320,"out":null,"qui":"Bilel","client":"atelier dolce","isTransport":false,"isAchat":false,"mois":"octobre","comm":""},{"in":50,"out":null,"qui":"Bilel","client":"Zouhir","isTransport":false,"isAchat":false,"mois":"octobre","comm":"prèt vitr à massy (transport)"},{"in":null,"out":160,"qui":"Bilel","client":"","isTransport":true,"isAchat":false,"mois":"octobre","comm":"transport: matin: trapps massy aulnay puis l soir, trapps aulnay paris"},{"in":null,"out":50,"qui":"Bilel","client":"NAAMN","isTransport":false,"isAchat":false,"mois":"octobre","comm":"aid naamn journ&*é aunla massy paris + Nttoyag camion"},{"in":380,"out":null,"qui":"Oussama","client":"Sagasdom","isTransport":false,"isAchat":false,"mois":"octobre","comm":"Resto Polio"},{"in":380,"out":null,"qui":"Oussama","client":"Sagasdom","isTransport":false,"isAchat":false,"mois":"octobre","comm":"Resto Polio"},{"in":null,"out":70,"qui":"Oussama","client":"Sagasdom","isTransport":true,"isAchat":false,"mois":"octobre","comm":"Livraison à Sagasdom"}],"prospection":[{"qui":"Oh oui","quand":"30 nov-03 oct","ou":"Salon du chocolat  : Porte de Versailles","combien":600,"concretise":true},{"qui":"Ladbloue","quand":"29 - 30 Juin","ou":"Mairie de Clichy","combien":270,"concretise":true},{"qui":"Nicolas Patrick","quand":"25-28 Juillet","ou":"?","combien":890,"concretise":false},{"qui":"Cheeseroad","quand":"Longue durée","ou":"Nogent sur marnes","combien":700,"concretise":false},{"qui":"Aggeria","quand":"4 nov- 2 déc","ou":"?","combien":700,"concretise":true},{"qui":"Sandra Vitrine","quand":"Aout-??","ou":"Montpellier","combien":250,"concretise":false},{"qui":"Sarah (Sugar free)","quand":"13-22 décembre","ou":"Saint denis","combien":450,"concretise":false},{"qui":"Younes","quand":"A partir de sept / Long durée","ou":"","combien":250,"concretise":false}],"ventes":[{"vitrine":"Kabile 2m","achete":400,"vendu":2000,"depense":25},{"vitrine":"Vitrine Portugais","achete":1400,"vendu":2200,"depense":450},{"vitrine":"Vitrine Portugais","achete":1400,"vendu":2200,"depense":450},{"vitrine":"Vitrine poissonier","achete":0,"vendu":1900,"depense":0},{"vitrine":"Vitrine poissonier","achete":null,"vendu":1900,"depense":0}],"actions":[{"action":"Récupérer les barres de jonction de Nassim","comm":"Oublie dans l'enlèvement des vitrines, les barres de jonctions","statut":"Fait"},{"action":"Récupérer les LED de Yassin","comm":"Oublie dans l'enlèvement des vitrines, les LED","statut":"Fait"},{"action":"Achat de Jupe pour les 1,5m des salons de Mai et Juin","comm":"Préparer les vitrines le weekend du 27,28 Mai","statut":"Fait"},{"action":"Achat des LED pour les 1,5m des salons de Mai et Juin","comm":"Préparer les vitrines le weekend du 27,28 Mai","statut":"Fait"},{"action":"Installation des jupes de Laundry  au marché de Massy + Roue des vitrines","comm":"Préparer les jupes en amont","statut":"Fait"},{"action":"Installation des jupes de Kouzinah au marché du 15ème","comm":"Préparer les jupes en amont","statut":"Non réalisé"},{"action":"Trouver un forgeron pour fabrication de plateaux","comm":"Poster sur alloVoisin aussi ... Contacter TMIC en région parisienne","statut":"Fait"},{"action":"Acheter des roues et remplacer au moins 2 par vitrines","comm":"Pour les vitrines ayant plus 3 roues KO...","statut":"Fait"},{"action":"Acheter des vitres ELITE FROID","comm":"3 vitres Elite Froid : 2 vitres Pour la vitrine de PEDRO et 1 pour la vitrine de Erin","statut":"Non réalisé"},{"action":"Commander un compresseur","comm":"Pour la Elite froid acheter à l'antillaise","statut":"Fait"},{"action":"Préparer des jupes et LED pour vitrines de Bryan","comm":"Récupérer les barres de jonctions pour Bryan","statut":"Fait"},{"action":"Fait réviser les vitrines par Adem","comm":"Faire réviser un maximum de vitrine, en priorité les PSV de Yassin","statut":"Fait"},{"action":"Acheter plusieurs Jupe","comm":"Acheter un stock de jupe pour 2m","statut":"Fait"},{"action":"Récupérer les 2 vitrines de chez Sophie","comm":"Avec 2 plateaux et 2 LED","statut":"Fait"},{"action":"Préparer les vitrines pour le Sugar Free","comm":"Avec Plateaux et LED","statut":"Fait"},{"action":"Acheter une paire de rampe","comm":"Acheter des rampes pour le deuxième boxe","statut":"Non réalisé"},{"action":"Acheter petite vitrine pour patissière","comm":"Pour patissière et salon","statut":"Fait"},{"action":"Terminer le site internet et la page facebook","comm":"Promouvoir les 2 afin de toucher plus de potentiel client","statut":"Non réalisé"},{"action":"Investissement S2 2024","comm":"Acheter petite vitrine pour patissière","statut":"2"}]};
+const DATA = {"vitrines":[{"id":"V-001","model":"vitrine non pliante pedro 1","reparation":0,"prix":300,"commentaire":"fonctionnelle","fonctionnelle":null,"lieu":"local orsay"},{"id":"V-002","model":"vitrine non pliante pedro 2","reparation":0,"prix":300,"commentaire":"fonctionnelle","fonctionnelle":null,"lieu":"local orsay"},{"id":"V-003","model":"vitrine non pliante pedro 3","reparation":0,"prix":300,"commentaire":"fonctionnelle","fonctionnelle":null,"lieu":"local orsay"},{"id":"V-004","model":"vitrine non pliante pedro 4","reparation":0,"prix":300,"commentaire":"fonctionnelle","fonctionnelle":null,"lieu":"local orsay"},{"id":"V-005","model":"vitrine non pliante pedro 5","reparation":0,"prix":300,"commentaire":"fonctionnelle","fonctionnelle":null,"lieu":"local orsay"},{"id":"V-006","model":"vitrine non pliante marocain","reparation":0,"prix":400,"commentaire":"fonctionnelle","fonctionnelle":null,"lieu":"local orsay"},{"id":"V-007","model":"Vitrine Elite Froid 2m (bougival)","reparation":0,"prix":1500,"commentaire":"souffle 2 degrés","fonctionnelle":true,"lieu":"local trappes"},{"id":"V-008","model":"Vitrine Elite Froid 2m bache rouge 1","reparation":0,"prix":null,"commentaire":"","fonctionnelle":true,"lieu":"mairie massy"},{"id":"V-009","model":"Vitrine Elite Froid 2m bache rouge 2","reparation":0,"prix":null,"commentaire":"","fonctionnelle":true,"lieu":"mairie massy"},{"id":"V-010","model":"Vitrine Elite Froid 2m bache rouge 3","reparation":1500,"prix":null,"commentaire":"","fonctionnelle":true,"lieu":"lola"},{"id":"V-011","model":"Vitrine Elite Froid 2m (marseille)","reparation":0,"prix":1500,"commentaire":"²","fonctionnelle":true,"lieu":"local trappes"},{"id":"V-012","model":"Vitrine Elite Froid 2m (Pedro)","reparation":0,"prix":1000,"commentaire":"","fonctionnelle":true,"lieu":"local trappes"},{"id":"V-013","model":"Vitrine Elite Froid 2m (sans vitre)","reparation":0,"prix":1500,"commentaire":"","fonctionnelle":null,"lieu":"chez kouzinah"},{"id":"V-014","model":"Vitrine Elite Froid 2m (sans vitre)","reparation":0,"prix":1500,"commentaire":"","fonctionnelle":null,"lieu":"chez kouzinah"},{"id":"V-015","model":"Vitrine verticale (1m)","reparation":0,"prix":280,"commentaire":"","fonctionnelle":null,"lieu":"non rendu azalé"},{"id":"V-016","model":"Vitrine verticale ronde (1m)","reparation":0,"prix":300,"commentaire":"","fonctionnelle":true,"lieu":"local trappes"},{"id":"V-017","model":"Vitrine verticale ronde (1m)","reparation":0,"prix":300,"commentaire":"","fonctionnelle":null,"lieu":"local orsay"},{"id":"V-018","model":"Vitrine Elite froid 1.5 m","reparation":0,"prix":1600,"commentaire":"","fonctionnelle":null,"lieu":"massy?"},{"id":"V-019","model":"Vitrine Elite froid 1 m rouge","reparation":0,"prix":null,"commentaire":"","fonctionnelle":true,"lieu":"local orsay"},{"id":"V-020","model":"Vitrine Elite froid 1 m","reparation":0,"prix":500,"commentaire":"","fonctionnelle":true,"lieu":"local trappes"},{"id":"V-021","model":"Vitrine PSV marocain 1","reparation":0,"prix":1250,"commentaire":"condenseur à changer, 12 degrés","fonctionnelle":false,"lieu":"local trappes"},{"id":"V-022","model":"Vitrine PSV marocain 2","reparation":0,"prix":1250,"commentaire":"condenseur neuf, 3 degrés en vente pour libanais souheile","fonctionnelle":true,"lieu":"local trappes"},{"id":"V-023","model":"Vitrine PSV portugais 1","reparation":0,"prix":1000,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-024","model":"Vitrine PSV portugais 2","reparation":0,"prix":1000,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-025","model":"Vitrine PSV portugais 3 (ex KO)","reparation":0,"prix":1000,"commentaire":"condenseur neuf 7 degrés, manque vitre, vitre remise et temperature 3 degré en vente pour souheil le libanais","fonctionnelle":true,"lieu":"local trappes"},{"id":"V-026","model":"vitrine poisson vendu 1800","reparation":0,"prix":1750,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-027","model":"vitrine poisson vendu 1800","reparation":0,"prix":1750,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-028","model":"Vitrine Elite froid 2m frigoriste","reparation":0,"prix":2200,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-029","model":"Vitrine Elite froid 2m Martiniquaise","reparation":0,"prix":1600,"commentaire":"manque pied 6 degrés","fonctionnelle":null,"lieu":"local trappes"},{"id":"V-030","model":"PSV 2021 ITALIEN","reparation":0,"prix":1400,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-031","model":"PSV 2021 ITALIEN","reparation":0,"prix":1400,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-032","model":"PSV 2015 ITALIEN","reparation":0,"prix":1400,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-033","model":"PSV ITALIEN (vitre + compresseur) vendu 2200","reparation":0,"prix":1400,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-034","model":"PSV ITALIEN (vitre + compresseur) vendu 2200","reparation":0,"prix":1400,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-035","model":"PSV 1","reparation":0,"prix":1500,"commentaire":"","fonctionnelle":null,"lieu":"Adeline"},{"id":"V-036","model":"PSV 2","reparation":0,"prix":1500,"commentaire":"","fonctionnelle":null,"lieu":"Adeline"},{"id":"V-037","model":"PSV 3","reparation":0,"prix":1500,"commentaire":"","fonctionnelle":null,"lieu":"Adeline"},{"id":"V-038","model":"PSV 4","reparation":0,"prix":1500,"commentaire":"","fonctionnelle":null,"lieu":"Adeline"},{"id":"V-039","model":"PSV 5","reparation":0,"prix":1500,"commentaire":"","fonctionnelle":null,"lieu":"Adeline"},{"id":"V-040","model":"PSV 6","reparation":0,"prix":1500,"commentaire":"","fonctionnelle":null,"lieu":"Adeline"},{"id":"V-041","model":"PSV ancienne digital","reparation":0,"prix":500,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-042","model":"PSV ancienne digital","reparation":0,"prix":500,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-043","model":"PSV Chanteloup 1","reparation":0,"prix":500,"commentaire":"condenseur à changer, viens de massy","fonctionnelle":false,"lieu":"local trappes"},{"id":"V-044","model":"PSV Chanteloup 2","reparation":0,"prix":500,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-045","model":"PSV Chanteloup 3","reparation":0,"prix":500,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-046","model":"PSV soudé","reparation":0,"prix":1000,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-047","model":"Elite froid boisy st leger 1","reparation":0,"prix":2250,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-048","model":"Elite froid boisy st leger 2","reparation":0,"prix":2250,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-049","model":"Vitrine PSV Boulanger reil","reparation":0,"prix":1550,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-050","model":"Vitrine 1,5m Stéfanon Libanais","reparation":0,"prix":1950,"commentaire":"","fonctionnelle":null,"lieu":"massy? Ou vendu?"},{"id":"V-051","model":"Vitrine 2m Antillaise (compresseur Ko)","reparation":0,"prix":900,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-052","model":"Vitrine 2m De bougival","reparation":0,"prix":2200,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-053","model":"Vitrine 2m EF De normandie","reparation":0,"prix":900,"commentaire":"souffle -1 degrés","fonctionnelle":true,"lieu":"local trappes"},{"id":"V-054","model":"Vitrine 2m EF De normandie","reparation":0,"prix":900,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-055","model":"Vitrine 2m EF De normandie","reparation":0,"prix":900,"commentaire":"3 degré","fonctionnelle":true,"lieu":"local trappes"},{"id":"V-056","model":"Vitrine 1,5m PSV","reparation":0,"prix":1200,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-057","model":"PSV 2m Kamel (vendu)","reparation":0,"prix":400,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-058","model":"PSV 2m Kamel","reparation":0,"prix":400,"commentaire":"","fonctionnelle":null,"lieu":"non renseigné"},{"id":"V-059","model":"Ancienne EF modele 1","reparation":0,"prix":400,"commentaire":"","fonctionnelle":null,"lieu":"ou? Vendu?"},{"id":"V-060","model":"Ancienne EF modele 1","reparation":0,"prix":0,"commentaire":"","fonctionnelle":true,"lieu":"local trappes"},{"id":"V-061","model":"PSV neuf trappes 1","reparation":0,"prix":1500,"commentaire":"","fonctionnelle":null,"lieu":"dreux alexandre"},{"id":"V-062","model":"PSV neuf trappes 2","reparation":0,"prix":1500,"commentaire":"","fonctionnelle":null,"lieu":"dreux alexandre"},{"id":"V-063","model":"PSV neuf trappes 3","reparation":0,"prix":1500,"commentaire":"","fonctionnelle":null,"lieu":"dreux alexandre"},{"id":"V-064","model":"Ancienne EF modele 1 à vendre cassé","reparation":0,"prix":0,"commentaire":"","fonctionnelle":true,"lieu":"local trappes"}],"flux":[{"in":null,"out":120,"qui":"Oussama","client":"Sabrina","isTransport":false,"isAchat":false,"mois":"Septembre","comm":"Nettoyage pour salon du mariage + d'autres vitrines"},{"in":null,"out":180,"qui":"Oussama","client":"Total essence","isTransport":false,"isAchat":false,"mois":"Septembre","comm":"Plein camion Bleue"},{"in":null,"out":40,"qui":"Oussama","client":"Mécano","isTransport":false,"isAchat":false,"mois":"Septembre","comm":"Diagnostic camion blanc"},{"in":400,"out":null,"qui":"Oussama","client":"Ekolo (traiteur congolaise)","isTransport":false,"isAchat":false,"mois":"Septembre","comm":"Salon de la gastronomie (Traiteur congolais)"},{"in":420,"out":null,"qui":"Oussama","client":"Lecoguic","isTransport":false,"isAchat":false,"mois":"Septembre","comm":"Foire d'Antony"},{"in":383,"out":null,"qui":"Oussama","client":"Saumonerie","isTransport":false,"isAchat":false,"mois":"Septembre","comm":"Salon dans le 77, livré chez lui dans le 91480"},{"in":500,"out":null,"qui":"Bilel","client":"sarah lee","isTransport":false,"isAchat":false,"mois":"Septembre","comm":"salon mariage espece"},{"in":650,"out":null,"qui":"Oussama","client":"Sofyia Patisserie","isTransport":false,"isAchat":false,"mois":"Septembre","comm":"Salon du mariage (facture)"},{"in":null,"out":200,"qui":"Bilel","client":"salon mariage","isTransport":true,"isAchat":false,"mois":"","comm":"trappes orsay jour 1 plaisir pour essais, jour 2 trappe salon / jour 3"},{"in":200,"out":null,"qui":"Bilel","client":"stefano houdan","isTransport":false,"isAchat":false,"mois":"Septembre","comm":"fête annuelle d'houdan"},{"in":null,"out":580,"qui":"Bilel","client":"fourriere camion bleu","isTransport":false,"isAchat":false,"mois":"Septembre","comm":"fourriere 150 + transporteur 140 + pièce 150 + mecano 100 + plaque 30"},{"in":null,"out":35,"qui":"Bilel","client":"fourriere camion bleu","isTransport":false,"isAchat":false,"mois":"Septembre","comm":"amende"},{"in":null,"out":1100,"qui":"Bilel","client":"","isTransport":true,"isAchat":true,"mois":"octobre","comm":"vitrine 27"},{"in":null,"out":70,"qui":"Bilel","client":"salon antille","isTransport":false,"isAchat":false,"mois":"octobre","comm":"transport vitrine 27"},{"in":null,"out":70,"qui":"Bilel","client":"","isTransport":true,"isAchat":false,"mois":"octobre","comm":"transport vitrine rond SALON ANTILLE"},{"in":null,"out":150,"qui":"Bilel","client":"Gasoil","isTransport":false,"isAchat":false,"mois":"octobre","comm":"Gasoil camion bleu"},{"in":320,"out":null,"qui":"Bilel","client":"atelier dolce","isTransport":false,"isAchat":false,"mois":"octobre","comm":""},{"in":50,"out":null,"qui":"Bilel","client":"Zouhir","isTransport":false,"isAchat":false,"mois":"octobre","comm":"prèt vitr à massy (transport)"},{"in":null,"out":160,"qui":"Bilel","client":"","isTransport":true,"isAchat":false,"mois":"octobre","comm":"transport: matin: trapps massy aulnay puis l soir, trapps aulnay paris"},{"in":null,"out":50,"qui":"Bilel","client":"NAAMN","isTransport":false,"isAchat":false,"mois":"octobre","comm":"aid naamn journ&*é aunla massy paris + Nttoyag camion"},{"in":380,"out":null,"qui":"Oussama","client":"Sagasdom","isTransport":false,"isAchat":false,"mois":"octobre","comm":"Resto Polio"},{"in":380,"out":null,"qui":"Oussama","client":"Sagasdom","isTransport":false,"isAchat":false,"mois":"octobre","comm":"Resto Polio"},{"in":null,"out":70,"qui":"Oussama","client":"Sagasdom","isTransport":true,"isAchat":false,"mois":"octobre","comm":"Livraison à Sagasdom"}],"prospection":[{"qui":"Oh oui","quand":"30 nov-03 oct","ou":"Salon du chocolat  : Porte de Versailles","combien":600,"concretise":true},{"qui":"Ladbloue","quand":"29 - 30 Juin","ou":"Mairie de Clichy","combien":270,"concretise":true},{"qui":"Nicolas Patrick","quand":"25-28 Juillet","ou":"?","combien":890,"concretise":false},{"qui":"Cheeseroad","quand":"Longue durée","ou":"Nogent sur marnes","combien":700,"concretise":false},{"qui":"Aggeria","quand":"4 nov- 2 déc","ou":"?","combien":700,"concretise":true},{"qui":"Sandra Vitrine","quand":"Aout-??","ou":"Montpellier","combien":250,"concretise":false},{"qui":"Sarah (Sugar free)","quand":"13-22 décembre","ou":"Saint denis","combien":450,"concretise":false},{"qui":"Younes","quand":"A partir de sept / Long durée","ou":"","combien":250,"concretise":false}],"ventes":[{"vitrine":"Kabile 2m","achete":400,"vendu":2000,"depense":25},{"vitrine":"Vitrine Portugais","achete":1400,"vendu":2200,"depense":450},{"vitrine":"Vitrine Portugais","achete":1400,"vendu":2200,"depense":450},{"vitrine":"Vitrine poissonier","achete":0,"vendu":1900,"depense":0},{"vitrine":"Vitrine poissonier","achete":null,"vendu":1900,"depense":0}],"actions":[{"action":"Récupérer les barres de jonction de Nassim","comm":"Oublie dans l'enlèvement des vitrines, les barres de jonctions","statut":"Fait"},{"action":"Récupérer les LED de Yassin","comm":"Oublie dans l'enlèvement des vitrines, les LED","statut":"Fait"},{"action":"Achat de Jupe pour les 1,5m des salons de Mai et Juin","comm":"Préparer les vitrines le weekend du 27,28 Mai","statut":"Fait"},{"action":"Achat des LED pour les 1,5m des salons de Mai et Juin","comm":"Préparer les vitrines le weekend du 27,28 Mai","statut":"Fait"},{"action":"Installation des jupes de Laundry  au marché de Massy + Roue des vitrines","comm":"Préparer les jupes en amont","statut":"Fait"},{"action":"Installation des jupes de Kouzinah au marché du 15ème","comm":"Préparer les jupes en amont","statut":"Non réalisé"},{"action":"Trouver un forgeron pour fabrication de plateaux","comm":"Poster sur alloVoisin aussi ... Contacter TMIC en région parisienne","statut":"Fait"},{"action":"Acheter des roues et remplacer au moins 2 par vitrines","comm":"Pour les vitrines ayant plus 3 roues KO...","statut":"Fait"},{"action":"Acheter des vitres ELITE FROID","comm":"3 vitres Elite Froid : 2 vitres Pour la vitrine de PEDRO et 1 pour la vitrine de Erin","statut":"Non réalisé"},{"action":"Commander un compresseur","comm":"Pour la Elite froid acheter à l'antillaise","statut":"Fait"},{"action":"Préparer des jupes et LED pour vitrines de Bryan","comm":"Récupérer les barres de jonctions pour Bryan","statut":"Fait"},{"action":"Fait réviser les vitrines par Adem","comm":"Faire réviser un maximum de vitrine, en priorité les PSV de Yassin","statut":"Fait"},{"action":"Acheter plusieurs Jupe","comm":"Acheter un stock de jupe pour 2m","statut":"Fait"},{"action":"Récupérer les 2 vitrines de chez Sophie","comm":"Avec 2 plateaux et 2 LED","statut":"Fait"},{"action":"Préparer les vitrines pour le Sugar Free","comm":"Avec Plateaux et LED","statut":"Fait"},{"action":"Acheter une paire de rampe","comm":"Acheter des rampes pour le deuxième boxe","statut":"Non réalisé"},{"action":"Acheter petite vitrine pour patissière","comm":"Pour patissière et salon","statut":"Fait"},{"action":"Terminer le site internet et la page facebook","comm":"Promouvoir les 2 afin de toucher plus de potentiel client","statut":"Non réalisé"},{"action":"Investissement S2 2024","comm":"Acheter petite vitrine pour patissière","statut":"2"}],
+"frigoristes":[
+{"id":"F-001","nom":"Karim Benzema","tel":"06 12 34 56 78","specialite":"Froid commercial"},
+{"id":"F-002","nom":"Youssef Amrani","tel":"06 98 76 54 32","specialite":"Climatisation"},
+{"id":"F-003","nom":"Rachid Mehdaoui","tel":"07 11 22 33 44","specialite":"Froid industriel"},
+{"id":"F-004","nom":"Mehdi Chakir","tel":"06 55 66 77 88","specialite":"Dépannage urgent"}
+],
+"interventions":[
+{"id":"I-001","vitrineId":"V-007","frigoriste":"F-001","date":"2025-03-14","description":"Vérification circuit frigorifique","cout":90,"tempSoufflage":3.5,"tempDate":"2025-03-14"},
+{"id":"I-002","vitrineId":"V-007","frigoriste":"F-001","date":"2025-09-22","description":"Nettoyage condenseur","cout":70,"tempSoufflage":3.0,"tempDate":"2025-09-22"},
+{"id":"I-003","vitrineId":"V-007","frigoriste":"F-002","date":"2026-02-10","description":"Remplacement ventilateur évaporateur","cout":185,"tempSoufflage":2.5,"tempDate":"2026-02-10"},
+{"id":"I-004","vitrineId":"V-007","frigoriste":"F-001","date":"2026-09-18","description":"Réglage température","cout":55,"tempSoufflage":2.0,"tempDate":"2026-09-18"},
+{"id":"I-005","vitrineId":"V-021","frigoriste":"F-003","date":"2025-05-06","description":"Vérification circuit frigorifique","cout":120,"tempSoufflage":8.0,"tempDate":"2025-05-06"},
+{"id":"I-006","vitrineId":"V-021","frigoriste":"F-004","date":"2025-07-15","description":"Recharge gaz R134a","cout":160,"tempSoufflage":7.5,"tempDate":"2025-07-15"},
+{"id":"I-007","vitrineId":"V-021","frigoriste":"F-003","date":"2025-11-03","description":"Remplacement thermostat","cout":95,"tempSoufflage":7.0,"tempDate":"2025-11-03"},
+{"id":"I-008","vitrineId":"V-021","frigoriste":"F-003","date":"2026-04-21","description":"Remplacement compresseur","cout":780,"tempSoufflage":5.5,"tempDate":"2026-04-21"},
+{"id":"I-009","vitrineId":"V-021","frigoriste":"F-004","date":"2026-10-06","description":"Réparation joint de porte","cout":140,"tempSoufflage":6.5,"tempDate":"2026-10-06"},
+{"id":"I-010","vitrineId":"V-025","frigoriste":"F-001","date":"2025-02-18","description":"Remplacement condenseur","cout":420,"tempSoufflage":7.0,"tempDate":"2025-02-18"},
+{"id":"I-011","vitrineId":"V-025","frigoriste":"F-001","date":"2025-04-09","description":"Réglage température","cout":50,"tempSoufflage":3.0,"tempDate":"2025-04-09"},
+{"id":"I-012","vitrineId":"V-025","frigoriste":"F-002","date":"2025-12-02","description":"Réparation joint de porte","cout":130,"tempSoufflage":3.5,"tempDate":"2025-12-02"},
+{"id":"I-013","vitrineId":"V-025","frigoriste":"F-001","date":"2026-07-28","description":"Recharge gaz R134a","cout":145,"tempSoufflage":3.0,"tempDate":"2026-07-28"},
+{"id":"I-014","vitrineId":"V-043","frigoriste":"F-004","date":"2025-06-12","description":"Vérification circuit frigorifique","cout":85,"tempSoufflage":8.0,"tempDate":"2025-06-12"},
+{"id":"I-015","vitrineId":"V-043","frigoriste":"F-003","date":"2025-10-20","description":"Nettoyage condenseur","cout":75,"tempSoufflage":7.5,"tempDate":"2025-10-20"},
+{"id":"I-016","vitrineId":"V-043","frigoriste":"F-003","date":"2026-06-03","description":"Remplacement condenseur","cout":390,"tempSoufflage":4.0,"tempDate":"2026-06-03"},
+{"id":"I-017","vitrineId":"V-022","frigoriste":"F-002","date":"2025-08-26","description":"Remplacement condenseur","cout":410,"tempSoufflage":3.0,"tempDate":"2025-08-26"},
+{"id":"I-018","vitrineId":"V-022","frigoriste":"F-002","date":"2026-01-14","description":"Recharge gaz R134a","cout":150,"tempSoufflage":3.5,"tempDate":"2026-01-14"},
+{"id":"I-019","vitrineId":"V-022","frigoriste":"F-001","date":"2026-08-11","description":"Nettoyage condenseur","cout":65,"tempSoufflage":4.5,"tempDate":"2026-08-11"},
+{"id":"I-020","vitrineId":"V-053","frigoriste":"F-004","date":"2025-10-08","description":"Réglage température","cout":55,"tempSoufflage":-1.0,"tempDate":"2025-10-08"},
+{"id":"I-021","vitrineId":"V-053","frigoriste":"F-001","date":"2026-05-19","description":"Remplacement thermostat","cout":110,"tempSoufflage":1.0,"tempDate":"2026-05-19"},
+{"id":"I-022","vitrineId":"V-055","frigoriste":"F-002","date":"2025-12-16","description":"Réparation joint de porte","cout":120,"tempSoufflage":3.0,"tempDate":"2025-12-16"},
+{"id":"I-023","vitrineId":"V-055","frigoriste":"F-002","date":"2026-09-25","description":"Nettoyage condenseur","cout":60,"tempSoufflage":3.5,"tempDate":"2026-09-25"},
+{"id":"I-024","vitrineId":"V-029","frigoriste":"F-004","date":"2025-09-02","description":"Vérification circuit frigorifique","cout":95,"tempSoufflage":6.0,"tempDate":"2025-09-02"},
+{"id":"I-025","vitrineId":"V-029","frigoriste":"F-003","date":"2026-03-17","description":"Remplacement ventilateur évaporateur","cout":220,"tempSoufflage":4.5,"tempDate":"2026-03-17"},
+{"id":"I-026","vitrineId":"V-010","frigoriste":"F-003","date":"2026-01-27","description":"Remplacement compresseur","cout":800,"tempSoufflage":2.5,"tempDate":"2026-01-27"},
+{"id":"I-027","vitrineId":"V-011","frigoriste":"F-001","date":"2025-11-25","description":"Recharge gaz R134a","cout":140,"tempSoufflage":2.0,"tempDate":"2025-11-25"},
+{"id":"I-028","vitrineId":"V-020","frigoriste":"F-002","date":"2026-08-30","description":"Remplacement thermostat","cout":105,"tempSoufflage":3.0,"tempDate":"2026-08-30"}
+]};
 
 // ===== State (localStorage) =====
 const LS_KEY = 'vitritrack_state_v1';
@@ -861,6 +1010,11 @@ function loadState() {
   if (!state.bookings) state.bookings = seedBookings();
   if (!state.lieux) state.lieux = seedLieux();
   if (state.user === undefined) state.user = null;
+  if (!state.frigoristes) state.frigoristes = JSON.parse(JSON.stringify(DATA.frigoristes));
+  if (!state.interventions) state.interventions = JSON.parse(JSON.stringify(DATA.interventions));
+  state.settings = Object.assign(defaultSettings(), state.settings || {});
+  // Backfill : date ISO de chaque opération (dérivée du mois) pour le filtre par période
+  state.flux.forEach((f,i) => { if (!f.date) f.date = fluxDateFromMois(f.mois, i); });
   // Backfill : rattache chaque réservation à une vitrine + compte encaisseur
   if (state.bookings.some(b => !b.vitrineId || !b.montant || !b.qui)) {
     const dispo = state.vitrines.filter(v => !/vendu/i.test(v.model) && v.fonctionnelle !== false);
@@ -1005,7 +1159,7 @@ function quiBadge(name) {
   return '<span class="badge '+(name==='Oussama'?'qui-o':'qui-b')+'">'+esc(name||'')+'</span>';
 }
 function soldeCompte(name) {
-  return state.flux.filter(f => f.qui === name).reduce((s,f)=>s+(f.in||0)-(f.out||0),0);
+  return fluxPeriod().filter(f => f.qui === name).reduce((s,f)=>s+(f.in||0)-(f.out||0),0);
 }
 function periodeBooking(b) {
   const mShort = ['Sep','Oct','Nov','Déc','Jan','Fév','Mar','Avr','Mai','Juin','Juil','Août'];
@@ -1015,7 +1169,7 @@ function periodeBooking(b) {
 
 // ===== Renders =====
 function renderDashboard() {
-  const flux = state.flux;
+  const flux = fluxPeriod();
   const totalIn = flux.reduce((s,f)=>s+(f.in||0),0);
   const totalOut = flux.reduce((s,f)=>s+(f.out||0),0);
   const solde = totalIn - totalOut;
@@ -1047,7 +1201,7 @@ function renderDashboard() {
   // Prochaines réservations (triées par mois de début, 5 premières)
   const curIdx = currentMonthIndex();
   const upcoming = state.bookings
-    .filter(b => !b.maint)
+    .filter(b => !b.maint && bookingInPeriod(b))
     .slice()
     .sort((a,b) => a.start - b.start)
     .slice(0,5);
@@ -1088,6 +1242,16 @@ function renderDashboard() {
   state.vitrines.filter(v=>v.fonctionnelle===false).forEach(v=>alerts.push({level:'danger',t:v.id+' — Hors service',s:v.model+' · '+(v.commentaire||'')+' · lieu : '+(v.lieu||''),vitrineId:v.id}));
   state.vitrines.filter(v=>/non rendu/i.test(v.lieu||'')||/\?\s*$/.test(v.lieu||'')).forEach(v=>alerts.push({level:'warn',t:v.id+' — Statut incertain',s:v.model+' · '+v.lieu,vitrineId:v.id}));
   state.vitrines.filter(v=>(v.reparation||0)>0 && v.prix && v.reparation > v.prix*0.3).forEach(v=>alerts.push({level:'warn',t:v.id+' — Réparations > 30% de la valeur',s:'Réparations '+eur(v.reparation)+' sur une valeur de '+eur(v.prix),vitrineId:v.id}));
+  // Alertes température de soufflage (dernière mesure de la période > 6°C)
+  const lastTemp = {};
+  state.interventions.filter(i => i.tempSoufflage != null && inPeriod(i.tempDate || i.date))
+    .sort((a,b) => (a.tempDate||a.date).localeCompare(b.tempDate||b.date))
+    .forEach(i => { lastTemp[i.vitrineId] = i; });
+  Object.values(lastTemp).filter(i => i.tempSoufflage > 6).forEach(i => alerts.push({level:'danger',t:i.vitrineId+' — Soufflage trop chaud ('+fmtTemp(i.tempSoufflage)+')',s:'Mesure du '+fmtDate(i.tempDate||i.date)+' · '+i.description,vitrineId:i.vitrineId}));
+  if (hasDateFilter()) {
+    const nb = state.interventions.filter(i => inPeriod(i.date)).length;
+    alerts.push({level:'warn',t:nb+' intervention'+(nb>1?'s':'')+' frigoriste sur la période',s:'Coût total : '+eur(state.interventions.filter(i => inPeriod(i.date)).reduce((s,i)=>s+(i.cout||0),0))});
+  }
   document.getElementById('dash-alerts').innerHTML = alerts.length ? alerts.map(a=>
     a.vitrineId
       ? '<button type="button" class="alert-item '+a.level+'" onclick="showVitrine(\''+esc(a.vitrineId)+'\')"><div class="alert-dot"></div><div><div class="alert-text">'+esc(a.t)+'</div><div class="alert-sub">'+esc(a.s)+'</div></div></button>'
@@ -1271,6 +1435,10 @@ function showVitrine(id) {
         '<div class="vd-nfc-title" style="font-family:var(--font-display);font-size:1.5rem;font-weight:700;margin-top:0;color:var(--accent-fg)">'+v.id+'</div>' +
         '<div style="font-size:.75rem;color:var(--fg-muted)">ID vitrine · badge NFC associé</div>' +
       '</div>' +
+      '<div class="vd-nfc-btns">' +
+        '<button type="button" class="btn btn-primary" onclick="writeNfc(\''+v.id+'\')">Écrire sur badge NFC</button>' +
+        '<button type="button" class="btn btn-secondary" onclick="readNfc(\''+v.id+'\')">Lire le badge NFC</button>' +
+      '</div>' +
     '</div>' +
   '</div>' +
   '<div class="card">' +
@@ -1308,7 +1476,8 @@ function showVitrine(id) {
         '</button>';
       }).join('') + '</div>'
     : '<div style="color:var(--fg-muted);font-size:.875rem">Aucune réservation — vitrine disponible</div>') +
-  '</div>';
+  '</div>' +
+  interventionsHTML(v);
   showPage('vitrine-detail', true);
 }
 
@@ -1681,7 +1850,7 @@ function renderTresorerie() {
 
   let kpis = '';
   if (tresoView === 'mine') {
-    const fluxMoi = state.flux.filter(f => f.qui === moi);
+    const fluxMoi = fluxPeriod().filter(f => f.qui === moi);
     const inMoi = fluxMoi.reduce((s,f)=>s+(f.in||0),0);
     const outMoi = fluxMoi.reduce((s,f)=>s+(f.out||0),0);
     kpis =
@@ -1691,15 +1860,16 @@ function renderTresorerie() {
       '<div class="card kpi" style="border:1px dashed var(--border)"><div class="kpi-label">Solde général (2 caisses)</div><div class="kpi-value">'+eur(totalGeneral)+'</div><div class="kpi-sub">Bilel '+eur(soldes['Bilel'])+' · Oussama '+eur(soldes['Oussama'])+'</div></div>';
   } else {
     kpis =
-      '<div class="card kpi" style="border:2px solid var(--info)"><div class="kpi-label">Solde Bilel</div><div class="kpi-value" style="color:'+(soldes['Bilel']>=0?'var(--success)':'var(--danger)')+'">'+eur(soldes['Bilel'])+'</div><div class="kpi-sub">'+state.flux.filter(f=>f.qui==='Bilel').length+' opérations</div></div>' +
-      '<div class="card kpi" style="border:2px solid var(--warn)"><div class="kpi-label">Solde Oussama</div><div class="kpi-value" style="color:'+(soldes['Oussama']>=0?'var(--success)':'var(--danger)')+'">'+eur(soldes['Oussama'])+'</div><div class="kpi-sub">'+state.flux.filter(f=>f.qui==='Oussama').length+' opérations</div></div>' +
+      '<div class="card kpi" style="border:2px solid var(--info)"><div class="kpi-label">Solde Bilel</div><div class="kpi-value" style="color:'+(soldes['Bilel']>=0?'var(--success)':'var(--danger)')+'">'+eur(soldes['Bilel'])+'</div><div class="kpi-sub">'+fluxPeriod().filter(f=>f.qui==='Bilel').length+' opérations</div></div>' +
+      '<div class="card kpi" style="border:2px solid var(--warn)"><div class="kpi-label">Solde Oussama</div><div class="kpi-value" style="color:'+(soldes['Oussama']>=0?'var(--success)':'var(--danger)')+'">'+eur(soldes['Oussama'])+'</div><div class="kpi-sub">'+fluxPeriod().filter(f=>f.qui==='Oussama').length+' opérations</div></div>' +
       '<div class="card kpi"><div class="kpi-label">Total général</div><div class="kpi-value">'+eur(totalGeneral)+'</div><div class="kpi-sub">inclut les plus-values de ventes</div></div>';
   }
   document.getElementById('treso-kpis').innerHTML = kpis;
+  renderCaisses();
 
   // Journal filtré
   const filtre = tresoView === 'mine' ? moi : quiFilter.value;
-  const journal = filtre ? state.flux.filter(f => f.qui === filtre) : state.flux;
+  const journal = filtre ? fluxPeriod().filter(f => f.qui === filtre) : fluxPeriod();
   const idxMap = journal.map(f => state.flux.indexOf(f));
   document.getElementById('treso-journal-title').textContent = tresoView === 'mine' ? 'Journal — ma caisse (' + moi + ')' : 'Journal — toutes les caisses';
   document.getElementById('treso-journal-sub').textContent = journal.length + ' opération' + (journal.length>1?'s':'');
@@ -1710,7 +1880,7 @@ function renderTresorerie() {
     '<td style="color:var(--danger);font-weight:600;font-variant-numeric:tabular-nums">'+(f.out?'-'+eur(f.out):'')+'</td>' +
     '<td>'+quiBadge(f.qui)+'</td>' +
     '<td style="font-weight:500">'+esc(f.client||'')+'</td>' +
-    '<td>'+esc(f.mois||'')+'</td>' +
+    '<td>'+esc(f.date ? fmtDateShort(f.date) : (f.mois||''))+'</td>' +
     '<td style="max-width:260px;font-size:.75rem;color:var(--fg-muted)">'+esc(f.comm||'')+'</td>' +
     '<td><button class="row-del" title="Supprimer" onclick="deleteFlux('+idxMap[k]+')">&times;</button></td></tr>'
   ).join('');
@@ -1722,7 +1892,7 @@ function renderTresorerie() {
         quiBadge(f.qui) +
       '</div>' +
       '<div class="m-card-title">'+esc(f.client||'')+'</div>' +
-      '<div class="m-card-sub">'+esc(f.mois||'')+(f.comm?' · '+esc(f.comm.length>50?f.comm.slice(0,50)+'…':f.comm):'')+'</div>' +
+      '<div class="m-card-sub">'+esc(f.date ? fmtDateShort(f.date) : (f.mois||''))+(f.comm?' · '+esc(f.comm.length>50?f.comm.slice(0,50)+'…':f.comm):'')+'</div>' +
       '<div class="m-actions"><button type="button" class="btn btn-secondary" style="min-width:44px;flex:0 0 44px" title="Supprimer" onclick="deleteFlux('+idxMap[k]+')">&times;</button></div>' +
     '</div>'
   ).join('') || '<div style="color:var(--fg-muted);font-size:.875rem">Aucune opération</div>';
@@ -1765,6 +1935,7 @@ function saveFlux(ev) {
     isTransport: type==='out' && document.getElementById('ff-transport').checked,
     isAchat: false,
     mois: fv('ff-mois'),
+    date: fluxDateNouvelle(fv('ff-mois')),
     comm: fv('ff-comm')
   });
   toast('Opération enregistrée : ' + eur(montant));
@@ -1862,6 +2033,7 @@ function saveVente(ev) {
       isTransport: false,
       isAchat: false,
       mois: MONTHS[currentMonthIndex()],
+      date: todayISO(),
       comm: 'Vente vitrine : ' + nom
     });
   }
@@ -2161,6 +2333,418 @@ function collapseNfcZoneOnMobile() {
   document.getElementById('nfc-toggle').setAttribute('aria-expanded','false');
 }
 
+// ===== Période (filtre Du / Au / Ce mois) — Dashboard + Trésorerie =====
+const dateFilter = {from:'', to:''};
+const pad2 = n => String(n).padStart(2,'0');
+const isoDate = d => d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());
+const todayISO = () => isoDate(new Date());
+function fmtDate(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso + 'T00:00:00');
+  return isNaN(d) ? iso : d.toLocaleDateString('fr-FR', {day:'numeric', month:'long', year:'numeric'});
+}
+function fmtDateShort(iso) {
+  const d = new Date(iso + 'T00:00:00');
+  return isNaN(d) ? iso : d.toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit', year:'numeric'});
+}
+function monthRange() {
+  const n = new Date();
+  return {from: isoDate(new Date(n.getFullYear(), n.getMonth(), 1)), to: isoDate(new Date(n.getFullYear(), n.getMonth()+1, 0))};
+}
+function isMonthFilter() { const r = monthRange(); return dateFilter.from === r.from && dateFilter.to === r.to; }
+function hasDateFilter() { return !!(dateFilter.from || dateFilter.to); }
+function inPeriod(d) {
+  if (!hasDateFilter()) return true;
+  if (!d) return false;
+  if (dateFilter.from && d < dateFilter.from) return false;
+  if (dateFilter.to && d > dateFilter.to) return false;
+  return true;
+}
+function periodLabel() {
+  if (!hasDateFilter()) return 'toute la saison';
+  return (dateFilter.from ? 'du ' + fmtDateShort(dateFilter.from) : 'jusqu\'au') + (dateFilter.from && dateFilter.to ? ' ' : ' ') + (dateFilter.to ? (dateFilter.from ? 'au ' : '') + fmtDateShort(dateFilter.to) : 'à aujourd\'hui');
+}
+// Index du cycle Sept(0)→Août(11) → année/mois calendaires
+function cycleMonth(i) { return {y: i <= 3 ? 2026 : 2027, m: (i + 8) % 12}; }
+function fluxDateFromMois(mois, idx) {
+  const i = MONTHS.findIndex(m => m.toLowerCase() === String(mois||'').trim().toLowerCase());
+  const c = cycleMonth(i < 0 ? 0 : i);
+  return c.y + '-' + pad2(c.m + 1) + '-' + pad2(((idx * 7) % 27) + 1);
+}
+function fluxDateNouvelle(mois) {
+  const now = new Date();
+  const i = MONTHS.findIndex(m => m.toLowerCase() === String(mois||'').trim().toLowerCase());
+  if (i < 0) return todayISO();
+  const c = cycleMonth(i);
+  if (c.m === now.getMonth() && c.y === now.getFullYear()) return todayISO();
+  return c.y + '-' + pad2(c.m + 1) + '-15';
+}
+function fluxPeriod() { return state.flux.filter(f => inPeriod(f.date)); }
+function bookingInPeriod(b) {
+  if (!hasDateFilter()) return true;
+  const s = cycleMonth(b.start), e = cycleMonth(Math.min(11, b.start + b.len - 1));
+  const bs = s.y + '-' + pad2(s.m + 1) + '-01';
+  const be = isoDate(new Date(e.y, e.m + 1, 0));
+  return (!dateFilter.to || bs <= dateFilter.to) && (!dateFilter.from || be >= dateFilter.from);
+}
+function dateBarHTML(ctx) {
+  const mois = isMonthFilter();
+  return '<div class="filter-field"><label for="df-from-'+ctx+'">Du</label><input type="date" id="df-from-'+ctx+'" value="'+dateFilter.from+'" onchange="setDateFilter(\'from\',this.value)"></div>' +
+    '<div class="filter-field"><label for="df-to-'+ctx+'">Au</label><input type="date" id="df-to-'+ctx+'" value="'+dateFilter.to+'" onchange="setDateFilter(\'to\',this.value)"></div>' +
+    '<button type="button" class="btn btn-secondary period-btn'+(mois?' active':'')+'" aria-pressed="'+mois+'" onclick="setThisMonth()">Ce mois</button>' +
+    '<button type="button" class="filter-reset" onclick="resetDateFilter()"'+(hasDateFilter()?'':' style="opacity:.5"')+'>Réinitialiser</button>' +
+    (hasDateFilter() ? '<span style="font-size:.75rem;color:var(--fg-muted);align-self:center">Période : '+esc(periodLabel())+'</span>' : '');
+}
+function syncDateBars() {
+  ['dashboard','tresorerie'].forEach(c => { const el = document.getElementById('datebar-' + c); if (el) el.innerHTML = dateBarHTML(c); });
+}
+function setDateFilter(which, val) {
+  dateFilter[which] = val || '';
+  if (dateFilter.from && dateFilter.to && dateFilter.from > dateFilter.to) {
+    const t = dateFilter.from; dateFilter.from = dateFilter.to; dateFilter.to = t;
+  }
+  renderAll();
+  toast(hasDateFilter() ? 'Période appliquée : ' + periodLabel() : 'Filtre de période retiré');
+}
+function setThisMonth() {
+  const r = monthRange();
+  dateFilter.from = r.from; dateFilter.to = r.to;
+  renderAll();
+  toast('Période : ' + new Date().toLocaleDateString('fr-FR', {month:'long', year:'numeric'}));
+}
+function resetDateFilter() {
+  dateFilter.from = ''; dateFilter.to = '';
+  renderAll();
+  toast('Filtre de période réinitialisé');
+}
+
+// ===== Caisse totale + par compte =====
+function renderCaisses() {
+  const fl = fluxPeriod();
+  const cartes = [
+    ['Caisse totale', fl, 'var(--accent)'],
+    ['Caisse Bilel', fl.filter(f => f.qui === 'Bilel'), 'var(--info)'],
+    ['Caisse Oussama', fl.filter(f => f.qui === 'Oussama'), 'var(--warn)']
+  ];
+  document.getElementById('treso-caisses').innerHTML = cartes.map(c => {
+    const i = c[1].reduce((s,f) => s + (f.in||0), 0), o = c[1].reduce((s,f) => s + (f.out||0), 0), net = i - o;
+    return '<div class="card kpi caisse-card" style="border:2px solid '+c[2]+'">' +
+      '<div class="kpi-label">'+c[0]+'</div>' +
+      '<div class="kpi-value" style="color:'+(net>=0?'var(--success)':'var(--danger)')+'">'+eur(net)+'</div>' +
+      '<div class="stat-row"><span class="label">Total entrées</span><span class="value" style="color:var(--success)">+ '+eur(i)+'</span></div>' +
+      '<div class="stat-row"><span class="label">Total sorties</span><span class="value" style="color:var(--danger)">- '+eur(o)+'</span></div>' +
+      '<div class="stat-row"><span class="label" style="font-weight:600">Solde net</span><span class="value">'+eur(net)+'</span></div>' +
+      '<div class="kpi-sub">'+c[1].length+' opération'+(c[1].length>1?'s':'')+' · '+esc(periodLabel())+'</div>' +
+    '</div>';
+  }).join('');
+}
+
+// ===== Interventions frigoristes =====
+function frigoNom(id) { const f = state.frigoristes.find(x => x.id === id); return f ? f.nom : '—'; }
+function fmtTemp(t) { return (Math.round(t*10)/10).toFixed(1) + '°C'; }
+function tempClass(t) { return t <= 4 ? 'temp-ok' : t <= 6 ? 'temp-warn' : 'temp-bad'; }
+function tempLabel(t) { return t <= 4 ? 'Conforme' : t <= 6 ? 'À surveiller' : 'Trop chaud'; }
+function vitrineInterventions(id) {
+  return state.interventions.filter(i => i.vitrineId === id).sort((a,b) => b.date.localeCompare(a.date));
+}
+function nextInterventionId() {
+  let max = 0;
+  state.interventions.forEach(i => { const m = /^I-(\d+)$/.exec(i.id); if (m) max = Math.max(max, parseInt(m[1],10)); });
+  return 'I-' + String(max+1).padStart(3,'0');
+}
+function interventionsHTML(v) {
+  const list = vitrineInterventions(v.id);
+  const mesures = list.filter(i => i.tempSoufflage != null).sort((a,b) => (b.tempDate||b.date).localeCompare(a.tempDate||a.date));
+  const last = mesures[0];
+  const total = list.reduce((s,i) => s + (i.cout||0), 0);
+  const tempCard = last
+    ? '<div class="card temp-card '+tempClass(last.tempSoufflage)+'">' +
+        '<div class="temp-big">'+fmtTemp(last.tempSoufflage)+'</div>' +
+        '<div class="temp-meta">' +
+          '<div class="kpi-label" style="margin:0">Dernière température de soufflage</div>' +
+          '<div style="font-size:.8125rem;color:var(--fg-muted)">Mesurée le '+esc(fmtDate(last.tempDate||last.date))+' · '+esc(frigoNom(last.frigoriste))+'</div>' +
+          '<div><span class="badge '+(last.tempSoufflage<=4?'badge-dispo':last.tempSoufflage<=6?'badge-maintenance':'badge-hs')+'">'+tempLabel(last.tempSoufflage)+'</span></div>' +
+        '</div>' +
+      '</div>'
+    : '<div class="card temp-card"><div class="temp-meta"><div class="kpi-label" style="margin:0">Dernière température de soufflage</div><div style="font-size:.875rem;color:var(--fg-muted)">Aucune mesure enregistrée pour cette vitrine</div></div></div>';
+  return tempCard +
+  '<div class="card" style="margin-top:16px">' +
+    '<div class="section-head">' +
+      '<div class="card-title">Interventions'+(list.length ? ' <span style="color:var(--fg-muted);font-weight:500">· '+list.length+' · '+eur(total)+'</span>' : '')+'</div>' +
+      '<div class="section-btns">' +
+        '<button type="button" class="btn btn-primary btn-sm" onclick="formIntervention(\''+v.id+'\')">+ Ajouter une intervention</button>' +
+        '<button type="button" class="btn btn-secondary btn-sm" onclick="formDevis(\''+v.id+'\')">Générer devis</button>' +
+      '</div>' +
+    '</div>' +
+    (list.length ? '<div class="timeline">' + list.map(i =>
+      '<div class="timeline-item">' +
+        '<div class="int-head"><div class="timeline-date">'+esc(fmtDate(i.date))+'</div><div class="int-cost">'+eur(i.cout)+'</div></div>' +
+        '<div class="int-desc">'+esc(i.description)+'</div>' +
+        '<div class="int-meta"><span>'+esc(frigoNom(i.frigoriste))+'</span>' +
+        (i.tempSoufflage != null ? '<span class="badge '+(i.tempSoufflage<=4?'badge-dispo':i.tempSoufflage<=6?'badge-maintenance':'badge-hs')+'">Soufflage '+fmtTemp(i.tempSoufflage)+'</span>' : '') +
+        '</div>' +
+      '</div>').join('') + '</div>'
+    : '<div style="color:var(--fg-muted);font-size:.875rem">Aucune intervention enregistrée pour cette vitrine</div>') +
+  '</div>';
+}
+function formIntervention(vid) {
+  openModal('Ajouter une intervention — ' + vid,
+    '<form id="f-int" onsubmit="saveIntervention(event,\''+vid+'\')">' +
+    '<div class="form-group"><label class="form-label" for="fi-frigo">Frigoriste *</label>' +
+    '<select class="form-select" id="fi-frigo" required>'+state.frigoristes.map(f=>'<option value="'+esc(f.id)+'">'+esc(f.nom)+' — '+esc(f.specialite)+'</option>').join('')+'</select></div>' +
+    '<div class="form-row">' +
+      '<div class="form-group"><label class="form-label" for="fi-date">Date *</label>' +
+      '<input class="form-input" id="fi-date" type="date" required value="'+todayISO()+'"></div>' +
+      '<div class="form-group"><label class="form-label" for="fi-cout">Coût (€) *</label>' +
+      '<input class="form-input" id="fi-cout" required inputmode="decimal" placeholder="Ex : 150"></div>' +
+    '</div>' +
+    '<div class="form-group"><label class="form-label" for="fi-desc">Description *</label>' +
+    '<textarea class="form-textarea" id="fi-desc" required maxlength="200" placeholder="Ex : Recharge gaz R134a"></textarea></div>' +
+    '<div class="form-group"><label class="form-label" for="fi-temp">Température de soufflage (°C)</label>' +
+    '<input class="form-input" id="fi-temp" inputmode="decimal" placeholder="Ex : 2.5"></div>' +
+    '<div class="modal-actions">' +
+      '<button type="button" class="btn btn-secondary" onclick="closeModal()">Annuler</button>' +
+      '<button type="submit" class="btn btn-primary">Enregistrer</button>' +
+    '</div></form>'
+  );
+}
+function saveIntervention(ev, vid) {
+  ev.preventDefault();
+  const cout = fn('fi-cout'), temp = fn('fi-temp');
+  if (cout == null || cout < 0) { toast('Coût invalide'); return; }
+  if (temp != null && (temp < -30 || temp > 40)) { toast('Température invalide (entre -30 et 40 °C)'); return; }
+  const date = fv('fi-date') || todayISO();
+  state.interventions.push({
+    id: nextInterventionId(), vitrineId: vid, frigoriste: fv('fi-frigo'), date: date,
+    description: fv('fi-desc'), cout: cout, tempSoufflage: temp, tempDate: temp != null ? date : null
+  });
+  saveState(); closeModal(); renderAll(); showVitrine(vid);
+  toast('Intervention ajoutée à ' + vid + ' · ' + eur(cout));
+}
+
+// ===== NFC : écriture / lecture (simulation) =====
+function writeNfc(id) {
+  const v = state.vitrines.find(x => x.id === id);
+  if (!v) return;
+  const tag = 'nfc-w-' + id + '-' + Date.now();
+  openModal('Écrire sur badge NFC — ' + id,
+    '<div id="nfc-op" data-tag="'+tag+'" style="text-align:center;padding:8px 0">' +
+      '<div class="nfc-spinner" role="status" aria-label="Écriture en cours"></div>' +
+      '<div style="font-family:var(--font-display);font-size:1.0625rem;font-weight:600">Approchez le badge NFC...</div>' +
+      '<div style="font-size:.8125rem;color:var(--fg-muted);margin-top:6px">Écriture de '+esc(v.id)+' · '+esc(v.model.slice(0,40))+'</div>' +
+    '</div>');
+  setTimeout(() => {
+    const el = document.getElementById('nfc-op');
+    if (!el || el.dataset.tag !== tag) return; // modale fermée entre-temps
+    el.innerHTML =
+      '<div class="nfc-ok"><svg width="26" height="26" viewBox="0 0 28 28" fill="none"><path d="M7 14l5 5 9-9" stroke="var(--success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' +
+      '<div style="font-family:var(--font-display);font-size:1.0625rem;font-weight:600">Badge écrit avec succès</div>' +
+      '<div style="font-size:.8125rem;color:var(--fg-muted);margin:6px 0 16px">'+esc(v.id)+(v.serie?' · série '+esc(v.serie):'')+' · '+esc(v.lieu||'')+'</div>' +
+      '<button type="button" class="btn btn-primary" style="width:100%;justify-content:center" onclick="closeModal()">Fermer</button>';
+    toast('Badge NFC écrit : ' + id);
+  }, 2000);
+}
+function readNfc(id) {
+  const v = state.vitrines.find(x => x.id === id);
+  if (!v) return;
+  const tag = 'nfc-r-' + id + '-' + Date.now();
+  openModal('Lire le badge NFC — ' + id,
+    '<div id="nfc-op" data-tag="'+tag+'" style="text-align:center;padding:8px 0">' +
+      '<div class="nfc-spinner" role="status" aria-label="Lecture en cours"></div>' +
+      '<div style="font-family:var(--font-display);font-size:1.0625rem;font-weight:600">Approchez le badge NFC...</div>' +
+    '</div>');
+  setTimeout(() => {
+    const el = document.getElementById('nfc-op');
+    if (!el || el.dataset.tag !== tag) return;
+    el.style.textAlign = 'left';
+    el.innerHTML =
+      '<div class="stat-row"><span class="label">ID</span><span class="value" style="color:var(--accent-fg)">'+esc(v.id)+'</span></div>' +
+      '<div class="stat-row"><span class="label">Modèle</span><span class="value">'+esc(v.model)+'</span></div>' +
+      '<div class="stat-row"><span class="label">N° de série</span><span class="value">'+(v.serie?esc(v.serie):'—')+'</span></div>' +
+      '<div class="stat-row"><span class="label">Lieu</span><span class="value">'+esc(v.lieu||'—')+'</span></div>' +
+      '<button type="button" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:16px" onclick="closeModal()">Fermer</button>';
+    toast('Badge NFC lu : ' + id);
+  }, 1500);
+}
+
+// ===== Paramètres =====
+function defaultSettings() {
+  return {
+    nom: 'VitriTrack SARL',
+    adresse: '15 rue des Frigoristes, 93100 Montreuil',
+    siret: 'RCS Bobigny 123 456 789 - SIRET 123 456 789 00012',
+    tel: '01 48 57 23 10',
+    email: 'contact@vitritrack.fr',
+    entete: 'Location et vente de vitrines réfrigérées pour salons, marchés et commerces de bouche.',
+    pied: 'VitriTrack SARL - 15 rue des Frigoristes, 93100 Montreuil - RCS Bobigny 123 456 789 - TVA FR12 123456789',
+    cgv: 'Devis valable 30 jours. Acompte de 30 % à la commande, solde à réception de la facture. Paiement à 30 jours par virement. Pénalité de retard : 3 fois le taux d\'intérêt légal, indemnité forfaitaire de recouvrement de 40 EUR. Toute intervention est garantie 3 mois pièces et main-d\'oeuvre.',
+    tva: 20,
+    devisSeq: 0
+  };
+}
+const SETTINGS_IDS = {nom:'st-nom', adresse:'st-adresse', siret:'st-siret', tel:'st-tel', email:'st-email', entete:'st-entete', pied:'st-pied', cgv:'st-cgv', tva:'st-tva'};
+function renderSettings() {
+  Object.keys(SETTINGS_IDS).forEach(k => {
+    const el = document.getElementById(SETTINGS_IDS[k]);
+    if (el && document.activeElement !== el) el.value = state.settings[k] == null ? '' : state.settings[k];
+  });
+}
+function saveSettings(notify) {
+  Object.keys(SETTINGS_IDS).forEach(k => {
+    const el = document.getElementById(SETTINGS_IDS[k]);
+    if (!el) return;
+    if (k === 'tva') { const n = fn(SETTINGS_IDS[k]); state.settings.tva = (n == null || n < 0 || n > 100) ? 20 : n; }
+    else state.settings[k] = el.value;
+  });
+  saveState();
+  if (notify) toast('Paramètres enregistrés');
+}
+
+// ===== Devis PDF (jsPDF) =====
+function formDevis(vid) {
+  const v = state.vitrines.find(x => x.id === vid);
+  if (!v) return;
+  const list = vitrineInterventions(vid);
+  openModal('Générer un devis — ' + vid,
+    '<form id="f-devis" onsubmit="genererDevis(event,\''+vid+'\')">' +
+    '<div class="form-group"><label class="form-label" for="fd-client">Nom du client *</label>' +
+    '<input class="form-input" id="fd-client" required maxlength="80" placeholder="Ex : Boulangerie Lecoguic"></div>' +
+    '<div class="form-group"><label class="form-label">Interventions à inclure</label>' +
+    (list.length ? list.map(i =>
+      '<label class="chk-row"><input type="checkbox" name="fd-int" value="'+esc(i.id)+'" checked>' +
+      '<span style="flex:1">'+esc(fmtDateShort(i.date))+' · '+esc(i.description)+'</span>' +
+      '<strong style="font-variant-numeric:tabular-nums">'+eur(i.cout)+'</strong></label>').join('')
+    : '<div style="color:var(--fg-muted);font-size:.8125rem">Aucune intervention enregistrée : ajoutez-en une avant de générer un devis.</div>') +
+    '</div>' +
+    '<div class="form-group"><label class="form-label" for="fd-notes">Notes</label>' +
+    '<textarea class="form-textarea" id="fd-notes" maxlength="400" placeholder="Ex : intervention sur site le matin, accès par le quai de livraison"></textarea></div>' +
+    '<div class="modal-actions">' +
+      '<button type="button" class="btn btn-secondary" onclick="closeModal()">Annuler</button>' +
+      '<button type="submit" class="btn btn-primary">Générer PDF</button>' +
+    '</div></form>'
+  );
+}
+function genererDevis(ev, vid) {
+  ev.preventDefault();
+  if (!(window.jspdf && window.jspdf.jsPDF)) { toast('Bibliothèque PDF indisponible (connexion internet requise)'); return; }
+  const v = state.vitrines.find(x => x.id === vid);
+  const ids = [...document.querySelectorAll('input[name="fd-int"]:checked')].map(x => x.value);
+  const items = state.interventions.filter(i => ids.includes(i.id)).sort((a,b) => a.date.localeCompare(b.date));
+  if (!items.length) { toast('Sélectionnez au moins une intervention'); return; }
+  const client = fv('fd-client'), notes = fv('fd-notes');
+  const s = state.settings;
+  s.devisSeq = (s.devisSeq || 0) + 1;
+  const now = new Date();
+  const numero = 'DV-' + now.getFullYear() + '-' + String(s.devisSeq).padStart(3,'0');
+  const tvaPct = s.tva == null ? 20 : Number(s.tva);
+  const ht = items.reduce((t,i) => t + (i.cout||0), 0);
+  const tva = ht * tvaPct / 100, ttc = ht + tva;
+  const money = n => { const p = (Number(n)||0).toFixed(2).split('.'); return p[0].replace(/\B(?=(\d{3})+$)/g, ' ') + ',' + p[1] + ' EUR'; };
+  const doc = new window.jspdf.jsPDF({unit:'mm', format:'a4'});
+  const W = 210, M = 15, R = W - M;
+  let y = 0;
+  const need = h => { if (y + h > 272) { doc.addPage(); y = 20; } };
+
+  // Bandeau société
+  doc.setFillColor(14,140,127); doc.rect(0, 0, W, 34, 'F');
+  doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(17);
+  doc.text(s.nom || 'VitriTrack', M, 14);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8.5);
+  doc.text([s.adresse, s.siret, [s.tel, s.email].filter(Boolean).join(' - ')].filter(Boolean), M, 20);
+  doc.setFont('helvetica','bold'); doc.setFontSize(22);
+  doc.text('DEVIS', R, 15, {align:'right'});
+  doc.setFont('helvetica','normal'); doc.setFontSize(9);
+  doc.text(numero, R, 22, {align:'right'});
+  y = 42;
+
+  if (s.entete) {
+    doc.setTextColor(90,100,115); doc.setFontSize(9); doc.setFont('helvetica','italic');
+    const l = doc.splitTextToSize(s.entete, W - 2*M);
+    doc.text(l, M, y); y += l.length * 4.2 + 4;
+  }
+
+  // Client / dates
+  doc.setTextColor(26,35,50);
+  doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.text('CLIENT', M, y); doc.text('INFORMATIONS', 120, y);
+  doc.setFont('helvetica','normal'); doc.setFontSize(10.5);
+  const cl = doc.splitTextToSize(client, 90);
+  doc.text(cl, M, y + 6);
+  doc.setFontSize(9.5);
+  doc.text(['Date : ' + now.toLocaleDateString('fr-FR'), 'N° de devis : ' + numero, 'Validité : 30 jours'], 120, y + 6);
+  y += Math.max(cl.length * 5, 15) + 8;
+
+  // Vitrine
+  doc.setFillColor(237,241,245); doc.roundedRect(M, y, W - 2*M, 17, 2, 2, 'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.text('VITRINE CONCERNEE', M + 4, y + 5.5);
+  doc.setFont('helvetica','normal'); doc.setFontSize(9.5);
+  doc.text(v.id + ' - ' + (v.model.length > 70 ? v.model.slice(0,70) + '...' : v.model), M + 4, y + 10.5);
+  doc.text('N° de série : ' + (v.serie || 'non renseigné') + '   -   Lieu : ' + (v.lieu || 'non renseigné'), M + 4, y + 15);
+  y += 25;
+
+  // Tableau
+  const drawHead = () => {
+    doc.setFillColor(14,140,127); doc.rect(M, y, W - 2*M, 8, 'F');
+    doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(9);
+    doc.text('Date', M + 3, y + 5.5); doc.text('Description', M + 30, y + 5.5);
+    doc.text('Intervenant', M + 108, y + 5.5); doc.text('Montant HT', R - 3, y + 5.5, {align:'right'});
+    y += 8; doc.setTextColor(26,35,50);
+  };
+  drawHead();
+  doc.setFont('helvetica','normal'); doc.setFontSize(9);
+  items.forEach((i, k) => {
+    const desc = doc.splitTextToSize(i.description, 74);
+    const rh = Math.max(desc.length * 4.2, 4.2) + 4;
+    if (y + rh > 272) { doc.addPage(); y = 20; drawHead(); doc.setFont('helvetica','normal'); doc.setFontSize(9); }
+    if (k % 2 === 1) { doc.setFillColor(247,249,251); doc.rect(M, y, W - 2*M, rh, 'F'); }
+    doc.text(fmtDateShort(i.date), M + 3, y + 5);
+    doc.text(desc, M + 30, y + 5);
+    doc.text(frigoNom(i.frigoriste), M + 108, y + 5);
+    doc.text(money(i.cout), R - 3, y + 5, {align:'right'});
+    y += rh;
+  });
+  doc.setDrawColor(221,227,236); doc.line(M, y, R, y); y += 7;
+
+  // Totaux
+  need(30);
+  const tx = 125;
+  doc.setFontSize(10); doc.setFont('helvetica','normal');
+  doc.text('Sous-total HT', tx, y); doc.text(money(ht), R, y, {align:'right'}); y += 6;
+  doc.text('TVA (' + String(tvaPct).replace('.', ',') + ' %)', tx, y); doc.text(money(tva), R, y, {align:'right'}); y += 3;
+  doc.setDrawColor(14,140,127); doc.setLineWidth(0.5); doc.line(tx, y, R, y); y += 6;
+  doc.setFont('helvetica','bold'); doc.setFontSize(12);
+  doc.text('Total TTC', tx, y); doc.text(money(ttc), R, y, {align:'right'}); y += 10;
+
+  // Notes
+  if (notes) {
+    const nl = doc.splitTextToSize(notes, W - 2*M);
+    need(nl.length * 4.5 + 10);
+    doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.text('NOTES', M, y); y += 5;
+    doc.setFont('helvetica','normal'); doc.text(nl, M, y); y += nl.length * 4.5 + 6;
+  }
+
+  // Conditions
+  if (s.cgv) {
+    const cg = doc.splitTextToSize(s.cgv, W - 2*M);
+    need(Math.min(cg.length, 6) * 4 + 10);
+    doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.text('CONDITIONS GENERALES', M, y); y += 5;
+    doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(90,100,115);
+    cg.forEach(line => { need(4); doc.text(line, M, y); y += 3.8; });
+  }
+
+  // Pied de page + pagination
+  const pages = doc.getNumberOfPages();
+  for (let p = 1; p <= pages; p++) {
+    doc.setPage(p);
+    doc.setDrawColor(221,227,236); doc.setLineWidth(0.2); doc.line(M, 282, R, 282);
+    doc.setTextColor(120,130,145); doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
+    doc.text(doc.splitTextToSize(s.pied || '', W - 2*M).slice(0,2), W/2, 286, {align:'center'});
+    doc.text('Page ' + p + '/' + pages, R, 293, {align:'right'});
+  }
+  doc.save('Devis_' + numero + '_' + v.id + '.pdf');
+  saveState(); closeModal();
+  toast('Devis ' + numero + ' généré · ' + money(ttc) + ' TTC');
+}
+
 // ===== Navigation =====
 function showPage(page, skipNav) {
   document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
@@ -2174,6 +2758,7 @@ function showPage(page, skipNav) {
 }
 
 function renderAll() {
+  syncDateBars();
   renderDashboard();
   initVitrineFilters();
   renderVitrines();
@@ -2182,6 +2767,7 @@ function renderAll() {
   renderVentes();
   renderLieux();
   renderActions();
+  renderSettings();
 }
 
 document.querySelectorAll('.nav-item').forEach(btn => btn.addEventListener('click', () => {

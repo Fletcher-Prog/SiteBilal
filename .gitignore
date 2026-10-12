@@ -1,2 +1,4 @@
 *.xlsx
 .tasks/
+.claude/
+.v05/
