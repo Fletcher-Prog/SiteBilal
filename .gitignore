@@ -10,3 +10,4 @@ dist/
 .v05-state/
 feedback.log
 deploy/docker/.env
+.cronforge/
