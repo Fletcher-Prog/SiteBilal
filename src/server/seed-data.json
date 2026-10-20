@@ -1,0 +1,1863 @@
+{
+ "vitrines": [
+  {
+   "id": 1,
+   "serial": "V-001",
+   "model": "vitrine non pliante pedro 1",
+   "prix_achat": 300,
+   "prix_reparation": 0,
+   "commentaire": "fonctionnelle",
+   "fonctionnelle": null,
+   "lieu_id": 2,
+   "nfc_tag": null
+  },
+  {
+   "id": 2,
+   "serial": "V-002",
+   "model": "vitrine non pliante pedro 2",
+   "prix_achat": 300,
+   "prix_reparation": 0,
+   "commentaire": "fonctionnelle",
+   "fonctionnelle": null,
+   "lieu_id": 2,
+   "nfc_tag": null
+  },
+  {
+   "id": 3,
+   "serial": "V-003",
+   "model": "vitrine non pliante pedro 3",
+   "prix_achat": 300,
+   "prix_reparation": 0,
+   "commentaire": "fonctionnelle",
+   "fonctionnelle": null,
+   "lieu_id": 2,
+   "nfc_tag": null
+  },
+  {
+   "id": 4,
+   "serial": "V-004",
+   "model": "vitrine non pliante pedro 4",
+   "prix_achat": 300,
+   "prix_reparation": 0,
+   "commentaire": "fonctionnelle",
+   "fonctionnelle": null,
+   "lieu_id": 2,
+   "nfc_tag": null
+  },
+  {
+   "id": 5,
+   "serial": "V-005",
+   "model": "vitrine non pliante pedro 5",
+   "prix_achat": 300,
+   "prix_reparation": 0,
+   "commentaire": "fonctionnelle",
+   "fonctionnelle": null,
+   "lieu_id": 2,
+   "nfc_tag": null
+  },
+  {
+   "id": 6,
+   "serial": "V-006",
+   "model": "vitrine non pliante marocain",
+   "prix_achat": 400,
+   "prix_reparation": 0,
+   "commentaire": "fonctionnelle",
+   "fonctionnelle": null,
+   "lieu_id": 2,
+   "nfc_tag": null
+  },
+  {
+   "id": 7,
+   "serial": "V-007",
+   "model": "Vitrine Elite Froid 2m (bougival)",
+   "prix_achat": 1500,
+   "prix_reparation": 0,
+   "commentaire": "souffle 2 degrés",
+   "fonctionnelle": 1,
+   "lieu_id": 1,
+   "nfc_tag": null
+  },
+  {
+   "id": 8,
+   "serial": "V-008",
+   "model": "Vitrine Elite Froid 2m bache rouge 1",
+   "prix_achat": null,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": 1,
+   "lieu_id": 5,
+   "nfc_tag": null
+  },
+  {
+   "id": 9,
+   "serial": "V-009",
+   "model": "Vitrine Elite Froid 2m bache rouge 2",
+   "prix_achat": null,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": 1,
+   "lieu_id": 5,
+   "nfc_tag": null
+  },
+  {
+   "id": 10,
+   "serial": "V-010",
+   "model": "Vitrine Elite Froid 2m bache rouge 3",
+   "prix_achat": null,
+   "prix_reparation": 1500,
+   "commentaire": "",
+   "fonctionnelle": 1,
+   "lieu_id": 7,
+   "nfc_tag": null
+  },
+  {
+   "id": 11,
+   "serial": "V-011",
+   "model": "Vitrine Elite Froid 2m (marseille)",
+   "prix_achat": 1500,
+   "prix_reparation": 0,
+   "commentaire": "²",
+   "fonctionnelle": 1,
+   "lieu_id": 1,
+   "nfc_tag": null
+  },
+  {
+   "id": 12,
+   "serial": "V-012",
+   "model": "Vitrine Elite Froid 2m (Pedro)",
+   "prix_achat": 1000,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": 1,
+   "lieu_id": 1,
+   "nfc_tag": null
+  },
+  {
+   "id": 13,
+   "serial": "V-013",
+   "model": "Vitrine Elite Froid 2m (sans vitre)",
+   "prix_achat": 1500,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 6,
+   "nfc_tag": null
+  },
+  {
+   "id": 14,
+   "serial": "V-014",
+   "model": "Vitrine Elite Froid 2m (sans vitre)",
+   "prix_achat": 1500,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 6,
+   "nfc_tag": null
+  },
+  {
+   "id": 15,
+   "serial": "V-015",
+   "model": "Vitrine verticale (1m)",
+   "prix_achat": 280,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 8,
+   "nfc_tag": null
+  },
+  {
+   "id": 16,
+   "serial": "V-016",
+   "model": "Vitrine verticale ronde (1m)",
+   "prix_achat": 300,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": 1,
+   "lieu_id": 1,
+   "nfc_tag": null
+  },
+  {
+   "id": 17,
+   "serial": "V-017",
+   "model": "Vitrine verticale ronde (1m)",
+   "prix_achat": 300,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 2,
+   "nfc_tag": null
+  },
+  {
+   "id": 18,
+   "serial": "V-018",
+   "model": "Vitrine Elite froid 1.5 m",
+   "prix_achat": 1600,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 9,
+   "nfc_tag": null
+  },
+  {
+   "id": 19,
+   "serial": "V-019",
+   "model": "Vitrine Elite froid 1 m rouge",
+   "prix_achat": null,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": 1,
+   "lieu_id": 2,
+   "nfc_tag": null
+  },
+  {
+   "id": 20,
+   "serial": "V-020",
+   "model": "Vitrine Elite froid 1 m",
+   "prix_achat": 500,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": 1,
+   "lieu_id": 1,
+   "nfc_tag": null
+  },
+  {
+   "id": 21,
+   "serial": "V-021",
+   "model": "Vitrine PSV marocain 1",
+   "prix_achat": 1250,
+   "prix_reparation": 0,
+   "commentaire": "condenseur à changer, 12 degrés",
+   "fonctionnelle": 0,
+   "lieu_id": 1,
+   "nfc_tag": null
+  },
+  {
+   "id": 22,
+   "serial": "V-022",
+   "model": "Vitrine PSV marocain 2",
+   "prix_achat": 1250,
+   "prix_reparation": 0,
+   "commentaire": "condenseur neuf, 3 degrés en vente pour libanais souheile",
+   "fonctionnelle": 1,
+   "lieu_id": 1,
+   "nfc_tag": null
+  },
+  {
+   "id": 23,
+   "serial": "V-023",
+   "model": "Vitrine PSV portugais 1",
+   "prix_achat": 1000,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 11,
+   "nfc_tag": null
+  },
+  {
+   "id": 24,
+   "serial": "V-024",
+   "model": "Vitrine PSV portugais 2",
+   "prix_achat": 1000,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 11,
+   "nfc_tag": null
+  },
+  {
+   "id": 25,
+   "serial": "V-025",
+   "model": "Vitrine PSV portugais 3 (ex KO)",
+   "prix_achat": 1000,
+   "prix_reparation": 0,
+   "commentaire": "condenseur neuf 7 degrés, manque vitre, vitre remise et temperature 3 degré en vente pour souheil le libanais",
+   "fonctionnelle": 1,
+   "lieu_id": 1,
+   "nfc_tag": null
+  },
+  {
+   "id": 26,
+   "serial": "V-026",
+   "model": "vitrine poisson vendu 1800",
+   "prix_achat": 1750,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 11,
+   "nfc_tag": null
+  },
+  {
+   "id": 27,
+   "serial": "V-027",
+   "model": "vitrine poisson vendu 1800",
+   "prix_achat": 1750,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 11,
+   "nfc_tag": null
+  },
+  {
+   "id": 28,
+   "serial": "V-028",
+   "model": "Vitrine Elite froid 2m frigoriste",
+   "prix_achat": 2200,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 11,
+   "nfc_tag": null
+  },
+  {
+   "id": 29,
+   "serial": "V-029",
+   "model": "Vitrine Elite froid 2m Martiniquaise",
+   "prix_achat": 1600,
+   "prix_reparation": 0,
+   "commentaire": "manque pied 6 degrés",
+   "fonctionnelle": null,
+   "lieu_id": 1,
+   "nfc_tag": null
+  },
+  {
+   "id": 30,
+   "serial": "V-030",
+   "model": "PSV 2021 ITALIEN",
+   "prix_achat": 1400,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 11,
+   "nfc_tag": null
+  },
+  {
+   "id": 31,
+   "serial": "V-031",
+   "model": "PSV 2021 ITALIEN",
+   "prix_achat": 1400,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 11,
+   "nfc_tag": null
+  },
+  {
+   "id": 32,
+   "serial": "V-032",
+   "model": "PSV 2015 ITALIEN",
+   "prix_achat": 1400,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 11,
+   "nfc_tag": null
+  },
+  {
+   "id": 33,
+   "serial": "V-033",
+   "model": "PSV ITALIEN (vitre + compresseur) vendu 2200",
+   "prix_achat": 1400,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 11,
+   "nfc_tag": null
+  },
+  {
+   "id": 34,
+   "serial": "V-034",
+   "model": "PSV ITALIEN (vitre + compresseur) vendu 2200",
+   "prix_achat": 1400,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 11,
+   "nfc_tag": null
+  },
+  {
+   "id": 35,
+   "serial": "V-035",
+   "model": "PSV 1",
+   "prix_achat": 1500,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 3,
+   "nfc_tag": null
+  },
+  {
+   "id": 36,
+   "serial": "V-036",
+   "model": "PSV 2",
+   "prix_achat": 1500,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 3,
+   "nfc_tag": null
+  },
+  {
+   "id": 37,
+   "serial": "V-037",
+   "model": "PSV 3",
+   "prix_achat": 1500,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 3,
+   "nfc_tag": null
+  },
+  {
+   "id": 38,
+   "serial": "V-038",
+   "model": "PSV 4",
+   "prix_achat": 1500,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 3,
+   "nfc_tag": null
+  },
+  {
+   "id": 39,
+   "serial": "V-039",
+   "model": "PSV 5",
+   "prix_achat": 1500,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 3,
+   "nfc_tag": null
+  },
+  {
+   "id": 40,
+   "serial": "V-040",
+   "model": "PSV 6",
+   "prix_achat": 1500,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 3,
+   "nfc_tag": null
+  },
+  {
+   "id": 41,
+   "serial": "V-041",
+   "model": "PSV ancienne digital",
+   "prix_achat": 500,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 11,
+   "nfc_tag": null
+  },
+  {
+   "id": 42,
+   "serial": "V-042",
+   "model": "PSV ancienne digital",
+   "prix_achat": 500,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 11,
+   "nfc_tag": null
+  },
+  {
+   "id": 43,
+   "serial": "V-043",
+   "model": "PSV Chanteloup 1",
+   "prix_achat": 500,
+   "prix_reparation": 0,
+   "commentaire": "condenseur à changer, viens de massy",
+   "fonctionnelle": 0,
+   "lieu_id": 1,
+   "nfc_tag": null
+  },
+  {
+   "id": 44,
+   "serial": "V-044",
+   "model": "PSV Chanteloup 2",
+   "prix_achat": 500,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 11,
+   "nfc_tag": null
+  },
+  {
+   "id": 45,
+   "serial": "V-045",
+   "model": "PSV Chanteloup 3",
+   "prix_achat": 500,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 11,
+   "nfc_tag": null
+  },
+  {
+   "id": 46,
+   "serial": "V-046",
+   "model": "PSV soudé",
+   "prix_achat": 1000,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 11,
+   "nfc_tag": null
+  },
+  {
+   "id": 47,
+   "serial": "V-047",
+   "model": "Elite froid boisy st leger 1",
+   "prix_achat": 2250,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 11,
+   "nfc_tag": null
+  },
+  {
+   "id": 48,
+   "serial": "V-048",
+   "model": "Elite froid boisy st leger 2",
+   "prix_achat": 2250,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 11,
+   "nfc_tag": null
+  },
+  {
+   "id": 49,
+   "serial": "V-049",
+   "model": "Vitrine PSV Boulanger reil",
+   "prix_achat": 1550,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 11,
+   "nfc_tag": null
+  },
+  {
+   "id": 50,
+   "serial": "V-050",
+   "model": "Vitrine 1,5m Stéfanon Libanais",
+   "prix_achat": 1950,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 12,
+   "nfc_tag": null
+  },
+  {
+   "id": 51,
+   "serial": "V-051",
+   "model": "Vitrine 2m Antillaise (compresseur Ko)",
+   "prix_achat": 900,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 11,
+   "nfc_tag": null
+  },
+  {
+   "id": 52,
+   "serial": "V-052",
+   "model": "Vitrine 2m De bougival",
+   "prix_achat": 2200,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 11,
+   "nfc_tag": null
+  },
+  {
+   "id": 53,
+   "serial": "V-053",
+   "model": "Vitrine 2m EF De normandie",
+   "prix_achat": 900,
+   "prix_reparation": 0,
+   "commentaire": "souffle -1 degrés",
+   "fonctionnelle": 1,
+   "lieu_id": 1,
+   "nfc_tag": null
+  },
+  {
+   "id": 54,
+   "serial": "V-054",
+   "model": "Vitrine 2m EF De normandie",
+   "prix_achat": 900,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 11,
+   "nfc_tag": null
+  },
+  {
+   "id": 55,
+   "serial": "V-055",
+   "model": "Vitrine 2m EF De normandie",
+   "prix_achat": 900,
+   "prix_reparation": 0,
+   "commentaire": "3 degré",
+   "fonctionnelle": 1,
+   "lieu_id": 1,
+   "nfc_tag": null
+  },
+  {
+   "id": 56,
+   "serial": "V-056",
+   "model": "Vitrine 1,5m PSV",
+   "prix_achat": 1200,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 11,
+   "nfc_tag": null
+  },
+  {
+   "id": 57,
+   "serial": "V-057",
+   "model": "PSV 2m Kamel (vendu)",
+   "prix_achat": 400,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 11,
+   "nfc_tag": null
+  },
+  {
+   "id": 58,
+   "serial": "V-058",
+   "model": "PSV 2m Kamel",
+   "prix_achat": 400,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 11,
+   "nfc_tag": null
+  },
+  {
+   "id": 59,
+   "serial": "V-059",
+   "model": "Ancienne EF modele 1",
+   "prix_achat": 400,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 10,
+   "nfc_tag": null
+  },
+  {
+   "id": 60,
+   "serial": "V-060",
+   "model": "Ancienne EF modele 1",
+   "prix_achat": 0,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": 1,
+   "lieu_id": 1,
+   "nfc_tag": null
+  },
+  {
+   "id": 61,
+   "serial": "V-061",
+   "model": "PSV neuf trappes 1",
+   "prix_achat": 1500,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 4,
+   "nfc_tag": null
+  },
+  {
+   "id": 62,
+   "serial": "V-062",
+   "model": "PSV neuf trappes 2",
+   "prix_achat": 1500,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 4,
+   "nfc_tag": null
+  },
+  {
+   "id": 63,
+   "serial": "V-063",
+   "model": "PSV neuf trappes 3",
+   "prix_achat": 1500,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": null,
+   "lieu_id": 4,
+   "nfc_tag": null
+  },
+  {
+   "id": 64,
+   "serial": "V-064",
+   "model": "Ancienne EF modele 1 à vendre cassé",
+   "prix_achat": 0,
+   "prix_reparation": 0,
+   "commentaire": "",
+   "fonctionnelle": 1,
+   "lieu_id": 1,
+   "nfc_tag": null
+  }
+ ],
+ "bookings": [
+  {
+   "id": 1,
+   "vitrine_id": 1,
+   "client_name": "Ekolo — Salon gastronomie",
+   "start_date": "2026-09-01",
+   "duration_months": 3,
+   "montant": 300,
+   "transporteur": "Oussama",
+   "etat": "paye",
+   "qui": "Bilel",
+   "tel_client": "06 12 34 56 78",
+   "adresse_livraison": "12 rue de la Paix, 75002 Paris",
+   "type_duree": "longue",
+   "maint": 0,
+   "duree_jours": null
+  },
+  {
+   "id": 2,
+   "vitrine_id": 2,
+   "client_name": "Lecoguic — Foire d'Antony",
+   "start_date": "2026-09-01",
+   "duration_months": 1,
+   "montant": 300,
+   "transporteur": "Oussama",
+   "etat": "paye",
+   "qui": "Oussama",
+   "tel_client": "06 23 45 67 89",
+   "adresse_livraison": "8 avenue de la République, 92160 Antony",
+   "type_duree": "longue",
+   "maint": 0,
+   "duree_jours": null
+  },
+  {
+   "id": 3,
+   "vitrine_id": 3,
+   "client_name": "Saumonerie — Salon 77",
+   "start_date": "2026-09-01",
+   "duration_months": 1,
+   "montant": 300,
+   "transporteur": "Oussama",
+   "etat": "paye",
+   "qui": "Bilel",
+   "tel_client": "06 34 56 78 90",
+   "adresse_livraison": "25 rue Victor Hugo, 77000 Melun",
+   "type_duree": "longue",
+   "maint": 0,
+   "duree_jours": null
+  },
+  {
+   "id": 4,
+   "vitrine_id": 4,
+   "client_name": "Sofyia — Salon mariage",
+   "start_date": "2026-09-01",
+   "duration_months": 1,
+   "montant": 300,
+   "transporteur": "Bilel",
+   "etat": "paye",
+   "qui": "Oussama",
+   "tel_client": "06 45 67 89 01",
+   "adresse_livraison": "3 place du Marché, 78550 Houdan",
+   "type_duree": "longue",
+   "maint": 0,
+   "duree_jours": null
+  },
+  {
+   "id": 5,
+   "vitrine_id": 5,
+   "client_name": "Stefano — Fête Houdan",
+   "start_date": "2026-09-01",
+   "duration_months": 1,
+   "montant": 300,
+   "transporteur": "Bilel",
+   "etat": "impaye",
+   "qui": "Bilel",
+   "tel_client": "06 56 78 90 12",
+   "adresse_livraison": "17 boulevard Voltaire, 75011 Paris",
+   "type_duree": "longue",
+   "maint": 0,
+   "duree_jours": null
+  },
+  {
+   "id": 6,
+   "vitrine_id": 6,
+   "client_name": "Oh oui — Salon chocolat",
+   "start_date": "2026-11-01",
+   "duration_months": 1,
+   "montant": 400,
+   "transporteur": "Transports Dubois",
+   "etat": "impaye",
+   "qui": "Oussama",
+   "tel_client": "06 67 89 01 23",
+   "adresse_livraison": "5 rue des Lilas, 91300 Massy",
+   "type_duree": "longue",
+   "maint": 0,
+   "duree_jours": null
+  },
+  {
+   "id": 7,
+   "vitrine_id": 7,
+   "client_name": "Aggeria (longue durée)",
+   "start_date": "2026-11-01",
+   "duration_months": 2,
+   "montant": 1500,
+   "transporteur": "Société Rapid Froid",
+   "etat": "impaye",
+   "qui": "Bilel",
+   "tel_client": "06 78 90 12 34",
+   "adresse_livraison": "42 avenue Jean Jaurès, 93100 Montreuil",
+   "type_duree": "longue",
+   "maint": 0,
+   "duree_jours": null
+  },
+  {
+   "id": 8,
+   "vitrine_id": 8,
+   "client_name": "Sarah — Sugar free (déc)",
+   "start_date": "2026-12-01",
+   "duration_months": 1,
+   "montant": 300,
+   "transporteur": "Bilel",
+   "etat": "paye",
+   "qui": "Oussama",
+   "tel_client": "06 89 01 23 45",
+   "adresse_livraison": "10 rue Saint-Denis, 75001 Paris",
+   "type_duree": "longue",
+   "maint": 0,
+   "duree_jours": null
+  },
+  {
+   "id": 9,
+   "vitrine_id": 9,
+   "client_name": "Laundry — Marché Massy",
+   "start_date": "2027-05-01",
+   "duration_months": 2,
+   "montant": 300,
+   "transporteur": "Oussama",
+   "etat": "paye",
+   "qui": "Bilel",
+   "tel_client": "06 90 12 34 56",
+   "adresse_livraison": "21 rue de Vaugirard, 75015 Paris",
+   "type_duree": "longue",
+   "maint": 0,
+   "duree_jours": null
+  },
+  {
+   "id": 10,
+   "vitrine_id": 10,
+   "client_name": "Kouzinah — Marché 15e",
+   "start_date": "2027-05-01",
+   "duration_months": 1,
+   "montant": 300,
+   "transporteur": "Bilel",
+   "etat": "paye",
+   "qui": "Oussama",
+   "tel_client": "06 01 23 45 67",
+   "adresse_livraison": "14 rue Gambetta, 94200 Ivry-sur-Seine",
+   "type_duree": "longue",
+   "maint": 0,
+   "duree_jours": null
+  },
+  {
+   "id": 11,
+   "vitrine_id": 11,
+   "client_name": "Maintenance préventive hivernale",
+   "start_date": "2027-01-01",
+   "duration_months": 2,
+   "montant": 1500,
+   "transporteur": "",
+   "etat": "maintenance",
+   "qui": "Bilel",
+   "tel_client": "06 11 22 33 44",
+   "adresse_livraison": "2 rue des Entrepôts, 91000 Évry",
+   "type_duree": "longue",
+   "maint": 1,
+   "duree_jours": null
+  },
+  {
+   "id": 12,
+   "vitrine_id": 3,
+   "client_name": "Boulangerie Moreau — Évènement",
+   "start_date": "2026-10-05",
+   "duration_months": 1,
+   "montant": 120,
+   "transporteur": "Oussama",
+   "etat": "paye",
+   "qui": "Bilel",
+   "tel_client": "06 40 50 60 70",
+   "adresse_livraison": "3 place du Marché, 78550 Houdan",
+   "type_duree": "courte",
+   "maint": 0,
+   "duree_jours": 4
+  },
+  {
+   "id": 13,
+   "vitrine_id": 5,
+   "client_name": "Traiteur Delice — Mariage",
+   "start_date": "2026-10-20",
+   "duration_months": 1,
+   "montant": 150,
+   "transporteur": "Bilel",
+   "etat": "impaye",
+   "qui": "Oussama",
+   "tel_client": "06 41 50 61 71",
+   "adresse_livraison": "17 boulevard Voltaire, 75011 Paris",
+   "type_duree": "courte",
+   "maint": 0,
+   "duree_jours": 2
+  },
+  {
+   "id": 14,
+   "vitrine_id": 7,
+   "client_name": "Mairie de Savigny — Fête locale",
+   "start_date": "2026-12-12",
+   "duration_months": 1,
+   "montant": 200,
+   "transporteur": "Oussama",
+   "etat": "paye",
+   "qui": "Bilel",
+   "tel_client": "06 42 50 62 72",
+   "adresse_livraison": "5 rue des Lilas, 91300 Massy",
+   "type_duree": "courte",
+   "maint": 0,
+   "duree_jours": 7
+  }
+ ],
+ "flux": [
+  {
+   "id": 1,
+   "type_flux": "sortie",
+   "montant": 120,
+   "qui": "Oussama",
+   "client": "Sabrina",
+   "mois": "Septembre",
+   "is_transport": 0,
+   "is_achat": 0,
+   "commentaire": "Nettoyage pour salon du mariage + d'autres vitrines"
+  },
+  {
+   "id": 2,
+   "type_flux": "sortie",
+   "montant": 180,
+   "qui": "Oussama",
+   "client": "Total essence",
+   "mois": "Septembre",
+   "is_transport": 0,
+   "is_achat": 0,
+   "commentaire": "Plein camion Bleue"
+  },
+  {
+   "id": 3,
+   "type_flux": "sortie",
+   "montant": 40,
+   "qui": "Oussama",
+   "client": "Mécano",
+   "mois": "Septembre",
+   "is_transport": 0,
+   "is_achat": 0,
+   "commentaire": "Diagnostic camion blanc"
+  },
+  {
+   "id": 4,
+   "type_flux": "entree",
+   "montant": 400,
+   "qui": "Oussama",
+   "client": "Ekolo (traiteur congolaise)",
+   "mois": "Septembre",
+   "is_transport": 0,
+   "is_achat": 0,
+   "commentaire": "Salon de la gastronomie (Traiteur congolais)"
+  },
+  {
+   "id": 5,
+   "type_flux": "entree",
+   "montant": 420,
+   "qui": "Oussama",
+   "client": "Lecoguic",
+   "mois": "Septembre",
+   "is_transport": 0,
+   "is_achat": 0,
+   "commentaire": "Foire d'Antony"
+  },
+  {
+   "id": 6,
+   "type_flux": "entree",
+   "montant": 383,
+   "qui": "Oussama",
+   "client": "Saumonerie",
+   "mois": "Septembre",
+   "is_transport": 0,
+   "is_achat": 0,
+   "commentaire": "Salon dans le 77, livré chez lui dans le 91480"
+  },
+  {
+   "id": 7,
+   "type_flux": "entree",
+   "montant": 500,
+   "qui": "Bilel",
+   "client": "sarah lee",
+   "mois": "Septembre",
+   "is_transport": 0,
+   "is_achat": 0,
+   "commentaire": "salon mariage espece"
+  },
+  {
+   "id": 8,
+   "type_flux": "entree",
+   "montant": 650,
+   "qui": "Oussama",
+   "client": "Sofyia Patisserie",
+   "mois": "Septembre",
+   "is_transport": 0,
+   "is_achat": 0,
+   "commentaire": "Salon du mariage (facture)"
+  },
+  {
+   "id": 9,
+   "type_flux": "sortie",
+   "montant": 200,
+   "qui": "Bilel",
+   "client": "salon mariage",
+   "mois": "",
+   "is_transport": 1,
+   "is_achat": 0,
+   "commentaire": "trappes orsay jour 1 plaisir pour essais, jour 2 trappe salon / jour 3"
+  },
+  {
+   "id": 10,
+   "type_flux": "entree",
+   "montant": 200,
+   "qui": "Bilel",
+   "client": "stefano houdan",
+   "mois": "Septembre",
+   "is_transport": 0,
+   "is_achat": 0,
+   "commentaire": "fête annuelle d'houdan"
+  },
+  {
+   "id": 11,
+   "type_flux": "sortie",
+   "montant": 580,
+   "qui": "Bilel",
+   "client": "fourriere camion bleu",
+   "mois": "Septembre",
+   "is_transport": 0,
+   "is_achat": 0,
+   "commentaire": "fourriere 150 + transporteur 140 + pièce 150 + mecano 100 + plaque 30"
+  },
+  {
+   "id": 12,
+   "type_flux": "sortie",
+   "montant": 35,
+   "qui": "Bilel",
+   "client": "fourriere camion bleu",
+   "mois": "Septembre",
+   "is_transport": 0,
+   "is_achat": 0,
+   "commentaire": "amende"
+  },
+  {
+   "id": 13,
+   "type_flux": "sortie",
+   "montant": 1100,
+   "qui": "Bilel",
+   "client": "",
+   "mois": "octobre",
+   "is_transport": 1,
+   "is_achat": 1,
+   "commentaire": "vitrine 27"
+  },
+  {
+   "id": 14,
+   "type_flux": "sortie",
+   "montant": 70,
+   "qui": "Bilel",
+   "client": "salon antille",
+   "mois": "octobre",
+   "is_transport": 0,
+   "is_achat": 0,
+   "commentaire": "transport vitrine 27"
+  },
+  {
+   "id": 15,
+   "type_flux": "sortie",
+   "montant": 70,
+   "qui": "Bilel",
+   "client": "",
+   "mois": "octobre",
+   "is_transport": 1,
+   "is_achat": 0,
+   "commentaire": "transport vitrine rond SALON ANTILLE"
+  },
+  {
+   "id": 16,
+   "type_flux": "sortie",
+   "montant": 150,
+   "qui": "Bilel",
+   "client": "Gasoil",
+   "mois": "octobre",
+   "is_transport": 0,
+   "is_achat": 0,
+   "commentaire": "Gasoil camion bleu"
+  },
+  {
+   "id": 17,
+   "type_flux": "entree",
+   "montant": 320,
+   "qui": "Bilel",
+   "client": "atelier dolce",
+   "mois": "octobre",
+   "is_transport": 0,
+   "is_achat": 0,
+   "commentaire": ""
+  },
+  {
+   "id": 18,
+   "type_flux": "entree",
+   "montant": 50,
+   "qui": "Bilel",
+   "client": "Zouhir",
+   "mois": "octobre",
+   "is_transport": 0,
+   "is_achat": 0,
+   "commentaire": "prèt vitr à massy (transport)"
+  },
+  {
+   "id": 19,
+   "type_flux": "sortie",
+   "montant": 160,
+   "qui": "Bilel",
+   "client": "",
+   "mois": "octobre",
+   "is_transport": 1,
+   "is_achat": 0,
+   "commentaire": "transport: matin: trapps massy aulnay puis l soir, trapps aulnay paris"
+  },
+  {
+   "id": 20,
+   "type_flux": "sortie",
+   "montant": 50,
+   "qui": "Bilel",
+   "client": "NAAMN",
+   "mois": "octobre",
+   "is_transport": 0,
+   "is_achat": 0,
+   "commentaire": "aid naamn journ&*é aunla massy paris + Nttoyag camion"
+  },
+  {
+   "id": 21,
+   "type_flux": "entree",
+   "montant": 380,
+   "qui": "Oussama",
+   "client": "Sagasdom",
+   "mois": "octobre",
+   "is_transport": 0,
+   "is_achat": 0,
+   "commentaire": "Resto Polio"
+  },
+  {
+   "id": 22,
+   "type_flux": "entree",
+   "montant": 380,
+   "qui": "Oussama",
+   "client": "Sagasdom",
+   "mois": "octobre",
+   "is_transport": 0,
+   "is_achat": 0,
+   "commentaire": "Resto Polio"
+  },
+  {
+   "id": 23,
+   "type_flux": "sortie",
+   "montant": 70,
+   "qui": "Oussama",
+   "client": "Sagasdom",
+   "mois": "octobre",
+   "is_transport": 1,
+   "is_achat": 0,
+   "commentaire": "Livraison à Sagasdom"
+  }
+ ],
+ "ventes": [
+  {
+   "id": 1,
+   "vitrine_id": null,
+   "prix_achat": 400,
+   "prix_vente": 2000,
+   "frais": 25,
+   "commentaire": "Kabile 2m",
+   "date_vente": null
+  },
+  {
+   "id": 2,
+   "vitrine_id": null,
+   "prix_achat": 1400,
+   "prix_vente": 2200,
+   "frais": 450,
+   "commentaire": "Vitrine Portugais",
+   "date_vente": null
+  },
+  {
+   "id": 3,
+   "vitrine_id": null,
+   "prix_achat": 1400,
+   "prix_vente": 2200,
+   "frais": 450,
+   "commentaire": "Vitrine Portugais",
+   "date_vente": null
+  },
+  {
+   "id": 4,
+   "vitrine_id": null,
+   "prix_achat": 0,
+   "prix_vente": 1900,
+   "frais": 0,
+   "commentaire": "Vitrine poissonier",
+   "date_vente": null
+  },
+  {
+   "id": 5,
+   "vitrine_id": null,
+   "prix_achat": null,
+   "prix_vente": 1900,
+   "frais": 0,
+   "commentaire": "Vitrine poissonier",
+   "date_vente": null
+  }
+ ],
+ "lieux": [
+  {
+   "id": 1,
+   "nom": "local trappes",
+   "type": "Local associé",
+   "note": ""
+  },
+  {
+   "id": 2,
+   "nom": "local orsay",
+   "type": "Local associé",
+   "note": ""
+  },
+  {
+   "id": 3,
+   "nom": "Adeline",
+   "type": "Dépôt partenaire",
+   "note": ""
+  },
+  {
+   "id": 4,
+   "nom": "dreux alexandre",
+   "type": "Dépôt partenaire",
+   "note": ""
+  },
+  {
+   "id": 5,
+   "nom": "mairie massy",
+   "type": "Dépôt partenaire",
+   "note": "Mairie de Massy"
+  },
+  {
+   "id": 6,
+   "nom": "chez kouzinah",
+   "type": "Dépôt partenaire",
+   "note": ""
+  },
+  {
+   "id": 7,
+   "nom": "lola",
+   "type": "Dépôt partenaire",
+   "note": ""
+  },
+  {
+   "id": 8,
+   "nom": "non rendu azalé",
+   "type": "Incertain",
+   "note": "À récupérer"
+  },
+  {
+   "id": 9,
+   "nom": "massy?",
+   "type": "Incertain",
+   "note": ""
+  },
+  {
+   "id": 10,
+   "nom": "ou? Vendu?",
+   "type": "Incertain",
+   "note": ""
+  },
+  {
+   "id": 11,
+   "nom": "non renseigné",
+   "type": "Incertain",
+   "note": ""
+  },
+  {
+   "id": 12,
+   "nom": "massy? Ou vendu?",
+   "type": "Incertain",
+   "note": ""
+  }
+ ],
+ "actions": [
+  {
+   "id": 1,
+   "titre": "Récupérer les barres de jonction de Nassim",
+   "fait": 1,
+   "commentaire": "Oublie dans l'enlèvement des vitrines, les barres de jonctions"
+  },
+  {
+   "id": 2,
+   "titre": "Récupérer les LED de Yassin",
+   "fait": 1,
+   "commentaire": "Oublie dans l'enlèvement des vitrines, les LED"
+  },
+  {
+   "id": 3,
+   "titre": "Achat de Jupe pour les 1,5m des salons de Mai et Juin",
+   "fait": 1,
+   "commentaire": "Préparer les vitrines le weekend du 27,28 Mai"
+  },
+  {
+   "id": 4,
+   "titre": "Achat des LED pour les 1,5m des salons de Mai et Juin",
+   "fait": 1,
+   "commentaire": "Préparer les vitrines le weekend du 27,28 Mai"
+  },
+  {
+   "id": 5,
+   "titre": "Installation des jupes de Laundry  au marché de Massy + Roue des vitrines",
+   "fait": 1,
+   "commentaire": "Préparer les jupes en amont"
+  },
+  {
+   "id": 6,
+   "titre": "Installation des jupes de Kouzinah au marché du 15ème",
+   "fait": 0,
+   "commentaire": "Préparer les jupes en amont [statut: Non réalisé]"
+  },
+  {
+   "id": 7,
+   "titre": "Trouver un forgeron pour fabrication de plateaux",
+   "fait": 1,
+   "commentaire": "Poster sur alloVoisin aussi ... Contacter TMIC en région parisienne"
+  },
+  {
+   "id": 8,
+   "titre": "Acheter des roues et remplacer au moins 2 par vitrines",
+   "fait": 1,
+   "commentaire": "Pour les vitrines ayant plus 3 roues KO..."
+  },
+  {
+   "id": 9,
+   "titre": "Acheter des vitres ELITE FROID",
+   "fait": 0,
+   "commentaire": "3 vitres Elite Froid : 2 vitres Pour la vitrine de PEDRO et 1 pour la vitrine de Erin [statut: Non réalisé]"
+  },
+  {
+   "id": 10,
+   "titre": "Commander un compresseur",
+   "fait": 1,
+   "commentaire": "Pour la Elite froid acheter à l'antillaise"
+  },
+  {
+   "id": 11,
+   "titre": "Préparer des jupes et LED pour vitrines de Bryan",
+   "fait": 1,
+   "commentaire": "Récupérer les barres de jonctions pour Bryan"
+  },
+  {
+   "id": 12,
+   "titre": "Fait réviser les vitrines par Adem",
+   "fait": 1,
+   "commentaire": "Faire réviser un maximum de vitrine, en priorité les PSV de Yassin"
+  },
+  {
+   "id": 13,
+   "titre": "Acheter plusieurs Jupe",
+   "fait": 1,
+   "commentaire": "Acheter un stock de jupe pour 2m"
+  },
+  {
+   "id": 14,
+   "titre": "Récupérer les 2 vitrines de chez Sophie",
+   "fait": 1,
+   "commentaire": "Avec 2 plateaux et 2 LED"
+  },
+  {
+   "id": 15,
+   "titre": "Préparer les vitrines pour le Sugar Free",
+   "fait": 1,
+   "commentaire": "Avec Plateaux et LED"
+  },
+  {
+   "id": 16,
+   "titre": "Acheter une paire de rampe",
+   "fait": 0,
+   "commentaire": "Acheter des rampes pour le deuxième boxe [statut: Non réalisé]"
+  },
+  {
+   "id": 17,
+   "titre": "Acheter petite vitrine pour patissière",
+   "fait": 1,
+   "commentaire": "Pour patissière et salon"
+  },
+  {
+   "id": 18,
+   "titre": "Terminer le site internet et la page facebook",
+   "fait": 0,
+   "commentaire": "Promouvoir les 2 afin de toucher plus de potentiel client [statut: Non réalisé]"
+  },
+  {
+   "id": 19,
+   "titre": "Investissement S2 2024",
+   "fait": 0,
+   "commentaire": "Acheter petite vitrine pour patissière [statut: 2]"
+  }
+ ],
+ "contrats": [
+  {
+   "id": 1,
+   "client": "Ekolo (traiteur congolais)",
+   "vitrine_id": 7,
+   "duree": 91,
+   "montant": 400,
+   "caution": 500,
+   "conditions": "Du 05/09/2026 au 05/12/2026 (3 mois) | Vitrine rendue propre, vidée et dégivrée, avec tous ses accessoires (plateaux, LED, jupe). Toute dégradation sera facturée sur devis. | Vitrine Elite Froid 2m en bon état, vitre intacte, 4 roues fonctionnelles, souffle à 3 °C."
+  },
+  {
+   "id": 2,
+   "client": "Aggeria",
+   "vitrine_id": 11,
+   "duree": 28,
+   "montant": 700,
+   "caution": 800,
+   "conditions": "Du 04/11/2026 au 02/12/2026 (longue durée) | Restitution au local de Trappes, vitrine nettoyée. Retard de restitution : 15 € par jour. | Quelques rayures légères sur le flanc gauche, compresseur et éclairage OK."
+  },
+  {
+   "id": 3,
+   "client": "Sarah (Sugar Free)",
+   "vitrine_id": 12,
+   "duree": 9,
+   "montant": 450,
+   "caution": 0,
+   "conditions": "Du 13/12/2026 au 22/12/2026 (10 jours) | Enlèvement par Bilel le dernier jour avant 18 h. Vitrine vidée et débranchée 2 h avant. | Vitrine en parfait état, fournie avec 3 plateaux et LED neuves."
+  }
+ ],
+ "frigoristes": [
+  {
+   "id": 1,
+   "nom": "Karim Benzema",
+   "tel": "06 12 34 56 78",
+   "zone": "Froid commercial"
+  },
+  {
+   "id": 2,
+   "nom": "Youssef Amrani",
+   "tel": "06 98 76 54 32",
+   "zone": "Climatisation"
+  },
+  {
+   "id": 3,
+   "nom": "Rachid Mehdaoui",
+   "tel": "07 11 22 33 44",
+   "zone": "Froid industriel"
+  },
+  {
+   "id": 4,
+   "nom": "Mehdi Chakir",
+   "tel": "06 55 66 77 88",
+   "zone": "Dépannage urgent"
+  }
+ ],
+ "interventions": [
+  {
+   "id": 1,
+   "vitrine_id": 7,
+   "frigoriste_id": 1,
+   "date": "2025-03-14",
+   "type": "Vérification circuit frigorifique",
+   "temperature": 3.5,
+   "notes": "Coût: 90 €",
+   "cout": 90
+  },
+  {
+   "id": 2,
+   "vitrine_id": 7,
+   "frigoriste_id": 1,
+   "date": "2025-09-22",
+   "type": "Nettoyage condenseur",
+   "temperature": 3,
+   "notes": "Coût: 70 €",
+   "cout": 70
+  },
+  {
+   "id": 3,
+   "vitrine_id": 7,
+   "frigoriste_id": 2,
+   "date": "2026-02-10",
+   "type": "Remplacement ventilateur évaporateur",
+   "temperature": 2.5,
+   "notes": "Coût: 185 €",
+   "cout": 185
+  },
+  {
+   "id": 4,
+   "vitrine_id": 7,
+   "frigoriste_id": 1,
+   "date": "2026-09-18",
+   "type": "Réglage température",
+   "temperature": 2,
+   "notes": "Coût: 55 €",
+   "cout": 55
+  },
+  {
+   "id": 5,
+   "vitrine_id": 21,
+   "frigoriste_id": 3,
+   "date": "2025-05-06",
+   "type": "Vérification circuit frigorifique",
+   "temperature": 8,
+   "notes": "Coût: 120 €",
+   "cout": 120
+  },
+  {
+   "id": 6,
+   "vitrine_id": 21,
+   "frigoriste_id": 4,
+   "date": "2025-07-15",
+   "type": "Recharge gaz R134a",
+   "temperature": 7.5,
+   "notes": "Coût: 160 €",
+   "cout": 160
+  },
+  {
+   "id": 7,
+   "vitrine_id": 21,
+   "frigoriste_id": 3,
+   "date": "2025-11-03",
+   "type": "Remplacement thermostat",
+   "temperature": 7,
+   "notes": "Coût: 95 €",
+   "cout": 95
+  },
+  {
+   "id": 8,
+   "vitrine_id": 21,
+   "frigoriste_id": 3,
+   "date": "2026-04-21",
+   "type": "Remplacement compresseur",
+   "temperature": 5.5,
+   "notes": "Coût: 780 €",
+   "cout": 780
+  },
+  {
+   "id": 9,
+   "vitrine_id": 21,
+   "frigoriste_id": 4,
+   "date": "2026-10-06",
+   "type": "Réparation joint de porte",
+   "temperature": 6.5,
+   "notes": "Coût: 140 €",
+   "cout": 140
+  },
+  {
+   "id": 10,
+   "vitrine_id": 25,
+   "frigoriste_id": 1,
+   "date": "2025-02-18",
+   "type": "Remplacement condenseur",
+   "temperature": 7,
+   "notes": "Coût: 420 €",
+   "cout": 420
+  },
+  {
+   "id": 11,
+   "vitrine_id": 25,
+   "frigoriste_id": 1,
+   "date": "2025-04-09",
+   "type": "Réglage température",
+   "temperature": 3,
+   "notes": "Coût: 50 €",
+   "cout": 50
+  },
+  {
+   "id": 12,
+   "vitrine_id": 25,
+   "frigoriste_id": 2,
+   "date": "2025-12-02",
+   "type": "Réparation joint de porte",
+   "temperature": 3.5,
+   "notes": "Coût: 130 €",
+   "cout": 130
+  },
+  {
+   "id": 13,
+   "vitrine_id": 25,
+   "frigoriste_id": 1,
+   "date": "2026-07-28",
+   "type": "Recharge gaz R134a",
+   "temperature": 3,
+   "notes": "Coût: 145 €",
+   "cout": 145
+  },
+  {
+   "id": 14,
+   "vitrine_id": 43,
+   "frigoriste_id": 4,
+   "date": "2025-06-12",
+   "type": "Vérification circuit frigorifique",
+   "temperature": 8,
+   "notes": "Coût: 85 €",
+   "cout": 85
+  },
+  {
+   "id": 15,
+   "vitrine_id": 43,
+   "frigoriste_id": 3,
+   "date": "2025-10-20",
+   "type": "Nettoyage condenseur",
+   "temperature": 7.5,
+   "notes": "Coût: 75 €",
+   "cout": 75
+  },
+  {
+   "id": 16,
+   "vitrine_id": 43,
+   "frigoriste_id": 3,
+   "date": "2026-06-03",
+   "type": "Remplacement condenseur",
+   "temperature": 4,
+   "notes": "Coût: 390 €",
+   "cout": 390
+  },
+  {
+   "id": 17,
+   "vitrine_id": 22,
+   "frigoriste_id": 2,
+   "date": "2025-08-26",
+   "type": "Remplacement condenseur",
+   "temperature": 3,
+   "notes": "Coût: 410 €",
+   "cout": 410
+  },
+  {
+   "id": 18,
+   "vitrine_id": 22,
+   "frigoriste_id": 2,
+   "date": "2026-01-14",
+   "type": "Recharge gaz R134a",
+   "temperature": 3.5,
+   "notes": "Coût: 150 €",
+   "cout": 150
+  },
+  {
+   "id": 19,
+   "vitrine_id": 22,
+   "frigoriste_id": 1,
+   "date": "2026-08-11",
+   "type": "Nettoyage condenseur",
+   "temperature": 4.5,
+   "notes": "Coût: 65 €",
+   "cout": 65
+  },
+  {
+   "id": 20,
+   "vitrine_id": 53,
+   "frigoriste_id": 4,
+   "date": "2025-10-08",
+   "type": "Réglage température",
+   "temperature": -1,
+   "notes": "Coût: 55 €",
+   "cout": 55
+  },
+  {
+   "id": 21,
+   "vitrine_id": 53,
+   "frigoriste_id": 1,
+   "date": "2026-05-19",
+   "type": "Remplacement thermostat",
+   "temperature": 1,
+   "notes": "Coût: 110 €",
+   "cout": 110
+  },
+  {
+   "id": 22,
+   "vitrine_id": 55,
+   "frigoriste_id": 2,
+   "date": "2025-12-16",
+   "type": "Réparation joint de porte",
+   "temperature": 3,
+   "notes": "Coût: 120 €",
+   "cout": 120
+  },
+  {
+   "id": 23,
+   "vitrine_id": 55,
+   "frigoriste_id": 2,
+   "date": "2026-09-25",
+   "type": "Nettoyage condenseur",
+   "temperature": 3.5,
+   "notes": "Coût: 60 €",
+   "cout": 60
+  },
+  {
+   "id": 24,
+   "vitrine_id": 29,
+   "frigoriste_id": 4,
+   "date": "2025-09-02",
+   "type": "Vérification circuit frigorifique",
+   "temperature": 6,
+   "notes": "Coût: 95 €",
+   "cout": 95
+  },
+  {
+   "id": 25,
+   "vitrine_id": 29,
+   "frigoriste_id": 3,
+   "date": "2026-03-17",
+   "type": "Remplacement ventilateur évaporateur",
+   "temperature": 4.5,
+   "notes": "Coût: 220 €",
+   "cout": 220
+  },
+  {
+   "id": 26,
+   "vitrine_id": 10,
+   "frigoriste_id": 3,
+   "date": "2026-01-27",
+   "type": "Remplacement compresseur",
+   "temperature": 2.5,
+   "notes": "Coût: 800 €",
+   "cout": 800
+  },
+  {
+   "id": 27,
+   "vitrine_id": 11,
+   "frigoriste_id": 1,
+   "date": "2025-11-25",
+   "type": "Recharge gaz R134a",
+   "temperature": 2,
+   "notes": "Coût: 140 €",
+   "cout": 140
+  },
+  {
+   "id": 28,
+   "vitrine_id": 20,
+   "frigoriste_id": 2,
+   "date": "2026-08-30",
+   "type": "Remplacement thermostat",
+   "temperature": 3,
+   "notes": "Coût: 105 €",
+   "cout": 105
+  }
+ ],
+ "prospection": [
+  {
+   "id": 1,
+   "client": "Oh oui",
+   "contact": "Salon du chocolat  : Porte de Versailles",
+   "notes": "30 nov-03 oct - 600 €",
+   "statut": "Concrétisé"
+  },
+  {
+   "id": 2,
+   "client": "Ladbloue",
+   "contact": "Mairie de Clichy",
+   "notes": "29 - 30 Juin - 270 €",
+   "statut": "Concrétisé"
+  },
+  {
+   "id": 3,
+   "client": "Nicolas Patrick",
+   "contact": "?",
+   "notes": "25-28 Juillet - 890 €",
+   "statut": "Non concrétisé"
+  },
+  {
+   "id": 4,
+   "client": "Cheeseroad",
+   "contact": "Nogent sur marnes",
+   "notes": "Longue durée - 700 €",
+   "statut": "Non concrétisé"
+  },
+  {
+   "id": 5,
+   "client": "Aggeria",
+   "contact": "?",
+   "notes": "4 nov- 2 déc - 700 €",
+   "statut": "Concrétisé"
+  },
+  {
+   "id": 6,
+   "client": "Sandra Vitrine",
+   "contact": "Montpellier",
+   "notes": "Aout-?? - 250 €",
+   "statut": "Non concrétisé"
+  },
+  {
+   "id": 7,
+   "client": "Sarah (Sugar free)",
+   "contact": "Saint denis",
+   "notes": "13-22 décembre - 450 €",
+   "statut": "Non concrétisé"
+  },
+  {
+   "id": 8,
+   "client": "Younes",
+   "contact": "",
+   "notes": "A partir de sept / Long durée - 250 €",
+   "statut": "Non concrétisé"
+  }
+ ],
+ "settings": [
+  {
+   "key": "nom",
+   "value": "\"VitriTrack SARL\""
+  },
+  {
+   "key": "adresse",
+   "value": "\"15 rue des Frigoristes, 93100 Montreuil\""
+  },
+  {
+   "key": "siret",
+   "value": "\"RCS Bobigny 123 456 789 - SIRET 123 456 789 00012\""
+  },
+  {
+   "key": "tel",
+   "value": "\"01 48 57 23 10\""
+  },
+  {
+   "key": "email",
+   "value": "\"contact@vitritrack.fr\""
+  },
+  {
+   "key": "entete",
+   "value": "\"Location et vente de vitrines réfrigérées pour salons, marchés et commerces de bouche.\""
+  },
+  {
+   "key": "pied",
+   "value": "\"VitriTrack SARL - 15 rue des Frigoristes, 93100 Montreuil - RCS Bobigny 123 456 789 - TVA FR12 123456789\""
+  },
+  {
+   "key": "cgv",
+   "value": "\"Devis valable 30 jours. Acompte de 30 % à la commande, solde à réception de la facture. Paiement à 30 jours par virement. Pénalité de retard : 3 fois le taux d'intérêt légal, indemnité forfaitaire de recouvrement de 40 EUR. Toute intervention est garantie 3 mois pièces et main-d'oeuvre.\""
+  },
+  {
+   "key": "tva",
+   "value": "20"
+  },
+  {
+   "key": "devisSeq",
+   "value": "0"
+  }
+ ]
+}

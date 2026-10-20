@@ -1,0 +1,28 @@
+name: vitritrack
+services:
+  app:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile
+    environment:
+      - PORT=3001
+      - DB_PATH=/app/data/vitritrack.db
+      - JWT_SECRET=${JWT_SECRET:-vitritrack-secret-change-me}
+    volumes:
+      - data:/app/data
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      - app
+    restart: unless-stopped
+
+volumes:
+  data:

@@ -1,5 +1,12 @@
+node_modules/
+dist/
+*.db
+*.db-shm
+*.db-wal
 *.xlsx
 .tasks/
 .claude/
 .v05/
 .v05-state/
+feedback.log
+deploy/docker/.env
