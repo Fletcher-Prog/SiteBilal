@@ -11,7 +11,7 @@ db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = OFF');
 
 // ---------- Types ----------
-export interface User { id: number; name: string; email: string; password: string; role: string }
+export interface User { id: number; name: string; email: string; password: string; role: string; active: number }
 export interface Vitrine { id: number; serial: string; model: string; prix_achat: number | null; prix_reparation: number; commentaire: string; fonctionnelle: number | null; lieu_id: number | null; nfc_tag: string | null }
 export interface Booking { id: number; vitrine_id: number; client_name: string; start_date: string; duration_months: number; montant: number; transporteur: string; etat: string; adresse_livraison: string; tel_client: string; qui: string; photo_livraison: string; photo_enlevement: string; type_duree: string; maint: number; duree_jours: number }
 export interface Flux { id: number; type_flux: string; montant: number; qui: string; client: string; mois: string; is_transport: number; is_achat: number; commentaire: string }
@@ -26,7 +26,7 @@ export interface Setting { key: string; value: string }
 
 // ---------- Schema ----------
 db.exec(`
-CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name TEXT, email TEXT, password TEXT, role TEXT);
+CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name TEXT, email TEXT DEFAULT '', password TEXT, role TEXT, active INTEGER DEFAULT 1);
 CREATE TABLE IF NOT EXISTS vitrines (id INTEGER PRIMARY KEY, serial TEXT, model TEXT, prix_achat REAL, prix_reparation REAL, commentaire TEXT, fonctionnelle INTEGER, lieu_id INTEGER, nfc_tag TEXT);
 CREATE TABLE IF NOT EXISTS bookings (id INTEGER PRIMARY KEY, vitrine_id INTEGER, client_name TEXT, start_date TEXT, duration_months INTEGER, montant REAL, transporteur TEXT, etat TEXT, adresse_livraison TEXT, tel_client TEXT, qui TEXT, photo_livraison TEXT, photo_enlevement TEXT, type_duree TEXT DEFAULT 'longue', maint INTEGER DEFAULT 0, duree_jours INTEGER);
 CREATE TABLE IF NOT EXISTS flux (id INTEGER PRIMARY KEY, type_flux TEXT, montant REAL, qui TEXT, client TEXT, mois TEXT, is_transport INTEGER, is_achat INTEGER, commentaire TEXT);
@@ -41,6 +41,8 @@ CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT);
 `);
 
 const migrations = [
+  "ALTER TABLE users ADD COLUMN email TEXT DEFAULT ''",
+  'ALTER TABLE users ADD COLUMN active INTEGER DEFAULT 1',
   'ALTER TABLE bookings ADD COLUMN adresse_livraison TEXT',
   'ALTER TABLE bookings ADD COLUMN tel_client TEXT',
   'ALTER TABLE bookings ADD COLUMN qui TEXT',
