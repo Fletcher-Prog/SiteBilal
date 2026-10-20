@@ -2,3 +2,4 @@
 [2026-10-20T00:04:43.631Z] [SUCCESS] config-database (#1): completed in 2 attempt(s)
 [2026-10-20T00:04:53.342Z] [FAILED] code-frontend-layout (#7): impl: [OmniRoute] CODE failed: No LLM provider for agentic CODE
 [2026-10-20T00:08:08.275Z] [FAILED] code-api-auth (#2): impl: [OmniRoute] CODE failed: No LLM provider for agentic CODE
+[2026-10-20T00:13:52.427Z] [FAILED] code-api-crud (#5): impl: [OmniRoute] CODE failed: All providers failed for agentic CODE: Pollinations (Free): rate limited (retry in 27s)
