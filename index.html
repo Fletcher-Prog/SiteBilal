@@ -896,6 +896,12 @@ button.alert-item{border:none;background:none;cursor:pointer;text-align:left;fon
           <div class="form-group"><label class="form-label" for="st-email">Email</label>
           <input class="form-input" id="st-email" type="email" maxlength="80" autocomplete="email" oninput="saveSettings(false)" onchange="saveSettings(true)"></div>
         </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label" for="st-iban">IBAN (virement)</label>
+          <input class="form-input" id="st-iban" maxlength="40" placeholder="FR76 …" oninput="saveSettings(false)" onchange="saveSettings(true)"></div>
+          <div class="form-group"><label class="form-label" for="st-bic">BIC</label>
+          <input class="form-input" id="st-bic" maxlength="15" placeholder="REVOFRP2" oninput="saveSettings(false)" onchange="saveSettings(true)"></div>
+        </div>
       </div>
       <div class="card">
         <div class="card-title">Template devis / facture</div>
@@ -2790,19 +2796,24 @@ function readNfc(id) {
 // ===== Paramètres =====
 function defaultSettings() {
   return {
-    nom: 'VitriTrack SARL',
-    adresse: '15 rue des Frigoristes, 93100 Montreuil',
-    siret: 'RCS Bobigny 123 456 789 - SIRET 123 456 789 00012',
-    tel: '01 48 57 23 10',
-    email: 'contact@vitritrack.fr',
+    nom: 'OB location vitrines réfrigérées',
+    adresse: '1 rue francis perrin, 91190 Gif-sur-Yvette',
+    siret: 'SIRET : 93809394500013',
+    tel: '06 66 40 47 10',
+    email: 'oblocationvitrine@gmail.com',
     entete: 'Location et vente de vitrines réfrigérées pour salons, marchés et commerces de bouche.',
-    pied: 'VitriTrack SARL - 15 rue des Frigoristes, 93100 Montreuil - RCS Bobigny 123 456 789 - TVA FR12 123456789',
+    pied: 'OB location vitrines réfrigérées - 1 rue francis perrin, 91190 Gif-sur-Yvette - SIRET : 93809394500013',
     cgv: 'Devis valable 30 jours. Acompte de 30 % à la commande, solde à réception de la facture. Paiement à 30 jours par virement. Pénalité de retard : 3 fois le taux d\'intérêt légal, indemnité forfaitaire de recouvrement de 40 EUR. Toute intervention est garantie 3 mois pièces et main-d\'oeuvre.',
-    tva: 20,
-    devisSeq: 0
+    tva: 0,
+    tvaExonere: true,
+    iban: 'FR76 2823 3000 0139 2024 7327 139',
+    bic: 'REVOFRP2',
+    devisSeq: 0,
+    devisLocSeq: 0,
+    factureSeq: 0
   };
 }
-const SETTINGS_IDS = {nom:'st-nom', adresse:'st-adresse', siret:'st-siret', tel:'st-tel', email:'st-email', entete:'st-entete', pied:'st-pied', cgv:'st-cgv', tva:'st-tva'};
+const SETTINGS_IDS = {nom:'st-nom', adresse:'st-adresse', siret:'st-siret', tel:'st-tel', email:'st-email', entete:'st-entete', pied:'st-pied', cgv:'st-cgv', tva:'st-tva', iban:'st-iban', bic:'st-bic'};
 function renderSettings() {
   Object.keys(SETTINGS_IDS).forEach(k => {
     const el = document.getElementById(SETTINGS_IDS[k]);
