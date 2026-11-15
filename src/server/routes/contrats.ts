@@ -1,7 +1,12 @@
 import { Router } from 'express';
 import { pick } from './_crud.js';
 
-const LIST_SQL = 'SELECT t.* FROM contrats t';
+const LIST_SQL = `SELECT t.*, v.serial AS vitrine_serial, v.model AS vitrine_model, v.serial AS vitrine_nom,
+  COALESCE(t.marque, '') AS marque, COALESCE(t.modele, v.model) AS modele, COALESCE(t.serial_vitrine, v.serial) AS serial_vitrine,
+  c.nom AS client_nom, c.adresse AS adresse_client_auto, c.tel AS tel_client_auto, c.email AS email_client_auto
+  FROM contrats t
+  LEFT JOIN vitrines v ON v.id = t.vitrine_id
+  LEFT JOIN clients c ON c.nom = t.client`;
 
 function generateFacturesForContrat(db: any, contratId: number) {
   const c = db.prepare('SELECT * FROM contrats WHERE id = ?').get(contratId);
@@ -35,7 +40,7 @@ export default function(db: any) {
 
   router.get('/:id', (req, res) => {
     try {
-      const row = db.prepare('SELECT * FROM contrats WHERE id = ?').get(req.params.id);
+      const row = db.prepare(`${LIST_SQL} WHERE t.id = ?`).get(req.params.id);
       if (!row) return res.status(404).json({ error: 'Introuvable' });
       const factures = db.prepare('SELECT * FROM factures WHERE contrat_id = ? ORDER BY periode').all(req.params.id);
       res.json({ ...row, factures });

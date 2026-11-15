@@ -93,7 +93,7 @@ function exportContratPdf(c: any, settings: Record<string, string>) {
 <p style="font-size:9pt;margin:0.5em 0"><strong>Entre les soussignés :</strong></p>
 <div class="parties">
   <div><h3>Bailleur</h3><p><strong>${esc(co)}</strong></p><p>${esc(coAdr)}</p><p>Tél : ${esc(coTel)}</p><p>Email : ${esc(coEmail)}</p><p>SIRET : ${esc(coSiret)}</p><p>Ci-après dénommé « le Bailleur »</p></div>
-  <div><h3>Locataire</h3><p><strong>${esc(c.client_nom || c.client)}</strong></p><p>${esc(c.adresse_client || '')}</p><p>Tél : ${esc(c.tel_client || '')}</p>${c.email_client ? `<p>Email : ${esc(c.email_client)}</p>` : ''}<p>Ci-après dénommé « le Locataire »</p></div>
+  <div><h3>Locataire</h3><p><strong>${esc(c.client_nom || c.client)}</strong></p><p>${esc(c.adresse_client || c.adresse_client_auto || '')}</p><p>Tél : ${esc(c.tel_client || c.tel_client_auto || '')}</p>${(c.email_client || c.email_client_auto) ? `<p>Email : ${esc(c.email_client || c.email_client_auto)}</p>` : ''}<p>Ci-après dénommé « le Locataire »</p></div>
 </div>
 <p style="font-size:9.5pt;font-weight:bold;text-align:center;margin:0.5em 0">IL A ÉTÉ CONVENU CE QUI SUIT :</p>
 
@@ -103,7 +103,7 @@ function exportContratPdf(c: any, settings: Record<string, string>) {
 <tr><td>${esc(c.marque || '—')}</td><td>${esc(c.modele || c.vitrine_nom || '—')}</td><td>${esc(c.serial_vitrine || '—')}</td><td>${esc(nb)}</td><td>${esc(c.equipements || '—')}</td></tr></table></div>
 
 <div class="section"><h2>Article 2 – Durée de la location</h2>
-<p>La location prend effet à compter du <strong>${fmtDate(c.date_debut)}</strong> et se poursuivra pour une durée déterminée de <strong>${esc(c.duree || '—')} mois</strong>.</p>
+<p>La location prend effet à compter du <strong>${fmtDate(c.date_debut)}</strong>${c.date_fin ? ` jusqu'au <strong>${fmtDate(c.date_fin)}</strong>` : ''}, soit une durée de <strong>${esc(c.duree || '—')} mois</strong>.</p>
 <p>Elle pourra être résiliée par l'une ou l'autre des parties sous réserve d'un préavis de <strong>90 jours</strong> sans motif nécessaire.</p></div>
 
 <div class="section"><h2>Article 3 – Montant et modalités de paiement du loyer</h2>
