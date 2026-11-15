@@ -16,6 +16,7 @@ import interventionsRoutes from './routes/interventions.js';
 import prospectionRoutes from './routes/prospection.js';
 import settingsRoutes from './routes/settings.js';
 import clientsRoutes from './routes/clients.js';
+import devisLocationRoutes from './routes/devis-location.js';
 import facturesRoutes from './routes/factures.js';
 import dashboardRoutes from './routes/dashboard.js';
 
@@ -36,6 +37,7 @@ app.use('/api/interventions', interventionsRoutes(db));
 app.use('/api/prospection', prospectionRoutes(db));
 app.use('/api/settings', settingsRoutes(db));
 app.use('/api/clients', clientsRoutes(db));
+app.use('/api/devis-location', devisLocationRoutes(db));
 app.use('/api/factures', facturesRoutes(db));
 app.use('/api/dashboard', dashboardRoutes(db));
 

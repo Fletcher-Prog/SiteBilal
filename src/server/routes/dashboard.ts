@@ -11,9 +11,11 @@ export default function(db: any) {
     const all = (sql: string, ...p: any[]) => db.prepare(sql).all(...p);
     const dateFilter = `start_date >= ? AND start_date <= ?`;
 
-    const impayes_count = one(`SELECT COUNT(*) AS n FROM bookings WHERE (etat IS NULL OR etat NOT IN ('paye','annulee')) AND ${dateFilter}`, from, to);
-    const impayes_total = one(`SELECT COALESCE(SUM(montant),0) AS s FROM bookings WHERE (etat IS NULL OR etat NOT IN ('paye','annulee')) AND ${dateFilter}`, from, to);
-    const impayes_detail = all(`SELECT b.id, b.client_name, b.vitrine_id, b.montant, b.start_date, b.duration_months, b.tel_client, b.type_duree, v.model AS vitrine_model FROM bookings b LEFT JOIN vitrines v ON v.id = b.vitrine_id WHERE (b.etat IS NULL OR b.etat NOT IN ('paye','annulee')) AND b.start_date >= ? AND b.start_date <= ? ORDER BY b.start_date DESC`, from, to);
+    const impayes_bookings = all(`SELECT b.id, 'booking' AS source, b.client_name, b.vitrine_id, b.montant, b.start_date AS date_ref, b.duration_months, b.tel_client, b.type_duree, v.model AS vitrine_model FROM bookings b LEFT JOIN vitrines v ON v.id = b.vitrine_id WHERE (b.etat IS NULL OR b.etat NOT IN ('paye','annulee')) AND b.start_date >= ? AND b.start_date <= ? ORDER BY b.start_date DESC`, from, to);
+    const impayes_factures = all(`SELECT f.id, 'facture' AS source, f.client AS client_name, f.vitrine_id, f.montant, f.date_emission AS date_ref, f.periode, NULL AS duration_months, f.tel_client, NULL AS type_duree, v.model AS vitrine_model FROM factures f LEFT JOIN vitrines v ON v.id = f.vitrine_id WHERE (f.statut IS NULL OR f.statut NOT IN ('payee')) AND f.date_emission >= ? AND f.date_emission <= ? ORDER BY f.date_emission DESC`, from, to);
+    const impayes_detail = [...impayes_bookings, ...impayes_factures];
+    const impayes_count = { n: impayes_detail.length };
+    const impayes_total = { s: impayes_detail.reduce((a: number, r: any) => a + (Number(r.montant) || 0), 0) };
     const ca_longue = one(`SELECT COALESCE(SUM(montant),0) AS s FROM bookings WHERE type_duree='longue' AND etat='paye' AND ${dateFilter}`, from, to);
     const ca_courte = one(`SELECT COALESCE(SUM(montant),0) AS s FROM bookings WHERE type_duree='courte' AND etat='paye' AND ${dateFilter}`, from, to);
     const ca_location = { total: one(`SELECT COALESCE(SUM(montant),0) AS s FROM bookings WHERE ${dateFilter}`, from, to).s, objectif: 70000 };

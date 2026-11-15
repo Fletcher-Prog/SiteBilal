@@ -30,9 +30,13 @@ export default function Dashboard() {
       .catch((e) => setError(e.message || 'Erreur de chargement'));
   }, [from, to, tick]);
 
-  const marquerPaye = async (id: number) => {
+  const marquerPaye = async (id: number, source?: string) => {
     try {
-      await api.put('/bookings/' + id, { etat: 'paye' });
+      if (source === 'facture') {
+        await api.put('/factures/' + id + '/payer', {});
+      } else {
+        await api.put('/bookings/' + id, { etat: 'paye' });
+      }
       setTick((t) => t + 1);
     } catch (e: any) {
       setError(e.message || 'Erreur lors de la mise à jour');
@@ -89,7 +93,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <Card title="Impayés" className={impayes > 0 ? 'border-red-300 bg-red-50' : ''}>
           <div className={`text-3xl font-bold ${impayes > 0 ? 'text-red-700' : 'text-green-700'}`}>{impayes}</div>
-          <div className="text-xs text-slate-500">{impayes > 0 ? `${impayes} réservation${impayes > 1 ? 's' : ''} · ${eur(impayesTotal)}` : 'tout est réglé'}</div>
+          <div className="text-xs text-slate-500">{impayes > 0 ? `${impayes} impayé${impayes > 1 ? 's' : ''} · ${eur(impayesTotal)}` : 'tout est réglé'}</div>
         </Card>
         <Card title="CA Location (objectif 70k)">
           <div className="text-3xl font-bold text-slate-800">{eur(ca)}</div>
@@ -126,16 +130,16 @@ export default function Dashboard() {
         <Card title={`Impayés à relancer (${eur(impayesTotal)})`}>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead><tr className="text-left text-slate-500 text-xs"><th className="py-1 pr-3">Client</th><th className="pr-3">Vitrine</th><th className="pr-3">Montant</th><th className="pr-3">Période</th><th className="pr-3">Téléphone</th><th></th></tr></thead>
+              <thead><tr className="text-left text-slate-500 text-xs"><th className="py-1 pr-3">Client</th><th className="pr-3">Vitrine</th><th className="pr-3">Montant</th><th className="pr-3">Détail</th><th className="pr-3">Téléphone</th><th></th></tr></thead>
               <tbody>
                 {impayesDetail.map((b: any) => (
-                  <tr key={b.id} className="border-t border-slate-100">
+                  <tr key={`${b.source || 'booking'}-${b.id}`} className="border-t border-slate-100">
                     <td className="py-1 pr-3 font-medium">{b.client_name}</td>
-                    <td className="pr-3">{b.vitrine_model || '#' + b.vitrine_id}</td>
+                    <td className="pr-3">{b.vitrine_model || (b.vitrine_id ? '#' + b.vitrine_id : '—')}</td>
                     <td className="pr-3 font-medium text-red-700">{eur(b.montant)}</td>
-                    <td className="pr-3">{b.start_date} · {b.duration_months} mois{b.type_duree ? ` (${b.type_duree})` : ''}</td>
+                    <td className="pr-3">{b.source === 'facture' ? `Facture · ${b.periode || b.date_ref || ''}` : `${b.start_date || b.date_ref || ''} · ${b.duration_months || ''} mois${b.type_duree ? ` (${b.type_duree})` : ''}`}</td>
                     <td className="pr-3">{b.tel_client ? <a href={'tel:' + b.tel_client} className="text-teal-700 hover:underline">{b.tel_client}</a> : '—'}</td>
-                    <td className="text-right"><button onClick={() => marquerPaye(b.id)} className="bg-teal-600 hover:bg-teal-700 text-white text-xs rounded-md px-2 py-1">Marquer payé</button></td>
+                    <td className="text-right"><button onClick={() => marquerPaye(b.id, b.source)} className="bg-teal-600 hover:bg-teal-700 text-white text-xs rounded-md px-2 py-1">Marquer payé</button></td>
                   </tr>
                 ))}
               </tbody>

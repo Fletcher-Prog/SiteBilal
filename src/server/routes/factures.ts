@@ -1,37 +1,73 @@
 import { Router } from 'express';
+import { pick } from './_crud.js';
 
-export default function(db: any) {
+const SQL = 'SELECT t.*, v.serial AS vitrine_serial, v.model AS vitrine_model FROM factures t LEFT JOIN vitrines v ON v.id = t.vitrine_id';
+
+function nextNumero(db: any): string {
+  const year = new Date().getFullYear();
+  const row = db.prepare(`SELECT MAX(CAST(SUBSTR(numero, 9) AS INTEGER)) AS n FROM factures WHERE numero LIKE 'FC-${year}-%'`).get() as { n: number | null };
+  const n = (row?.n ?? 0) + 1;
+  return `FC-${year}-${String(n).padStart(3, '0')}`;
+}
+
+export default function (db: any) {
   const router = Router();
 
   router.get('/', (req, res) => {
-    const { contrat_id, client, periode, statut } = req.query as any;
-    const where: string[] = [];
-    const params: any[] = [];
-    if (contrat_id) { where.push('contrat_id = ?'); params.push(contrat_id); }
-    if (client) { where.push('client = ?'); params.push(client); }
-    if (periode) { where.push('periode = ?'); params.push(periode); }
-    if (statut) { where.push('statut = ?'); params.push(statut); }
-    const w = where.length ? ' WHERE ' + where.join(' AND ') : '';
     try {
-      const rows = db.prepare(`SELECT f.*, v.serial AS vitrine_serial, v.model AS vitrine_model FROM factures f LEFT JOIN vitrines v ON v.id = f.vitrine_id${w} ORDER BY f.periode DESC, f.id DESC`).all(...params);
-      res.json(rows);
-    } catch {
-      res.json(db.prepare(`SELECT * FROM factures${w} ORDER BY periode DESC, id DESC`).all(...params));
-    }
+      const { contrat_id, client, periode, statut } = req.query as any;
+      const where: string[] = [];
+      const params: any[] = [];
+      if (contrat_id) { where.push('t.contrat_id = ?'); params.push(contrat_id); }
+      if (client) { where.push('t.client = ?'); params.push(client); }
+      if (periode) { where.push('t.periode = ?'); params.push(periode); }
+      if (statut) { where.push('t.statut = ?'); params.push(statut); }
+      const w = where.length ? ' WHERE ' + where.join(' AND ') : '';
+      res.json(db.prepare(`${SQL}${w} ORDER BY t.id DESC`).all(...params));
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+
+  router.get('/:id', (req, res) => {
+    try {
+      const row = db.prepare(`${SQL} WHERE t.id = ?`).get(req.params.id);
+      if (!row) return res.status(404).json({ error: 'Introuvable' });
+      res.json(row);
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+
+  router.post('/', (req, res) => {
+    try {
+      const d = pick(db, 'factures', { ...req.body, numero: req.body.numero || nextNumero(db) });
+      const keys = Object.keys(d);
+      const info = db.prepare(`INSERT INTO factures (${keys.join(',')}) VALUES (${keys.map(() => '?').join(',')})`).run(...keys.map((k) => d[k]));
+      res.status(201).json(db.prepare('SELECT * FROM factures WHERE id = ?').get(info.lastInsertRowid));
+    } catch (e: any) { res.status(400).json({ error: e.message }); }
+  });
+
+  router.put('/:id', (req, res) => {
+    try {
+      if (!db.prepare('SELECT 1 FROM factures WHERE id = ?').get(req.params.id)) return res.status(404).json({ error: 'Introuvable' });
+      const d = pick(db, 'factures', req.body);
+      const keys = Object.keys(d);
+      if (keys.length) db.prepare(`UPDATE factures SET ${keys.map((k) => k + ' = ?').join(',')} WHERE id = ?`).run(...keys.map((k) => d[k]), req.params.id);
+      res.json(db.prepare('SELECT * FROM factures WHERE id = ?').get(req.params.id));
+    } catch (e: any) { res.status(400).json({ error: e.message }); }
   });
 
   router.put('/:id/payer', (req, res) => {
-    const f = db.prepare('SELECT * FROM factures WHERE id = ?').get(req.params.id);
-    if (!f) return res.status(404).json({ error: 'Facture introuvable' });
-    db.prepare('UPDATE factures SET statut = ? WHERE id = ?').run('payee', req.params.id);
-    res.json(db.prepare('SELECT * FROM factures WHERE id = ?').get(req.params.id));
+    try {
+      if (!db.prepare('SELECT 1 FROM factures WHERE id = ?').get(req.params.id)) return res.status(404).json({ error: 'Introuvable' });
+      db.prepare('UPDATE factures SET statut = ? WHERE id = ?').run('payee', req.params.id);
+      res.json(db.prepare(`${SQL} WHERE t.id = ?`).get(req.params.id));
+    } catch (e: any) { res.status(400).json({ error: e.message }); }
   });
 
   router.put('/:id/impayee', (req, res) => {
-    const f = db.prepare('SELECT * FROM factures WHERE id = ?').get(req.params.id);
-    if (!f) return res.status(404).json({ error: 'Facture introuvable' });
-    db.prepare('UPDATE factures SET statut = ? WHERE id = ?').run('generee', req.params.id);
-    res.json(db.prepare('SELECT * FROM factures WHERE id = ?').get(req.params.id));
+    try {
+      if (!db.prepare('SELECT 1 FROM factures WHERE id = ?').get(req.params.id)) return res.status(404).json({ error: 'Introuvable' });
+      db.prepare('UPDATE factures SET statut = ? WHERE id = ?').run('emise', req.params.id);
+      res.json(db.prepare(`${SQL} WHERE t.id = ?`).get(req.params.id));
+    } catch (e: any) { res.status(400).json({ error: e.message }); }
   });
 
   router.post('/regenerate', (_req, res) => {
@@ -40,25 +76,33 @@ export default function(db: any) {
     const insert = db.prepare('INSERT OR IGNORE INTO factures (contrat_id, periode, montant, client, vitrine_id, statut, date_emission) VALUES (?, ?, ?, ?, ?, ?, ?)');
     let created = 0;
     db.transaction(() => {
-      for (const c of contrats) {
+      for (const c of contrats as any[]) {
         if (!c.date_debut) continue;
         const start = new Date(c.date_debut + 'T00:00:00');
         const end = c.date_fin ? new Date(c.date_fin + 'T00:00:00') : new Date(start.getFullYear(), start.getMonth() + (c.duree || 1), start.getDate());
         const d = new Date(start);
         while (d < end) {
           const p = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-          const r = insert.run(c.id, p, c.montant || 0, c.client || '', c.vitrine_id, 'generee', todayStr);
+          const r = insert.run(c.id, p, c.montant || 0, c.client || '', c.vitrine_id, 'emise', todayStr);
           if (r.changes) created++;
           d.setMonth(d.getMonth() + 1);
         }
         if (end <= start) {
           const p = `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}`;
-          const r = insert.run(c.id, p, c.montant || 0, c.client || '', c.vitrine_id, 'generee', todayStr);
+          const r = insert.run(c.id, p, c.montant || 0, c.client || '', c.vitrine_id, 'emise', todayStr);
           if (r.changes) created++;
         }
       }
     })();
     res.json({ created });
+  });
+
+  router.delete('/:id', (req, res) => {
+    try {
+      const info = db.prepare('DELETE FROM factures WHERE id = ?').run(req.params.id);
+      if (!info.changes) return res.status(404).json({ error: 'Introuvable' });
+      res.json({ ok: true });
+    } catch (e: any) { res.status(400).json({ error: e.message }); }
   });
 
   return router;

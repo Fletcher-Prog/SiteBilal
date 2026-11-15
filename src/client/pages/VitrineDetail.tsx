@@ -175,7 +175,7 @@ export default function VitrineDetail() {
           <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">CA généré</div>
           <div className="text-2xl font-semibold tabular-nums">{eur(capital)}</div>
         </div>
-        <button className={btnSecondary} onClick={devis}>Générer un devis</button>
+        <button className={btnSecondary} onClick={devis}>Générer CA</button>
       </div>
 
       <div className="mb-5 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">

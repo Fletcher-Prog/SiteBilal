@@ -36,11 +36,12 @@ CREATE TABLE IF NOT EXISTS ventes (id INTEGER PRIMARY KEY, vitrine_id INTEGER, p
 CREATE TABLE IF NOT EXISTS lieux (id INTEGER PRIMARY KEY, nom TEXT, type TEXT, note TEXT);
 CREATE TABLE IF NOT EXISTS actions (id INTEGER PRIMARY KEY, titre TEXT, fait INTEGER DEFAULT 0, commentaire TEXT);
 CREATE TABLE IF NOT EXISTS contrats (id INTEGER PRIMARY KEY, client TEXT, vitrine_id INTEGER, duree INTEGER, montant REAL, caution REAL, conditions TEXT, date_debut TEXT, date_fin TEXT);
+CREATE TABLE IF NOT EXISTS devis_location (id INTEGER PRIMARY KEY, numero TEXT UNIQUE, client TEXT, adresse_client TEXT, tel_client TEXT, email_client TEXT, vitrine_id INTEGER, marque TEXT, modele TEXT, serial_vitrine TEXT, equipements TEXT, date_debut TEXT, date_fin TEXT, duree INTEGER, montant REAL, caution REAL, jour_paiement INTEGER, mode_paiement TEXT, option_achat_prix REAL, conditions TEXT, date_creation TEXT DEFAULT (date('now')), signe INTEGER DEFAULT 0);
 CREATE TABLE IF NOT EXISTS frigoristes (id INTEGER PRIMARY KEY, nom TEXT, tel TEXT, zone TEXT);
 CREATE TABLE IF NOT EXISTS interventions (id INTEGER PRIMARY KEY, vitrine_id INTEGER, frigoriste_id INTEGER, date TEXT, type TEXT, temperature REAL, notes TEXT, cout REAL);
 CREATE TABLE IF NOT EXISTS prospection (id INTEGER PRIMARY KEY, client TEXT, contact TEXT, notes TEXT, statut TEXT);
 CREATE TABLE IF NOT EXISTS clients (id INTEGER PRIMARY KEY, nom TEXT, tel TEXT, email TEXT, adresse TEXT);
-CREATE TABLE IF NOT EXISTS factures (id INTEGER PRIMARY KEY, contrat_id INTEGER, periode TEXT, montant REAL, client TEXT, vitrine_id INTEGER, statut TEXT DEFAULT 'generee', date_emission TEXT, UNIQUE(contrat_id, periode));
+CREATE TABLE IF NOT EXISTS factures (id INTEGER PRIMARY KEY, numero TEXT UNIQUE, contrat_id INTEGER, client TEXT, adresse_client TEXT, tel_client TEXT, vitrine_id INTEGER, marque TEXT, modele TEXT, serial_vitrine TEXT, montant REAL, tva REAL DEFAULT 0, periode TEXT, date_emission TEXT DEFAULT (date('now')), statut TEXT DEFAULT 'emise', notes TEXT);
 CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT);
 `);
 
@@ -57,6 +58,33 @@ const migrations = [
   'ALTER TABLE bookings ADD COLUMN duree_jours INTEGER',
   'ALTER TABLE contrats ADD COLUMN date_debut TEXT',
   'ALTER TABLE contrats ADD COLUMN date_fin TEXT',
+  'ALTER TABLE contrats ADD COLUMN marque TEXT',
+  'ALTER TABLE contrats ADD COLUMN modele TEXT',
+  'ALTER TABLE contrats ADD COLUMN serial_vitrine TEXT',
+  'ALTER TABLE contrats ADD COLUMN equipements TEXT',
+  'ALTER TABLE contrats ADD COLUMN adresse_client TEXT',
+  'ALTER TABLE contrats ADD COLUMN tel_client TEXT',
+  'ALTER TABLE contrats ADD COLUMN email_client TEXT',
+  'ALTER TABLE contrats ADD COLUMN jour_paiement INTEGER',
+  'ALTER TABLE contrats ADD COLUMN mode_paiement TEXT',
+  'ALTER TABLE contrats ADD COLUMN option_achat_prix REAL',
+  'ALTER TABLE contrats ADD COLUMN signe INTEGER DEFAULT 0',
+  'ALTER TABLE contrats ADD COLUMN client_id INTEGER',
+  'ALTER TABLE contrats ADD COLUMN nb_vitrines INTEGER DEFAULT 1',
+  'ALTER TABLE contrats ADD COLUMN hors_idf INTEGER DEFAULT 0',
+  'ALTER TABLE contrats ADD COLUMN maintenance_forfait INTEGER DEFAULT 0',
+  'ALTER TABLE contrats ADD COLUMN numero TEXT',
+  "ALTER TABLE contrats ADD COLUMN vitrine_ids TEXT DEFAULT '[]'",
+  "ALTER TABLE contrats ADD COLUMN mode_facturation TEXT DEFAULT 'mensuel'",
+  'ALTER TABLE contrats ADD COLUMN actif INTEGER DEFAULT 1',
+  'ALTER TABLE factures ADD COLUMN numero TEXT UNIQUE',
+  'ALTER TABLE factures ADD COLUMN adresse_client TEXT',
+  'ALTER TABLE factures ADD COLUMN tel_client TEXT',
+  'ALTER TABLE factures ADD COLUMN marque TEXT',
+  'ALTER TABLE factures ADD COLUMN modele TEXT',
+  'ALTER TABLE factures ADD COLUMN serial_vitrine TEXT',
+  'ALTER TABLE factures ADD COLUMN tva REAL DEFAULT 0',
+  'ALTER TABLE factures ADD COLUMN notes TEXT',
   'ALTER TABLE vitrines ADD COLUMN date_achat TEXT',
   'ALTER TABLE bookings ADD COLUMN date_fin TEXT',
 ];
