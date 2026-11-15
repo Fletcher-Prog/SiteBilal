@@ -7,6 +7,17 @@ const esc = (s: any) => String(s ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&am
 const MONTHS = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 const fmtMonth = (m: string) => { const [y, mo] = m.split('-'); return `${MONTHS[Number(mo) - 1]} ${y}`; };
 const fmtDate = (s: string) => { if (!s) return '—'; const d = new Date(s + 'T00:00:00'); return d.toLocaleDateString('fr-FR'); };
+const fmtDuree = (c: any) => {
+  if (c.date_debut && c.date_fin) {
+    const d1 = new Date(c.date_debut + 'T00:00:00'), d2 = new Date(c.date_fin + 'T00:00:00');
+    const diffDays = Math.round((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
+    if (diffDays < 28) return `${diffDays} jour${diffDays > 1 ? 's' : ''}`;
+    const months = Math.round(diffDays / 30);
+    return `${months} mois`;
+  }
+  if (c.duree) return `${c.duree} mois`;
+  return '—';
+};
 
 /* ── PDF helpers ── */
 
@@ -62,7 +73,7 @@ function exportContratPdf(c: any, settings: Record<string, string>) {
       adresse_client: c.adresse_client || '', tel_client: c.tel_client || '', email_client: c.email_client || '',
       marque: c.marque || '', modele: c.modele || c.vitrine_nom || '', serial_vitrine: c.serial_vitrine || '',
       nb_vitrines: String(c.nb_vitrines || 1), equipements: c.equipements || '',
-      date_debut: fmtDate(c.date_debut), date_fin: fmtDate(c.date_fin), duree: String(c.duree || ''),
+      date_debut: fmtDate(c.date_debut), date_fin: fmtDate(c.date_fin), duree: fmtDuree(c),
       montant: eur(c.montant), caution: eur(c.caution),
       jour_paiement: String(c.jour_paiement || 1), mode_paiement: c.mode_paiement || 'virement bancaire',
       option_achat_prix: c.option_achat_prix ? eur(c.option_achat_prix) : '', conditions: c.conditions || '',
@@ -103,7 +114,7 @@ function exportContratPdf(c: any, settings: Record<string, string>) {
 <tr><td>${esc(c.marque || '—')}</td><td>${esc(c.modele || c.vitrine_nom || '—')}</td><td>${esc(c.serial_vitrine || '—')}</td><td>${esc(nb)}</td><td>${esc(c.equipements || '—')}</td></tr></table></div>
 
 <div class="section"><h2>Article 2 – Durée de la location</h2>
-<p>La location prend effet à compter du <strong>${fmtDate(c.date_debut)}</strong>${c.date_fin ? ` jusqu'au <strong>${fmtDate(c.date_fin)}</strong>` : ''}, soit une durée de <strong>${esc(c.duree || '—')} mois</strong>.</p>
+<p>La location prend effet à compter du <strong>${fmtDate(c.date_debut)}</strong>${c.date_fin ? ` jusqu'au <strong>${fmtDate(c.date_fin)}</strong>` : ''}, soit une durée de <strong>${fmtDuree(c)}</strong>.</p>
 <p>Elle pourra être résiliée par l'une ou l'autre des parties sous réserve d'un préavis de <strong>90 jours</strong> sans motif nécessaire.</p></div>
 
 <div class="section"><h2>Article 3 – Montant et modalités de paiement du loyer</h2>
@@ -305,7 +316,8 @@ export default function Contrats() {
     let duree = num(String(f.get('duree')));
     if (date_debut && date_fin && !duree) {
       const d1 = new Date(date_debut), d2 = new Date(date_fin);
-      duree = Math.max(1, Math.round((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24 * 30)));
+      const diffDays = Math.round((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
+      duree = diffDays >= 28 ? Math.round(diffDays / 30) : 0;
     }
     save(edit.id, {
       client: f.get('client'), vitrine_id: num(String(f.get('vitrine_id') || '')), duree,
@@ -353,7 +365,7 @@ export default function Contrats() {
             <dt className="text-slate-500">Vitrine</dt><dd>{vitrine(detail)}</dd>
             <dt className="text-slate-500">Début</dt><dd>{detail.date_debut || '—'}</dd>
             <dt className="text-slate-500">Fin</dt><dd>{detail.date_fin || '—'}</dd>
-            <dt className="text-slate-500">Durée</dt><dd>{detail.duree != null ? `${detail.duree} mois` : '—'}</dd>
+            <dt className="text-slate-500">Durée</dt><dd>{fmtDuree(detail)}</dd>
             <dt className="text-slate-500">Montant mensuel</dt><dd>{eur(detail.montant)}</dd>
             <dt className="text-slate-500">Caution</dt><dd>{eur(detail.caution)}</dd>
             <dt className="text-slate-500 col-span-2">Conditions</dt>
