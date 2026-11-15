@@ -9,13 +9,34 @@ const SECTIONS: { id: string; title: string; fields: Def[] }[] = [
     fields: [
       { key: 'company_nom', label: 'Nom' }, { key: 'company_adresse', label: 'Adresse' }, { key: 'company_siret', label: 'SIRET' },
       { key: 'company_tel', label: 'Téléphone', type: 'tel' }, { key: 'company_email', label: 'Email', type: 'email' },
+      { key: 'company_ville', label: 'Ville (juridiction)' },
     ],
   },
   {
-    id: 'template', title: 'Template devis/facture',
+    id: 'bank', title: 'Coordonnées bancaires',
     fields: [
-      { key: 'template_entete', label: 'En-tête', area: true }, { key: 'template_pied', label: 'Pied de page', area: true },
-      { key: 'template_cgv', label: 'CGV', area: true }, { key: 'template_tva', label: 'Taux TVA (%)', type: 'number' },
+      { key: 'company_iban', label: 'IBAN' }, { key: 'company_bic', label: 'BIC' },
+    ],
+  },
+  {
+    id: 'contrat', title: 'Contrats — paramètres',
+    fields: [
+      { key: 'company_signataire', label: 'Signataire (nom du représentant)' },
+      { key: 'company_lieu_signature', label: 'Lieu de signature' },
+    ],
+  },
+  {
+    id: 'facture', title: 'Factures — paramètres',
+    fields: [
+      { key: 'tva', label: 'Taux TVA (%)', type: 'number' },
+      { key: 'company_tva_exonere', label: 'Exonéré de TVA (1 = oui, 0 = non)' },
+    ],
+  },
+  {
+    id: 'template', title: 'Templates personnalisés',
+    fields: [
+      { key: 'template_contrat_html', label: 'Template contrat (HTML avec {{variables}})', area: true },
+      { key: 'template_facture_html', label: 'Template facture (HTML avec {{variables}})', area: true },
     ],
   },
 ];
