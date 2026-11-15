@@ -12,6 +12,15 @@ export default function Ventes() {
   const totalVentes = data.reduce((s: number, v: any) => s + (Number(v.prix_vente) || 0), 0);
   const totalMarge = data.reduce((s: number, v: any) => s + marge(v), 0);
 
+  const prixRef = (el: HTMLInputElement | null) => { if (el) (el as any)._ref = el; };
+  const onVitrineChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const vid = Number(e.target.value);
+    const v = vit.data.find((x: any) => x.id === vid);
+    if (v) {
+      const inp = e.target.form?.querySelector<HTMLInputElement>('[name="prix_achat"]');
+      if (inp) { inp.value = String(v.prix_achat ?? ''); }
+    }
+  };
   const submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const f = new FormData(e.currentTarget);
@@ -61,9 +70,9 @@ export default function Ventes() {
         <Modal title={edit.id ? 'Modifier la vente' : 'Nouvelle vente'} onClose={() => setEdit(null)}>
           <form onSubmit={submit}>
             <Field label="Vitrine">
-              <select name="vitrine_id" defaultValue={edit.vitrine_id ?? ''} className={inputCls}>
+              <select name="vitrine_id" defaultValue={edit.vitrine_id ?? ''} className={inputCls} onChange={onVitrineChange}>
                 <option value="">—</option>
-                {vit.data.map((x: any) => <option key={x.id} value={x.id}>{x.nom || x.serial || x.model || `#${x.id}`}</option>)}
+                {vit.data.map((x: any) => <option key={x.id} value={x.id}>{x.serial || x.model || `#${x.id}`}</option>)}
               </select>
             </Field>
             <div className="grid grid-cols-3 gap-3">

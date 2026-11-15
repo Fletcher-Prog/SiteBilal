@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../lib/api.js';
-import { EtatBadge, Modal, VitrineForm, btnDanger, btnPrimary, btnSecondary, eur, hasNfc, isOk, scanNfc, writeNfc } from './Vitrines.js';
+import { EtatBadge, Field, Modal, VitrineForm, btnDanger, btnPrimary, btnSecondary, eur, hasNfc, inputCls, isOk, scanNfc, writeNfc } from './Vitrines.js';
 
 const esc = (s: any) => String(s ?? '').replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
 
@@ -21,6 +21,8 @@ export default function VitrineDetail() {
   const [nfcMsg, setNfcMsg] = useState('');
   const [nfcBusy, setNfcBusy] = useState(false);
   const [showIosGuide, setShowIosGuide] = useState(false);
+  const [addingIntervention, setAddingIntervention] = useState(false);
+  const [intBusy, setIntBusy] = useState(false);
 
   useEffect(() => {
     setV(null);
@@ -84,7 +86,7 @@ export default function VitrineDetail() {
     const w = window.open('', '_blank');
     if (!w) { setError("Impossible d'ouvrir la fenêtre de devis (pop-up bloqué)."); return; }
     const lines = (v.bookings ?? []).map((b: any) => `<tr><td>${esc(b.client_name)}</td><td>${esc(fmtDate(b.start_date))}</td><td>${esc(b.duration_months)} mois</td><td>${esc(eur(b.montant))}</td></tr>`).join('');
-    w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Devis ${esc(v.serial)}</title><style>body{font-family:sans-serif;padding:32px}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ccc;padding:6px;text-align:left}</style></head><body><h1>Devis — ${esc(v.serial)}</h1><p>${esc(v.model)}<br>Lieu : ${esc(lieu)}<br>Date : ${new Date().toLocaleDateString('fr-FR')}</p><p>Prix d'achat : ${esc(eur(v.prix_achat))}<br>Réparations : ${esc(eur(v.prix_reparation))}</p><table><thead><tr><th>Client</th><th>Début</th><th>Durée</th><th>Montant</th></tr></thead><tbody>${lines}</tbody></table><p><strong>Capital généré : ${esc(eur(capital))}</strong></p></body></html>`);
+    w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Devis ${esc(v.serial)}</title><style>body{font-family:sans-serif;padding:32px}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{border:1px solid #ccc;padding:6px;text-align:left}.actions{margin-top:24px;text-align:center}button{padding:8px 24px;background:#0d9488;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px;margin:0 8px}button.close{background:#64748b}</style></head><body><h1>Devis — ${esc(v.serial)}</h1><p>${esc(v.model)}<br>Lieu : ${esc(lieu)}<br>Date : ${new Date().toLocaleDateString('fr-FR')}</p><p>Prix d'achat : ${esc(eur(v.prix_achat))}<br>Réparations : ${esc(eur(v.prix_reparation))}</p><table><thead><tr><th>Client</th><th>Début</th><th>Durée</th><th>Montant</th></tr></thead><tbody>${lines}</tbody></table><p><strong>CA généré : ${esc(eur(capital))}</strong></p><div class="actions"><button onclick="window.print()">Imprimer</button><button class="close" onclick="window.close()">Fermer</button></div></body></html>`);
     w.document.close();
     w.focus();
     w.print();
@@ -170,7 +172,7 @@ export default function VitrineDetail() {
 
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
         <div>
-          <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Capital généré</div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">CA généré</div>
           <div className="text-2xl font-semibold tabular-nums">{eur(capital)}</div>
         </div>
         <button className={btnSecondary} onClick={devis}>Générer un devis</button>
@@ -199,7 +201,10 @@ export default function VitrineDetail() {
       </div>
 
       <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="mb-3 text-sm font-semibold">Historique des interventions</h2>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-sm font-semibold">Historique des interventions</h2>
+          <button className={btnPrimary} onClick={() => setAddingIntervention(true)}>+ Intervention</button>
+        </div>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[520px] text-sm">
             <thead><tr className="border-b-2 border-slate-200">{['Date', 'Type', 'Température', 'Coût', 'Notes'].map(h => <th key={h} className={th}>{h}</th>)}</tr></thead>
@@ -231,6 +236,48 @@ export default function VitrineDetail() {
             <button className={btnSecondary} onClick={() => setConfirming(false)}>Annuler</button>
             <button className={btnDanger} onClick={del}>Confirmer la suppression</button>
           </div>
+        </Modal>
+      )}
+      {addingIntervention && (
+        <Modal title="Nouvelle intervention" onClose={() => setAddingIntervention(false)}>
+          <form onSubmit={async (e) => {
+            e.preventDefault();
+            setIntBusy(true);
+            const fd = new FormData(e.currentTarget);
+            try {
+              await api.post('/interventions', {
+                vitrine_id: v.id,
+                date: fd.get('date'),
+                type: fd.get('type'),
+                temperature: fd.get('temperature') ? Number(fd.get('temperature')) : null,
+                cout: fd.get('cout') ? Number(fd.get('cout')) : null,
+                notes: fd.get('notes'),
+                frigoriste_id: null,
+              });
+              const updated = await api.get(`/vitrines/${v.id}`);
+              setV(updated);
+              setAddingIntervention(false);
+            } catch (err: any) { setError(err.message); }
+            setIntBusy(false);
+          }}>
+            <Field label="Date *"><input name="date" type="date" required defaultValue={new Date().toISOString().slice(0, 10)} className={inputCls} /></Field>
+            <Field label="Type *">
+              <select name="type" required className={inputCls}>
+                <option value="maintenance">Maintenance</option>
+                <option value="reparation">Réparation</option>
+                <option value="controle">Contrôle</option>
+              </select>
+            </Field>
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Température (°C)"><input name="temperature" type="number" step="0.1" className={inputCls} /></Field>
+              <Field label="Coût (€)"><input name="cout" type="number" step="any" min="0" className={inputCls} /></Field>
+            </div>
+            <Field label="Notes"><textarea name="notes" rows={2} className={inputCls} /></Field>
+            <div className="flex justify-end gap-2">
+              <button type="button" className={btnSecondary} onClick={() => setAddingIntervention(false)}>Annuler</button>
+              <button type="submit" className={btnPrimary} disabled={intBusy}>Enregistrer</button>
+            </div>
+          </form>
         </Modal>
       )}
     </div>

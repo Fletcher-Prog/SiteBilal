@@ -12,16 +12,18 @@ db.pragma('foreign_keys = OFF');
 
 // ---------- Types ----------
 export interface User { id: number; name: string; email: string; password: string; role: string; active: number }
-export interface Vitrine { id: number; serial: string; model: string; prix_achat: number | null; prix_reparation: number; commentaire: string; fonctionnelle: number | null; lieu_id: number | null; nfc_tag: string | null }
-export interface Booking { id: number; vitrine_id: number; client_name: string; start_date: string; duration_months: number; montant: number; transporteur: string; etat: string; adresse_livraison: string; tel_client: string; qui: string; photo_livraison: string; photo_enlevement: string; type_duree: string; maint: number; duree_jours: number }
+export interface Vitrine { id: number; serial: string; model: string; prix_achat: number | null; prix_reparation: number; commentaire: string; fonctionnelle: number | null; lieu_id: number | null; nfc_tag: string | null; date_achat: string | null }
+export interface Booking { id: number; vitrine_id: number; client_name: string; start_date: string; duration_months: number; montant: number; transporteur: string; etat: string; adresse_livraison: string; tel_client: string; qui: string; photo_livraison: string; photo_enlevement: string; type_duree: string; maint: number; duree_jours: number; date_fin: string | null }
 export interface Flux { id: number; type_flux: string; montant: number; qui: string; client: string; mois: string; is_transport: number; is_achat: number; commentaire: string }
 export interface Vente { id: number; vitrine_id: number | null; prix_achat: number; prix_vente: number; frais: number; commentaire: string; date_vente: string | null }
 export interface Lieu { id: number; nom: string; type: string; note: string }
 export interface Action { id: number; titre: string; fait: number; commentaire: string }
-export interface Contrat { id: number; client: string; vitrine_id: number; duree: number | null; montant: number; caution: number; conditions: string }
+export interface Contrat { id: number; client: string; vitrine_id: number; duree: number | null; montant: number; caution: number; conditions: string; date_debut: string | null; date_fin: string | null }
 export interface Frigoriste { id: number; nom: string; tel: string; zone: string }
 export interface Intervention { id: number; vitrine_id: number; frigoriste_id: number; date: string; type: string; temperature: number | null; notes: string; cout: number | null }
 export interface Prospection { id: number; client: string; contact: string; notes: string; statut: string }
+export interface Client { id: number; nom: string; tel: string; email: string; adresse: string }
+export interface Facture { id: number; contrat_id: number; periode: string; montant: number; client: string; vitrine_id: number; statut: string; date_emission: string }
 export interface Setting { key: string; value: string }
 
 // ---------- Schema ----------
@@ -33,10 +35,12 @@ CREATE TABLE IF NOT EXISTS flux (id INTEGER PRIMARY KEY, type_flux TEXT, montant
 CREATE TABLE IF NOT EXISTS ventes (id INTEGER PRIMARY KEY, vitrine_id INTEGER, prix_achat REAL, prix_vente REAL, frais REAL, commentaire TEXT, date_vente TEXT);
 CREATE TABLE IF NOT EXISTS lieux (id INTEGER PRIMARY KEY, nom TEXT, type TEXT, note TEXT);
 CREATE TABLE IF NOT EXISTS actions (id INTEGER PRIMARY KEY, titre TEXT, fait INTEGER DEFAULT 0, commentaire TEXT);
-CREATE TABLE IF NOT EXISTS contrats (id INTEGER PRIMARY KEY, client TEXT, vitrine_id INTEGER, duree INTEGER, montant REAL, caution REAL, conditions TEXT);
+CREATE TABLE IF NOT EXISTS contrats (id INTEGER PRIMARY KEY, client TEXT, vitrine_id INTEGER, duree INTEGER, montant REAL, caution REAL, conditions TEXT, date_debut TEXT, date_fin TEXT);
 CREATE TABLE IF NOT EXISTS frigoristes (id INTEGER PRIMARY KEY, nom TEXT, tel TEXT, zone TEXT);
 CREATE TABLE IF NOT EXISTS interventions (id INTEGER PRIMARY KEY, vitrine_id INTEGER, frigoriste_id INTEGER, date TEXT, type TEXT, temperature REAL, notes TEXT, cout REAL);
 CREATE TABLE IF NOT EXISTS prospection (id INTEGER PRIMARY KEY, client TEXT, contact TEXT, notes TEXT, statut TEXT);
+CREATE TABLE IF NOT EXISTS clients (id INTEGER PRIMARY KEY, nom TEXT, tel TEXT, email TEXT, adresse TEXT);
+CREATE TABLE IF NOT EXISTS factures (id INTEGER PRIMARY KEY, contrat_id INTEGER, periode TEXT, montant REAL, client TEXT, vitrine_id INTEGER, statut TEXT DEFAULT 'generee', date_emission TEXT, UNIQUE(contrat_id, periode));
 CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT);
 `);
 
@@ -51,6 +55,10 @@ const migrations = [
   "ALTER TABLE bookings ADD COLUMN type_duree TEXT DEFAULT 'longue'",
   'ALTER TABLE bookings ADD COLUMN maint INTEGER DEFAULT 0',
   'ALTER TABLE bookings ADD COLUMN duree_jours INTEGER',
+  'ALTER TABLE contrats ADD COLUMN date_debut TEXT',
+  'ALTER TABLE contrats ADD COLUMN date_fin TEXT',
+  'ALTER TABLE vitrines ADD COLUMN date_achat TEXT',
+  'ALTER TABLE bookings ADD COLUMN date_fin TEXT',
 ];
 for (const sql of migrations) {
   try { db.exec(sql); } catch (e) { /* column already exists */ }
@@ -79,16 +87,18 @@ function crud<T extends { id: number }>(table: string, cols: string[]) {
 
 const T = {
   users: crud<User>('users', ['name', 'email', 'password', 'role']),
-  vitrines: crud<Vitrine>('vitrines', ['serial', 'model', 'prix_achat', 'prix_reparation', 'commentaire', 'fonctionnelle', 'lieu_id', 'nfc_tag']),
-  bookings: crud<Booking>('bookings', ['vitrine_id', 'client_name', 'start_date', 'duration_months', 'montant', 'transporteur', 'etat', 'adresse_livraison', 'tel_client', 'qui', 'photo_livraison', 'photo_enlevement', 'type_duree', 'maint', 'duree_jours']),
+  vitrines: crud<Vitrine>('vitrines', ['serial', 'model', 'prix_achat', 'prix_reparation', 'commentaire', 'fonctionnelle', 'lieu_id', 'nfc_tag', 'date_achat']),
+  bookings: crud<Booking>('bookings', ['vitrine_id', 'client_name', 'start_date', 'duration_months', 'montant', 'transporteur', 'etat', 'adresse_livraison', 'tel_client', 'qui', 'photo_livraison', 'photo_enlevement', 'type_duree', 'maint', 'duree_jours', 'date_fin']),
   flux: crud<Flux>('flux', ['type_flux', 'montant', 'qui', 'client', 'mois', 'is_transport', 'is_achat', 'commentaire']),
   ventes: crud<Vente>('ventes', ['vitrine_id', 'prix_achat', 'prix_vente', 'frais', 'commentaire', 'date_vente']),
   lieux: crud<Lieu>('lieux', ['nom', 'type', 'note']),
   actions: crud<Action>('actions', ['titre', 'fait', 'commentaire']),
-  contrats: crud<Contrat>('contrats', ['client', 'vitrine_id', 'duree', 'montant', 'caution', 'conditions']),
+  contrats: crud<Contrat>('contrats', ['client', 'vitrine_id', 'duree', 'montant', 'caution', 'conditions', 'date_debut', 'date_fin']),
   frigoristes: crud<Frigoriste>('frigoristes', ['nom', 'tel', 'zone']),
   interventions: crud<Intervention>('interventions', ['vitrine_id', 'frigoriste_id', 'date', 'type', 'temperature', 'notes', 'cout']),
   prospection: crud<Prospection>('prospection', ['client', 'contact', 'notes', 'statut']),
+  clients: crud<Client>('clients', ['nom', 'tel', 'email', 'adresse']),
+  factures: crud<Facture>('factures', ['contrat_id', 'periode', 'montant', 'client', 'vitrine_id', 'statut', 'date_emission']),
 };
 
 // ---------- Typed helpers ----------
@@ -104,6 +114,8 @@ export const getContrats = T.contrats.all, getContrat = T.contrats.get, createCo
 export const getFrigoristes = T.frigoristes.all, getFrigoriste = T.frigoristes.get, createFrigoriste = T.frigoristes.create, updateFrigoriste = T.frigoristes.update, deleteFrigoriste = T.frigoristes.remove;
 export const getInterventions = T.interventions.all, getIntervention = T.interventions.get, createIntervention = T.interventions.create, updateIntervention = T.interventions.update, deleteIntervention = T.interventions.remove;
 export const getProspections = T.prospection.all, getProspection = T.prospection.get, createProspection = T.prospection.create, updateProspection = T.prospection.update, deleteProspection = T.prospection.remove;
+export const getClients = T.clients.all, getClient = T.clients.get, createClient = T.clients.create, updateClient = T.clients.update, deleteClient = T.clients.remove;
+export const getFactures = T.factures.all, getFacture = T.factures.get, createFacture = T.factures.create, updateFacture = T.factures.update, deleteFacture = T.factures.remove;
 
 export const getSettings = (): Record<string, string> =>
   Object.fromEntries((db.prepare('SELECT key, value FROM settings').all() as Setting[]).map((s) => [s.key, s.value]));
@@ -134,5 +146,41 @@ function seed() {
   })();
 }
 seed();
+
+// ---------- Auto-generate factures for active contrats ----------
+function generateFactures() {
+  const contrats = db.prepare('SELECT * FROM contrats WHERE date_debut IS NOT NULL').all() as Contrat[];
+  const existing = new Set(
+    (db.prepare('SELECT contrat_id, periode FROM factures').all() as { contrat_id: number; periode: string }[])
+      .map(f => `${f.contrat_id}:${f.periode}`)
+  );
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const insert = db.prepare('INSERT OR IGNORE INTO factures (contrat_id, periode, montant, client, vitrine_id, statut, date_emission) VALUES (?, ?, ?, ?, ?, ?, ?)');
+
+  db.transaction(() => {
+    for (const c of contrats) {
+      if (!c.date_debut) continue;
+      const start = new Date(c.date_debut + 'T00:00:00');
+      const end = c.date_fin ? new Date(c.date_fin + 'T00:00:00') : new Date(start.getFullYear(), start.getMonth() + (c.duree || 1), start.getDate());
+      const d = new Date(start);
+      while (d < end) {
+        const p = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        const key = `${c.id}:${p}`;
+        if (!existing.has(key)) {
+          insert.run(c.id, p, c.montant || 0, c.client || '', c.vitrine_id, 'generee', todayStr);
+          existing.add(key);
+        }
+        d.setMonth(d.getMonth() + 1);
+      }
+      if (end <= start) {
+        const p = `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}`;
+        if (!existing.has(`${c.id}:${p}`)) {
+          insert.run(c.id, p, c.montant || 0, c.client || '', c.vitrine_id, 'generee', todayStr);
+        }
+      }
+    }
+  })();
+}
+generateFactures();
 
 export default db;

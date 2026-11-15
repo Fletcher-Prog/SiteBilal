@@ -114,16 +114,26 @@ export default function Planning() {
           <div key={k} className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
             <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">{fmt(parse(k + '-01'))}</div>
             {list.map(b => (
-              <div key={b.id} className="flex min-h-[48px] items-center justify-between gap-3 border-t border-slate-100 py-2 first:border-0">
-                <div className="min-w-0">
-                  <div className="truncate text-sm font-semibold text-teal-800">{serialOf(b.vitrine_id)}</div>
-                  <div className="truncate text-xs text-slate-500">{b.client_name} · {b.duration_months} mois</div>
+              <div key={b.id} className="border-t border-slate-100 py-2 first:border-0">
+                <div className="flex min-h-[48px] items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-semibold text-teal-800">{serialOf(b.vitrine_id)}</div>
+                    <div className="truncate text-xs text-slate-500">{b.client_name} · {b.duration_months} mois</div>
+                  </div>
+                  <div className="shrink-0 text-right">
+                    <div className="text-sm font-semibold tabular-nums">{b.montant ? eur(b.montant) : '—'}</div>
+                    <div className="text-xs text-slate-500">{b.transporteur || ''}</div>
+                  </div>
                 </div>
-                <div className="shrink-0 text-right">
-                  <div className="text-sm font-semibold tabular-nums">{b.montant ? eur(b.montant) : '—'}</div>
-                  <div className="text-xs text-slate-500">{b.transporteur || ''}</div>
-                  <button type="button" className="text-xs font-medium text-teal-700 underline" onClick={() => setEditing(b)}>Modifier</button>
+                <div className="mt-1 grid grid-cols-2 gap-x-4 gap-y-0.5 text-xs text-slate-500">
+                  <span>Début : {b.start_date}</span>
+                  <span>Fin : {b.date_fin || (b.duration_months ? `+${b.duration_months} mois` : '—')}</span>
+                  {b.tel_client && <span>Tél : {b.tel_client}</span>}
+                  {b.adresse_livraison && <span>Adr : {b.adresse_livraison}</span>}
+                  <span>État : {b.etat || 'impayé'}</span>
+                  <span>Par : {b.qui || '—'}</span>
                 </div>
+                <button type="button" className="mt-1 text-xs font-medium text-teal-700 underline" onClick={() => setEditing(b)}>Modifier</button>
               </div>
             ))}
           </div>
@@ -139,10 +149,11 @@ function BookingForm({ vitrines, booking, onClose, onSaved }: { vitrines: any[];
   const [f, setF] = useState<any>(booking ? {
     vitrine_id: String(booking.vitrine_id ?? ''), client_name: booking.client_name ?? '', start_date: booking.start_date ?? today(),
     duration_months: String(booking.type_duree === 'courte' ? (booking.duree_jours ?? booking.duration_months ?? 1) : (booking.duration_months ?? 1)),
+    date_fin: booking.date_fin ?? '',
     montant: booking.montant ?? '', transporteur: booking.transporteur ?? '', type_duree: booking.type_duree ?? 'longue',
     qui: booking.qui ?? 'Bilel', tel_client: booking.tel_client ?? '', adresse_livraison: booking.adresse_livraison ?? '',
     maint: booking.etat === 'maintenance',
-  } : { vitrine_id: '', client_name: '', start_date: today(), duration_months: '1', montant: '', transporteur: '', type_duree: 'longue', qui: 'Bilel', tel_client: '', adresse_livraison: '', maint: false });
+  } : { vitrine_id: '', client_name: '', start_date: today(), duration_months: '1', date_fin: '', montant: '', transporteur: '', type_duree: 'longue', qui: 'Bilel', tel_client: '', adresse_livraison: '', maint: false });
   const short = f.type_duree === 'courte';
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
@@ -158,6 +169,7 @@ function BookingForm({ vitrines, booking, onClose, onSaved }: { vitrines: any[];
       start_date: f.start_date,
       duration_months: short ? 1 : Number(f.duration_months),
       duree_jours: short ? Number(f.duration_months) : null,
+      date_fin: f.date_fin || null,
       type_duree: f.type_duree,
       qui: f.qui,
       tel_client: f.tel_client.trim(),
@@ -190,7 +202,7 @@ function BookingForm({ vitrines, booking, onClose, onSaved }: { vitrines: any[];
         <Field label="Vitrine *">
           <select className={inputCls} required value={f.vitrine_id} onChange={set('vitrine_id')}>
             <option value="">— Choisir —</option>
-            {vitrines.map(v => <option key={v.id} value={v.id}>{v.serial} — {String(v.model).slice(0, 40)}</option>)}
+            {vitrines.filter(v => v.fonctionnelle === 1).map(v => <option key={v.id} value={v.id}>{v.serial} — {String(v.model).slice(0, 40)}</option>)}
           </select>
         </Field>
         <label className="mb-3 flex items-center gap-2 text-sm"><input type="checkbox" checked={f.maint} onChange={e => setF({ ...f, maint: e.target.checked })} />Créneau de maintenance</label>
@@ -203,7 +215,10 @@ function BookingForm({ vitrines, booking, onClose, onSaved }: { vitrines: any[];
         <Field label="Client *"><input className={inputCls} required maxLength={80} value={f.client_name} onChange={set('client_name')} placeholder="Ex : Ekolo — Salon gastronomie" /></Field>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Date de début *"><input className={inputCls} type="date" required value={f.start_date} onChange={set('start_date')} /></Field>
-          <Field label={short ? 'Durée (jours) *' : 'Durée (mois) *'}><input className={inputCls} type="number" min="1" max={short ? 30 : 36} required value={f.duration_months} onChange={set('duration_months')} /></Field>
+          <Field label="Date de fin"><input className={inputCls} type="date" value={f.date_fin} onChange={set('date_fin')} /></Field>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <Field label={short ? 'Durée (jours)' : 'Durée (mois)'}><input className={inputCls} type="number" min="1" max={short ? 365 : 36} value={f.duration_months} onChange={set('duration_months')} placeholder="Auto si date fin" /></Field>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Montant (€)"><input className={inputCls} type="number" min="0" step="any" inputMode="decimal" value={f.montant} onChange={set('montant')} /></Field>

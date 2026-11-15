@@ -10,7 +10,7 @@ const NAV: { to: string; label: string; short: string; extra?: boolean; icon: Re
   { to: '/', label: 'Tableau de bord', short: 'Accueil', icon: ic(<><rect x="2" y="2" width="7" height="7" rx="1.5" /><rect x="11" y="2" width="7" height="4" rx="1.5" /><rect x="2" y="11" width="7" height="7" rx="1.5" /><rect x="11" y="8" width="7" height="10" rx="1.5" /></>) },
   { to: '/vitrines', label: 'Parc vitrines', short: 'Vitrines', icon: ic(<><rect x="3" y="4" width="14" height="12" rx="2" /><path d="M3 8h14M8 16v2M12 16v2" /></>) },
   { to: '/planning', label: 'Planning', short: 'Planning', icon: ic(<><rect x="2" y="3" width="16" height="15" rx="2" /><path d="M2 8h16M7 2v3M13 2v3" /></>) },
-  { to: '/contrats', label: 'Contrats', short: 'Contrats', extra: true, icon: ic(<><path d="M5 2h7l4 4v12H5z" /><path d="M12 2v4h4M8 10h5M8 13h5M8 16h3" /></>) },
+  { to: '/contrats', label: 'Contrats & Factures', short: 'Contrats', extra: true, icon: ic(<><path d="M5 2h7l4 4v12H5z" /><path d="M12 2v4h4M8 10h5M8 13h5M8 16h3" /></>) },
   { to: '/tresorerie', label: 'Trésorerie', short: 'Tréso', icon: ic(<><rect x="2" y="5" width="16" height="10" rx="2" /><circle cx="10" cy="10" r="2.5" /><path d="M5 8v4M15 8v4" /></>) },
   { to: '/ventes', label: 'Ventes', short: 'Ventes', extra: true, icon: ic(<path d="M10 2l2.4 4.9 5.4.8-3.9 3.8.9 5.4L10 14.4l-4.8 2.5.9-5.4L2.2 7.7l5.4-.8L10 2z" />) },
   { to: '/lieux', label: 'Lieux de stockage', short: 'Lieux', extra: true, icon: ic(<><path d="M10 18s6-5.2 6-10a6 6 0 10-12 0c0 4.8 6 10 6 10z" /><circle cx="10" cy="8" r="2.2" /></>) },

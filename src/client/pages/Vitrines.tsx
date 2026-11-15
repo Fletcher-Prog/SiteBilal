@@ -80,6 +80,7 @@ export function VitrineForm({ initial, lieux, onSaved, onCancel, prefillNfc }: {
     lieu_id: initial?.lieu_id ?? '',
     nfc_tag: initial?.nfc_tag ?? prefillNfc ?? '',
     commentaire: initial?.commentaire ?? '',
+    date_achat: initial?.date_achat ?? '',
   });
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
@@ -95,6 +96,7 @@ export function VitrineForm({ initial, lieux, onSaved, onCancel, prefillNfc }: {
       prix_reparation: f.prix_reparation === '' ? 0 : Number(f.prix_reparation),
       lieu_id: f.lieu_id === '' ? null : Number(f.lieu_id),
       nfc_tag: f.nfc_tag || null,
+      date_achat: f.date_achat || null,
       ...(initial ? {} : { fonctionnelle: 1 }),
     };
     try {
@@ -113,6 +115,7 @@ export function VitrineForm({ initial, lieux, onSaved, onCancel, prefillNfc }: {
         <Field label="Prix d'achat (€)"><input className={inputCls} type="number" min="0" step="any" inputMode="decimal" value={f.prix_achat} onChange={set('prix_achat')} /></Field>
         <Field label="Réparations (€)"><input className={inputCls} type="number" min="0" step="any" inputMode="decimal" value={f.prix_reparation} onChange={set('prix_reparation')} /></Field>
       </div>
+      <Field label="Date d'achat"><input className={inputCls} type="date" value={f.date_achat} onChange={set('date_achat')} /></Field>
       <Field label="Lieu">
         <select className={inputCls} value={f.lieu_id} onChange={set('lieu_id')}>
           <option value="">— Aucun —</option>
