@@ -21,12 +21,7 @@ const fmtDuree = (c: any) => {
 
 /* ── PDF helpers ── */
 
-function htmlPdf(title: string, body: string) {
-  const w = window.open('', '_blank');
-  if (!w) return;
-  w.document.write(`<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><title>${esc(title)}</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
+const PDF_STYLES = `*{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Arial',sans-serif;font-size:11pt;color:#111;padding:2cm;max-width:21cm;margin:auto}
 .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5em;border-bottom:2px solid #1e3a5f;padding-bottom:1em}
 .company{color:#1e3a5f}.company h1{font-size:18pt;font-weight:bold;letter-spacing:1px}.company p{font-size:9pt;margin-top:2px}
@@ -46,25 +41,65 @@ td{padding:5px 8px;font-size:9.5pt;border-bottom:1px solid #eee}
 .signatures h4{font-size:9pt;font-weight:bold;margin-bottom:4px}
 .signatures p{font-size:8.5pt;color:#555}
 ul.contract-list{padding-left:1.5em;margin:0.3em 0}ul.contract-list li{font-size:9.5pt;line-height:1.5;margin:2px 0}
-@media print{body{padding:0.5cm 1cm}.header{margin-bottom:1em}.no-print{display:none!important}}
-</style></head><body>
-<div class="no-print" style="position:sticky;top:0;background:#1e3a5f;padding:8px 16px;display:flex;gap:12px;align-items:center;margin:-2cm -2cm 1em -2cm;z-index:999">
-  <button onclick="window.print()" style="background:#fff;color:#1e3a5f;border:none;padding:6px 16px;border-radius:4px;font-weight:bold;cursor:pointer">Imprimer / PDF</button>
-  <button onclick="window.close()" style="background:transparent;color:#fff;border:1px solid #fff;padding:6px 16px;border-radius:4px;cursor:pointer">Fermer</button>
-</div>
-${body}</body></html>`);
-  w.document.close();
+@media print{body{padding:0.5cm 1cm}.header{margin-bottom:1em}}`;
+
+let _pdfOverlay: HTMLDivElement | null = null;
+
+function showPdfOverlay(html: string) {
+  closePdfOverlay();
+  const overlay = document.createElement('div');
+  overlay.id = 'pdf-overlay';
+  Object.assign(overlay.style, { position: 'fixed', inset: '0', zIndex: '9999', display: 'flex', flexDirection: 'column', background: '#000c' });
+
+  const bar = document.createElement('div');
+  Object.assign(bar.style, { background: '#1e3a5f', padding: '10px 20px', display: 'flex', gap: '12px', alignItems: 'center', flexShrink: '0' });
+
+  const btnStyle = (bg: string, color: string, border = 'none') => `background:${bg};color:${color};border:${border};padding:8px 20px;border-radius:6px;font-weight:600;cursor:pointer;font-size:14px`;
+  const btnPrint = document.createElement('button');
+  btnPrint.textContent = 'Imprimer / Télécharger PDF';
+  btnPrint.setAttribute('style', btnStyle('#fff', '#1e3a5f'));
+  btnPrint.onclick = () => { const f = overlay.querySelector('iframe') as HTMLIFrameElement; f?.contentWindow?.print(); };
+
+  const btnClose = document.createElement('button');
+  btnClose.textContent = '✕ Fermer';
+  btnClose.setAttribute('style', btnStyle('transparent', '#fff', '1px solid #fff'));
+  btnClose.onclick = closePdfOverlay;
+
+  bar.append(btnPrint, btnClose);
+
+  const iframe = document.createElement('iframe');
+  Object.assign(iframe.style, { flex: '1', border: 'none', background: '#fff', width: '100%' });
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  iframe.src = URL.createObjectURL(blob);
+
+  overlay.append(bar, iframe);
+  document.body.appendChild(overlay);
+  document.body.style.overflow = 'hidden';
+  _pdfOverlay = overlay;
+
+  const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') closePdfOverlay(); };
+  document.addEventListener('keydown', onKey);
+  (overlay as any)._onKey = onKey;
 }
 
-function htmlPdfFull(title: string, fullHtml: string) {
-  const w = window.open('', '_blank');
-  if (!w) return;
-  const bar = `<style>.no-print{position:sticky;top:0;background:#1e3a5f;padding:8px 16px;display:flex;gap:12px;align-items:center;z-index:999}@media print{.no-print{display:none!important}}</style>
-<div class="no-print"><button onclick="window.print()" style="background:#fff;color:#1e3a5f;border:none;padding:6px 16px;border-radius:4px;font-weight:bold;cursor:pointer">Imprimer / PDF</button><button onclick="window.close()" style="background:transparent;color:#fff;border:1px solid #fff;padding:6px 16px;border-radius:4px;cursor:pointer">Fermer</button></div>`;
-  const injected = fullHtml.replace(/<body([^>]*)>/i, `<body$1>${bar}`);
-  w.document.write(injected);
-  w.document.title = title;
-  w.document.close();
+function closePdfOverlay() {
+  if (!_pdfOverlay) return;
+  const onKey = (_pdfOverlay as any)._onKey;
+  if (onKey) document.removeEventListener('keydown', onKey);
+  const iframe = _pdfOverlay.querySelector('iframe');
+  if (iframe?.src) URL.revokeObjectURL(iframe.src);
+  _pdfOverlay.remove();
+  _pdfOverlay = null;
+  document.body.style.overflow = '';
+}
+
+function htmlPdf(title: string, body: string) {
+  const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><title>${esc(title)}</title><style>${PDF_STYLES}</style></head><body>${body}</body></html>`;
+  showPdfOverlay(html);
+}
+
+function htmlPdfFull(_title: string, fullHtml: string) {
+  showPdfOverlay(fullHtml);
 }
 
 function applyTemplate(tpl: string, vars: Record<string, string>): string {
