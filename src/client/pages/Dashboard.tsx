@@ -154,7 +154,7 @@ export default function Dashboard() {
             <ul className="divide-y divide-slate-100">
               {resas.map((r: any) => (
                 <li key={r.id} className="py-2 flex justify-between text-sm">
-                  <span><strong>{r.client_name}</strong> <span className="text-slate-500">· {r.start_date}</span></span>
+                  <span><strong>{r.client_name}</strong> {r.vitrine_model ? <span className="text-slate-400">({r.vitrine_model})</span> : null} <span className="text-slate-500">· {r.start_date}{r.duration_months ? ` · ${r.duration_months} mois` : ''}</span></span>
                   <span className="font-medium">{eur(r.montant)}</span>
                 </li>
               ))}

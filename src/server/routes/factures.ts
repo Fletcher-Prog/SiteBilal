@@ -58,7 +58,8 @@ export default function (db: any) {
     try {
       const facture = db.prepare('SELECT * FROM factures WHERE id = ?').get(req.params.id) as any;
       if (!facture) return res.status(404).json({ error: 'Introuvable' });
-      db.prepare('UPDATE factures SET statut = ? WHERE id = ?').run('payee', req.params.id);
+      const datePaiement = new Date().toISOString().slice(0, 10);
+      db.prepare('UPDATE factures SET statut = ?, date_paiement = ? WHERE id = ?').run('payee', datePaiement, req.params.id);
 
       // Auto-create flux entry for the payment
       let qui = facture.qui;
@@ -80,7 +81,7 @@ export default function (db: any) {
   router.put('/:id/impayee', (req, res) => {
     try {
       if (!db.prepare('SELECT 1 FROM factures WHERE id = ?').get(req.params.id)) return res.status(404).json({ error: 'Introuvable' });
-      db.prepare('UPDATE factures SET statut = ? WHERE id = ?').run('emise', req.params.id);
+      db.prepare('UPDATE factures SET statut = ?, date_paiement = NULL WHERE id = ?').run('emise', req.params.id);
       res.json(db.prepare(`${SQL} WHERE t.id = ?`).get(req.params.id));
     } catch (e: any) { res.status(400).json({ error: e.message }); }
   });

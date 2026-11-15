@@ -89,6 +89,8 @@ const migrations = [
   'ALTER TABLE bookings ADD COLUMN date_fin TEXT',
   'ALTER TABLE contrats ADD COLUMN qui TEXT',
   'ALTER TABLE factures ADD COLUMN qui TEXT',
+  'ALTER TABLE factures ADD COLUMN date_paiement TEXT',
+  'ALTER TABLE bookings ADD COLUMN date_paiement TEXT',
 ];
 for (const sql of migrations) {
   try { db.exec(sql); } catch (e) { /* column already exists */ }

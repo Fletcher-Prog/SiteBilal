@@ -54,6 +54,15 @@ export default function(db: any) {
     const m = { ...cur, ...req.body };
     const c = conflict(m, req.params.id);
     if (c.length) return res.status(409).json({ error: 'Conflit de dates', bookings: c });
+    // Auto-set date_paiement when marking as paid
+    if (req.body.etat === 'paye' && cur.etat !== 'paye' && !req.body.date_paiement) {
+      req.body.date_paiement = new Date().toISOString().slice(0, 10);
+      if (!keys.includes('date_paiement')) keys.push('date_paiement');
+    }
+    if (req.body.etat && req.body.etat !== 'paye' && cur.etat === 'paye' && !req.body.date_paiement) {
+      req.body.date_paiement = null;
+      if (!keys.includes('date_paiement')) keys.push('date_paiement');
+    }
     db.prepare(`UPDATE bookings SET ${keys.map(k => `${k} = ?`).join(', ')} WHERE id = ?`)
       .run(...keys.map(k => req.body[k]), req.params.id);
     res.json(db.prepare('SELECT * FROM bookings WHERE id = ?').get(req.params.id));
