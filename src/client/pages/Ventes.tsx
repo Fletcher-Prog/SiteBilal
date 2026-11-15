@@ -19,6 +19,10 @@ export default function Ventes() {
     if (v) {
       const inp = e.target.form?.querySelector<HTMLInputElement>('[name="prix_achat"]');
       if (inp) { inp.value = String(v.prix_achat ?? ''); }
+      const da = e.target.form?.querySelector<HTMLInputElement>('[name="date_achat"]');
+      if (da) { da.value = String(v.date_achat ?? ''); }
+      const fr = e.target.form?.querySelector<HTMLInputElement>('[name="frais"]');
+      if (fr) { fr.value = String(v.prix_reparation ?? 0); }
     }
   };
   const submit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -80,7 +84,10 @@ export default function Ventes() {
               <Field label="Prix vente (€)"><input name="prix_vente" type="number" step="any" required defaultValue={edit.prix_vente ?? ''} className={inputCls} /></Field>
               <Field label="Frais (€)"><input name="frais" type="number" step="any" defaultValue={edit.frais ?? 0} className={inputCls} /></Field>
             </div>
-            <Field label="Date"><input name="date_vente" type="date" defaultValue={edit.date_vente ?? new Date().toISOString().slice(0, 10)} className={inputCls} /></Field>
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Date d'achat"><input name="date_achat" type="date" defaultValue={edit.vitrine_date_achat ?? ''} className={inputCls} readOnly /></Field>
+              <Field label="Date de vente"><input name="date_vente" type="date" defaultValue={edit.date_vente ?? new Date().toISOString().slice(0, 10)} className={inputCls} /></Field>
+            </div>
             <Field label="Commentaire"><textarea name="commentaire" rows={2} defaultValue={edit.commentaire ?? ''} className={inputCls} /></Field>
             <FormActions saving={saving} error={saveErr} onCancel={() => setEdit(null)} />
           </form>
