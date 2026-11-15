@@ -120,7 +120,7 @@ export default function Parametres() {
                 <Field key={f.key} label={f.label}>
                   {f.area ? <>
                     <textarea rows={12} value={values[f.key] ?? ''} onChange={(e) => { setValues({ ...values, [f.key]: e.target.value }); setOk(''); }} className={inputCls} style={{ fontFamily: 'monospace', fontSize: '12px' }} />
-                    {!values[f.key] && <p className="text-xs text-amber-600 mt-1">Vide — le template par défaut intégré sera utilisé.</p>}
+                    {!values[f.key] && <p className="text-xs text-amber-600 mt-1">Vide — redémarrer le serveur pour charger le template par défaut.</p>}
                     <p className="text-xs text-slate-400 mt-1">Variables : {f.key.includes('contrat') ? VARS_CONTRAT : VARS_FACTURE}</p>
                   </> : <input type={f.type || 'text'} step={f.type === 'number' ? 'any' : undefined} value={values[f.key] ?? ''} onChange={(e) => { setValues({ ...values, [f.key]: e.target.value }); setOk(''); }} className={inputCls} />}
                 </Field>

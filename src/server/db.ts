@@ -98,6 +98,170 @@ for (const sql of migrations) {
 }
 try { db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_factures_numero ON factures(numero) WHERE numero IS NOT NULL'); } catch (e) { /* already exists */ }
 
+// ---------- Seed default templates ----------
+const seedSetting = db.prepare('INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)');
+
+seedSetting.run('template_contrat_html', `<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><title>Contrat {{numero}}</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Arial',sans-serif;font-size:11pt;color:#111;padding:2cm;max-width:21cm;margin:auto}
+.header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5em;border-bottom:2px solid #1e3a5f;padding-bottom:1em}
+.company{color:#1e3a5f}.company h1{font-size:18pt;font-weight:bold;letter-spacing:1px}.company p{font-size:9pt;margin-top:2px}
+.doc-info{text-align:right}.doc-info .doc-type{font-size:16pt;font-weight:bold;color:#1e3a5f}.doc-info p{font-size:9pt}
+.parties{display:grid;grid-template-columns:1fr 1fr;gap:1em;margin:1.2em 0;border:1px solid #ddd;padding:0.8em;border-radius:4px}
+.parties h3{font-size:10pt;font-weight:bold;text-transform:uppercase;color:#1e3a5f;margin-bottom:4px}
+.parties p{font-size:9pt;margin:1px 0}
+.section{margin:1em 0}
+.section h2{font-size:11pt;font-weight:bold;background:#1e3a5f;color:#fff;padding:4px 8px;margin-bottom:0.5em}
+.section p,.section li{font-size:9.5pt;line-height:1.5;margin:2px 0}
+table{width:100%;border-collapse:collapse;margin:0.8em 0}
+th{background:#1e3a5f;color:#fff;padding:6px 8px;font-size:9.5pt;text-align:left}
+td{padding:5px 8px;font-size:9.5pt;border-bottom:1px solid #eee}
+.signatures{display:grid;grid-template-columns:1fr 1fr;gap:2em;margin-top:2em}
+.signatures .sig-box{border:1px solid #ccc;border-radius:4px;padding:0.8em;min-height:80px}
+.signatures h4{font-size:9pt;font-weight:bold;margin-bottom:4px}
+.signatures p{font-size:8.5pt;color:#555}
+ul.contract-list{padding-left:1.5em;margin:0.3em 0}ul.contract-list li{font-size:9.5pt;line-height:1.5;margin:2px 0}
+@media print{body{padding:0.5cm 1cm}}
+</style></head><body>
+<div class="header">
+  <div class="company"><h1>{{company_nom}}</h1><p>{{company_adresse}}</p><p>SIRET : {{company_siret}}</p></div>
+  <div class="doc-info"><div class="doc-type">CONTRAT DE LOCATION</div><p><strong>Réf. :</strong> {{numero}}</p><p><strong>Date :</strong> {{date_debut}}</p></div>
+</div>
+<p style="font-size:9pt;margin:0.5em 0"><strong>Entre les soussignés :</strong></p>
+<div class="parties">
+  <div><h3>Bailleur</h3><p><strong>{{company_nom}}</strong></p><p>{{company_adresse}}</p><p>SIRET : {{company_siret}}</p><p>Ci-après dénommé « le Bailleur »</p></div>
+  <div><h3>Locataire</h3><p><strong>{{client}}</strong></p><p>{{adresse_client}}</p><p>Tél : {{tel_client}}</p><p>Email : {{email_client}}</p><p>Ci-après dénommé « le Locataire »</p></div>
+</div>
+<p style="font-size:9.5pt;font-weight:bold;text-align:center;margin:0.5em 0">IL A ÉTÉ CONVENU CE QUI SUIT :</p>
+
+<div class="section"><h2>Article 1 – Objet du contrat</h2>
+<p>Le Bailleur met à la disposition du Locataire, à titre de location, les vitrines réfrigérées suivantes :</p>
+<table><tr><th>Marque</th><th>Modèle</th><th>N° Série</th><th>Nombre</th><th>Équipements</th></tr>
+<tr><td>{{marque}}</td><td>{{modele}}</td><td>{{serial_vitrine}}</td><td>{{nb_vitrines}}</td><td>{{equipements}}</td></tr></table></div>
+
+<div class="section"><h2>Article 2 – Durée de la location</h2>
+<p>La location prend effet à compter du <strong>{{date_debut}}</strong> jusqu'au <strong>{{date_fin}}</strong>, soit une durée de <strong>{{duree}}</strong>.</p>
+<p>Elle pourra être résiliée par l'une ou l'autre des parties sous réserve d'un préavis de <strong>90 jours</strong> sans motif nécessaire.</p></div>
+
+<div class="section"><h2>Article 3 – Montant et modalités de paiement</h2>
+<p>Le loyer mensuel est fixé à <strong>{{montant}}</strong> par vitrine réfrigérée.</p>
+<p>Le paiement du loyer est exigible le <strong>{{jour_paiement}}</strong> de chaque mois et sera effectué par <strong>{{mode_paiement}}</strong>.</p>
+<p>IBAN : <strong>{{company_iban}}</strong> · BIC : <strong>{{company_bic}}</strong></p></div>
+
+<div class="section"><h2>Article 4 – Caution</h2>
+<p>Le Locataire verse au Bailleur un chèque de caution de <strong>{{caution}}</strong>, correspondant à un pourcentage de la valeur des biens.</p>
+<p>Ce chèque sera restitué au Locataire ou détruit dans un délai de 10 jours maximum après la restitution des vitrines réfrigérées en bon état.</p></div>
+
+<div class="section"><h2>Article 5 – Pénalités de retard</h2>
+<p>En cas de retard de paiement du loyer, des pénalités de retard calculées au taux de <strong>5 % par semaine de retard</strong> seront appliquées, à compter des 7 jours suivant la date d'exigibilité du loyer.</p></div>
+
+<div class="section"><h2>Article 6 – Obligations du Bailleur</h2>
+<ul class="contract-list">
+  <li>Mettre à disposition les vitrines réfrigérées en bon état de fonctionnement.</li>
+  <li>Assurer la maintenance régulière des équipements.</li>
+  <li>En cas de panne non réparable, remplacer par des équipements équivalents dans un délai de 15 jours.</li>
+</ul></div>
+
+<div class="section"><h2>Article 6 bis – Clause de maintenance</h2>
+<p>Le Bailleur garantit le bon fonctionnement pendant <strong>2 mois</strong>. Au-delà, l'entretien est à la charge du Locataire.</p>
+<p>Un forfait de maintenance optionnel est disponible : <strong>70 € TTC / vitrine / mois</strong>.</p></div>
+
+<div class="section"><h2>Article 7 – Obligations du Locataire</h2>
+<ul class="contract-list">
+  <li>Utiliser les vitrines conformément à leur usage prévu.</li>
+  <li>Maintenir les équipements en bon état de fonctionnement.</li>
+  <li>Ne pas sous-louer sans l'accord écrit du Bailleur.</li>
+  <li>Restituer les vitrines en bon état à la fin du contrat.</li>
+</ul></div>
+
+<div class="section"><h2>Article 8 – État des lieux</h2>
+<p>Un état des lieux contradictoire sera établi lors de la mise à disposition et à la restitution des vitrines réfrigérées.</p></div>
+
+<div class="section"><h2>Article 9 – Assurance</h2>
+<p>Le Locataire s'engage à souscrire une assurance couvrant les risques liés à l'utilisation des vitrines réfrigérées.</p></div>
+
+<div class="section"><h2>Article 9 bis – Non-restitution</h2>
+<p>En cas de non-restitution, le Locataire sera redevable d'une indemnité de <strong>5% du prix d'achat neuf par semaine de retard</strong>.</p></div>
+
+<div class="section"><h2>Article 10 – Résiliation du contrat</h2>
+<p>Le Bailleur pourra résilier le contrat en cas de non-paiement après <strong>20 jours</strong> de mise en demeure.</p></div>
+
+<div class="section"><h2>Loi applicable</h2>
+<p>Le présent contrat est régi par la loi française.</p></div>
+
+<p style="font-size:9pt;text-align:center;margin:1.5em 0"><strong>Fait en deux exemplaires, à {{lieu_signature}}, le {{date_contrat}}</strong></p>
+<div class="signatures">
+  <div class="sig-box"><h4>Signature du Bailleur</h4><p>{{company_nom}}</p><p><br><br>Signature :</p></div>
+  <div class="sig-box"><h4>Signature du Locataire</h4><p>{{client}}</p><p>Lu et approuvé :<br><br>Signature :</p></div>
+</div>
+
+<div style="page-break-before:always"></div>
+<h2 style="font-size:13pt;font-weight:bold;text-align:center;margin:1em 0;border-bottom:2px solid #1e3a5f;padding-bottom:0.5em">ANNEXE 1 – BARÈME DE MAINTENANCE</h2>
+<div class="section"><h2>Forfait mensuel : 70 € TTC / vitrine / mois</h2>
+<ul class="contract-list"><li>1 visite préventive / trimestre</li><li>Vérification technique complète</li><li>Nettoyage technique et réglages</li><li>Main-d'œuvre réparations courantes</li><li>Pièces d'usure courante</li></ul></div>
+<div class="section"><h2>Tarifs hors forfait</h2>
+<ul class="contract-list"><li>Déplacement + diagnostic : 60 € TTC</li><li>Main-d'œuvre : 90 € TTC / heure</li><li>Pièces : prix fournisseur + 15%</li><li>Urgence (sous 24h) : + 60 € TTC</li></ul></div>
+
+<div style="page-break-before:always"></div>
+<h2 style="font-size:13pt;font-weight:bold;text-align:center;margin:1em 0;border-bottom:2px solid #1e3a5f;padding-bottom:0.5em">ANNEXE 2 – PRIX PAR ÉLÉMENT DÉTÉRIORÉ</h2>
+<table>
+  <tr><th>Élément</th><th style="text-align:right">Tarif TTC</th></tr>
+  <tr><td>Une vitre</td><td style="text-align:right">300 €</td></tr>
+  <tr><td>Un plexiglas</td><td style="text-align:right">90 €</td></tr>
+  <tr><td>Une roue</td><td style="text-align:right">30 €</td></tr>
+  <tr><td>Un plateau</td><td style="text-align:right">150 €</td></tr>
+  <tr><td>Un pied</td><td style="text-align:right">80 €</td></tr>
+  <tr><td>Un câblage</td><td style="text-align:right">20 €</td></tr>
+  <tr><td>Un luminaire</td><td style="text-align:right">30 €</td></tr>
+</table>
+</body></html>`);
+
+seedSetting.run('template_facture_html', `<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><title>Facture {{numero}}</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Arial',sans-serif;font-size:11pt;color:#111;padding:2cm;max-width:21cm;margin:auto}
+.header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5em;border-bottom:2px solid #1e3a5f;padding-bottom:1em}
+.company{color:#1e3a5f}.company h1{font-size:18pt;font-weight:bold;letter-spacing:1px}.company p{font-size:9pt;margin-top:2px}
+.doc-info{text-align:right}.doc-info .doc-type{font-size:16pt;font-weight:bold;color:#1e3a5f}.doc-info p{font-size:9pt}
+.parties{display:grid;grid-template-columns:1fr 1fr;gap:1em;margin:1.2em 0;border:1px solid #ddd;padding:0.8em;border-radius:4px}
+.parties h3{font-size:10pt;font-weight:bold;text-transform:uppercase;color:#1e3a5f;margin-bottom:4px}
+.parties p{font-size:9pt;margin:1px 0}
+table{width:100%;border-collapse:collapse;margin:0.8em 0}
+th{background:#1e3a5f;color:#fff;padding:6px 8px;font-size:9.5pt;text-align:left}
+td{padding:5px 8px;font-size:9.5pt;border-bottom:1px solid #eee}
+.total-row td{font-weight:bold;background:#f0f4f8}
+.section{margin:1em 0}
+.section h2{font-size:11pt;font-weight:bold;background:#1e3a5f;color:#fff;padding:4px 8px;margin-bottom:0.5em}
+@media print{body{padding:0.5cm 1cm}}
+</style></head><body>
+<div class="header">
+  <div class="company"><h1>{{company_nom}}</h1><p>{{company_adresse}}</p><p>SIRET : {{company_siret}}</p></div>
+  <div class="doc-info"><div class="doc-type">FACTURE</div><p><strong>N° :</strong> {{numero}}</p><p><strong>Date :</strong> {{date_emission}}</p></div>
+</div>
+<div class="parties">
+  <div><h3>Émetteur</h3><p><strong>{{company_nom}}</strong></p><p>{{company_adresse}}</p><p>SIRET : {{company_siret}}</p></div>
+  <div><h3>Facturer à</h3><p><strong>{{client}}</strong></p><p>{{adresse_client}}</p><p>Tél : {{tel_client}}</p></div>
+</div>
+<table>
+  <tr><th>Désignation</th><th>Marque / Modèle</th><th>N° Série</th><th>Période</th><th>Montant HT</th></tr>
+  <tr><td>Location vitrine réfrigérée</td><td>{{marque}} {{modele}}</td><td>{{serial_vitrine}}</td><td>{{periode}}</td><td>{{montant}}</td></tr>
+</table>
+<table style="max-width:300px;margin-left:auto">
+  <tr><td>Total HT</td><td style="text-align:right">{{montant}}</td></tr>
+  <tr><td>TVA ({{tva_pct}}%)</td><td style="text-align:right">{{tva}}</td></tr>
+  <tr class="total-row"><td>Total TTC</td><td style="text-align:right">{{total_ttc}}</td></tr>
+</table>
+<div class="section"><h2>Règlement</h2>
+<p>IBAN : <strong>{{company_iban}}</strong> · BIC : <strong>{{company_bic}}</strong></p></div>
+<div style="margin-top:2em;border-top:1px solid #ddd;padding-top:1em">
+  <p style="font-size:9pt;font-weight:bold;margin-bottom:0.4em">Mentions légales</p>
+  <p style="font-size:8.5pt;color:#555">La vitrine louée reste la propriété exclusive de {{company_nom}}.</p>
+  <p style="font-size:8.5pt;color:#555">Tout retard de paiement prolongé entraînera des frais de recouvrement.</p>
+  <p style="font-size:8.5pt;color:#555;text-align:center;margin-top:0.5em">Facture payable à réception</p>
+</div>
+</body></html>`);
+
 // ---------- Generic CRUD ----------
 type Row = Record<string, unknown>;
 function crud<T extends { id: number }>(table: string, cols: string[]) {

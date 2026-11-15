@@ -248,10 +248,13 @@ ${c.conditions ? `<div class="section"><h2>Conditions particulières</h2><p>${es
 function printFacturePdf(f: any, settings: Record<string, string>) {
   const tplFacture = settings['template_facture_html'];
   if (tplFacture) {
+    const ht = Number(f.montant) || 0;
+    const tvaRate = Number(settings.tva) || 0;
+    const tvaAmt = ht * tvaRate / 100;
     const vars: Record<string, string> = {
       numero: f.numero || '', client: f.client || '', adresse_client: f.adresse_client || '',
       tel_client: f.tel_client || '', periode: f.periode ? fmtMonth(f.periode) : '',
-      montant: eur(f.montant), tva: String(f.tva || settings.tva || 0),
+      montant: eur(ht), tva: eur(tvaAmt), tva_pct: String(tvaRate), total_ttc: eur(ht + tvaAmt),
       date_emission: fmtDate(f.date_emission || new Date().toISOString().slice(0, 10)),
       marque: f.marque || '', modele: f.modele || f.vitrine_model || '',
       serial_vitrine: f.serial_vitrine || f.vitrine_serial || '',
