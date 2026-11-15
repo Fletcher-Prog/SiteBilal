@@ -91,6 +91,7 @@ const migrations = [
   'ALTER TABLE factures ADD COLUMN qui TEXT',
   'ALTER TABLE factures ADD COLUMN date_paiement TEXT',
   'ALTER TABLE bookings ADD COLUMN date_paiement TEXT',
+  'ALTER TABLE contrats ADD COLUMN montant_fixe REAL',
 ];
 for (const sql of migrations) {
   try { db.exec(sql); } catch (e) { /* column already exists */ }
@@ -126,7 +127,7 @@ const T = {
   ventes: crud<Vente>('ventes', ['vitrine_id', 'prix_achat', 'prix_vente', 'frais', 'commentaire', 'date_vente']),
   lieux: crud<Lieu>('lieux', ['nom', 'type', 'note']),
   actions: crud<Action>('actions', ['titre', 'fait', 'commentaire']),
-  contrats: crud<Contrat>('contrats', ['client', 'vitrine_id', 'duree', 'montant', 'caution', 'conditions', 'date_debut', 'date_fin', 'qui']),
+  contrats: crud<Contrat>('contrats', ['client', 'vitrine_id', 'duree', 'montant', 'montant_fixe', 'caution', 'conditions', 'date_debut', 'date_fin', 'qui']),
   frigoristes: crud<Frigoriste>('frigoristes', ['nom', 'tel', 'zone']),
   interventions: crud<Intervention>('interventions', ['vitrine_id', 'frigoriste_id', 'date', 'type', 'temperature', 'notes', 'cout']),
   prospection: crud<Prospection>('prospection', ['client', 'contact', 'notes', 'statut']),

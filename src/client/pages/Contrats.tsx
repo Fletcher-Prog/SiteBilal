@@ -46,19 +46,25 @@ td{padding:5px 8px;font-size:9.5pt;border-bottom:1px solid #eee}
 .signatures h4{font-size:9pt;font-weight:bold;margin-bottom:4px}
 .signatures p{font-size:8.5pt;color:#555}
 ul.contract-list{padding-left:1.5em;margin:0.3em 0}ul.contract-list li{font-size:9.5pt;line-height:1.5;margin:2px 0}
-@media print{body{padding:0.5cm 1cm}.header{margin-bottom:1em}}
-</style></head><body>${body}</body></html>`);
+@media print{body{padding:0.5cm 1cm}.header{margin-bottom:1em}.no-print{display:none!important}}
+</style></head><body>
+<div class="no-print" style="position:sticky;top:0;background:#1e3a5f;padding:8px 16px;display:flex;gap:12px;align-items:center;margin:-2cm -2cm 1em -2cm;z-index:999">
+  <button onclick="window.print()" style="background:#fff;color:#1e3a5f;border:none;padding:6px 16px;border-radius:4px;font-weight:bold;cursor:pointer">Imprimer / PDF</button>
+  <button onclick="window.close()" style="background:transparent;color:#fff;border:1px solid #fff;padding:6px 16px;border-radius:4px;cursor:pointer">Fermer</button>
+</div>
+${body}</body></html>`);
   w.document.close();
-  setTimeout(() => w.print(), 300);
 }
 
 function htmlPdfFull(title: string, fullHtml: string) {
   const w = window.open('', '_blank');
   if (!w) return;
-  w.document.write(fullHtml);
+  const bar = `<style>.no-print{position:sticky;top:0;background:#1e3a5f;padding:8px 16px;display:flex;gap:12px;align-items:center;z-index:999}@media print{.no-print{display:none!important}}</style>
+<div class="no-print"><button onclick="window.print()" style="background:#fff;color:#1e3a5f;border:none;padding:6px 16px;border-radius:4px;font-weight:bold;cursor:pointer">Imprimer / PDF</button><button onclick="window.close()" style="background:transparent;color:#fff;border:1px solid #fff;padding:6px 16px;border-radius:4px;cursor:pointer">Fermer</button></div>`;
+  const injected = fullHtml.replace(/<body([^>]*)>/i, `<body$1>${bar}`);
+  w.document.write(injected);
   w.document.title = title;
   w.document.close();
-  setTimeout(() => w.print(), 300);
 }
 
 function applyTemplate(tpl: string, vars: Record<string, string>): string {
@@ -74,7 +80,7 @@ function exportContratPdf(c: any, settings: Record<string, string>) {
       marque: c.marque || '', modele: c.modele || c.vitrine_nom || '', serial_vitrine: c.serial_vitrine || '',
       nb_vitrines: String(c.nb_vitrines || 1), equipements: c.equipements || '',
       date_debut: fmtDate(c.date_debut), date_fin: fmtDate(c.date_fin), duree: fmtDuree(c),
-      montant: eur(c.montant), caution: eur(c.caution),
+      montant: eur(c.montant), montant_fixe: c.montant_fixe ? eur(c.montant_fixe) : '', caution: eur(c.caution),
       jour_paiement: String(c.jour_paiement || 1), mode_paiement: c.mode_paiement || 'virement bancaire',
       option_achat_prix: c.option_achat_prix ? eur(c.option_achat_prix) : '', conditions: c.conditions || '',
       company_nom: settings.company_nom || 'OB LOCATION', company_adresse: settings.company_adresse || '',
@@ -95,6 +101,7 @@ function exportContratPdf(c: any, settings: Record<string, string>) {
   const bic = settings.company_bic || '';
   const nb = c.nb_vitrines || 1;
   const totalMensuel = ((c.montant || 0) * nb).toFixed(2).replace('.', ',') + ' €';
+  const isFixe = !!c.montant_fixe;
 
   const body = `
 <div class="header">
@@ -117,9 +124,12 @@ function exportContratPdf(c: any, settings: Record<string, string>) {
 <p>La location prend effet à compter du <strong>${fmtDate(c.date_debut)}</strong>${c.date_fin ? ` jusqu'au <strong>${fmtDate(c.date_fin)}</strong>` : ''}, soit une durée de <strong>${fmtDuree(c)}</strong>.</p>
 <p>Elle pourra être résiliée par l'une ou l'autre des parties sous réserve d'un préavis de <strong>90 jours</strong> sans motif nécessaire.</p></div>
 
-<div class="section"><h2>Article 3 – Montant et modalités de paiement du loyer</h2>
-<p>Le loyer mensuel est fixé à <strong>${eur(c.montant)}</strong> par vitrine réfrigérée, soit un total de <strong>${totalMensuel}</strong> par mois.</p>
-<p>Le paiement du loyer est exigible le <strong>${esc(c.jour_paiement || 1)}</strong> de chaque mois et sera effectué par <strong>${esc(c.mode_paiement || 'virement bancaire')}</strong>.</p>
+<div class="section"><h2>Article 3 – Montant et modalités de paiement</h2>
+${isFixe
+  ? `<p>Le montant forfaitaire de la location est fixé à <strong>${eur(c.montant_fixe)}</strong> pour la durée totale du contrat (${fmtDuree(c)}).</p>
+<p>Le paiement est dû à la signature du contrat et sera effectué par <strong>${esc(c.mode_paiement || 'virement bancaire')}</strong>.</p>`
+  : `<p>Le loyer mensuel est fixé à <strong>${eur(c.montant)}</strong> par vitrine réfrigérée, soit un total de <strong>${totalMensuel}</strong> par mois.</p>
+<p>Le paiement du loyer est exigible le <strong>${esc(c.jour_paiement || 1)}</strong> de chaque mois et sera effectué par <strong>${esc(c.mode_paiement || 'virement bancaire')}</strong>.</p>`}
 ${iban ? `<p>IBAN : <strong>${esc(iban)}</strong> · BIC : <strong>${esc(bic)}</strong></p>` : ''}</div>
 
 <div class="section"><h2>Article 4 – Caution</h2>
@@ -321,7 +331,7 @@ export default function Contrats() {
     }
     save(edit.id, {
       client: f.get('client'), vitrine_id: num(String(f.get('vitrine_id') || '')), duree,
-      montant: num(String(f.get('montant'))), caution: num(String(f.get('caution'))), conditions: f.get('conditions'),
+      montant: num(String(f.get('montant'))), montant_fixe: num(String(f.get('montant_fixe'))), caution: num(String(f.get('caution'))), conditions: f.get('conditions'),
       date_debut, date_fin, qui: f.get('qui') || null,
     });
   };
@@ -335,7 +345,7 @@ export default function Contrats() {
         <div className={`${card} overflow-x-auto`}>
           <table className="w-full text-sm">
             <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500">
-              <tr>{['Client', 'Vitrine', 'Début', 'Fin', 'Mensuel', 'Caution', 'Associé', ''].map((h) => <th key={h} className="px-3 py-2">{h}</th>)}</tr>
+              <tr>{['Client', 'Vitrine', 'Début', 'Fin', 'Montant', 'Caution', 'Associé', ''].map((h) => <th key={h} className="px-3 py-2">{h}</th>)}</tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {data.map((c: any) => (
@@ -344,7 +354,7 @@ export default function Contrats() {
                   <td className="px-3 py-2">{vitrine(c)}</td>
                   <td className="px-3 py-2">{c.date_debut || '—'}</td>
                   <td className="px-3 py-2">{c.date_fin || '—'}</td>
-                  <td className="px-3 py-2">{eur(c.montant)}</td>
+                  <td className="px-3 py-2">{c.montant_fixe ? `${eur(c.montant_fixe)} (fixe)` : eur(c.montant)}</td>
                   <td className="px-3 py-2">{eur(c.caution)}</td>
                   <td className="px-3 py-2">{c.qui || '—'}</td>
                   <td className="px-3 py-2" onClick={(e) => e.stopPropagation()}>
@@ -366,7 +376,7 @@ export default function Contrats() {
             <dt className="text-slate-500">Début</dt><dd>{detail.date_debut || '—'}</dd>
             <dt className="text-slate-500">Fin</dt><dd>{detail.date_fin || '—'}</dd>
             <dt className="text-slate-500">Durée</dt><dd>{fmtDuree(detail)}</dd>
-            <dt className="text-slate-500">Montant mensuel</dt><dd>{eur(detail.montant)}</dd>
+            {detail.montant_fixe ? <><dt className="text-slate-500">Montant fixe</dt><dd>{eur(detail.montant_fixe)}</dd></> : <><dt className="text-slate-500">Montant mensuel</dt><dd>{eur(detail.montant)}</dd></>}
             <dt className="text-slate-500">Caution</dt><dd>{eur(detail.caution)}</dd>
             <dt className="text-slate-500 col-span-2">Conditions</dt>
             <dd className="col-span-2 whitespace-pre-wrap">{detail.conditions || '—'}</dd>
@@ -396,10 +406,13 @@ export default function Contrats() {
               <Field label="Date début *"><input name="date_debut" type="date" required defaultValue={edit.date_debut ?? ''} className={inputCls} /></Field>
               <Field label="Date fin *"><input name="date_fin" type="date" required defaultValue={edit.date_fin ?? ''} className={inputCls} /></Field>
             </div>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <Field label="Durée (mois)"><input name="duree" type="number" min={0} defaultValue={edit.duree ?? ''} className={inputCls} placeholder="Auto si dates" /></Field>
-              <Field label="Montant mensuel (€)"><input name="montant" type="number" step="any" defaultValue={edit.montant ?? ''} className={inputCls} /></Field>
               <Field label="Caution (€)"><input name="caution" type="number" step="any" defaultValue={edit.caution ?? ''} className={inputCls} /></Field>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Montant mensuel (€)"><input name="montant" type="number" step="any" defaultValue={edit.montant ?? ''} className={inputCls} placeholder="Location longue" /></Field>
+              <Field label="Montant fixe (€)"><input name="montant_fixe" type="number" step="any" defaultValue={edit.montant_fixe ?? ''} className={inputCls} placeholder="Location courte" /></Field>
             </div>
             <Field label="Associé (trésorerie)">
               <select name="qui" defaultValue={edit.qui ?? ''} className={inputCls}>
