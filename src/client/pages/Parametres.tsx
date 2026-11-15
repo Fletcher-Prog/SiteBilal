@@ -3,6 +3,10 @@ import api from '../lib/api.js';
 import { PageHeader, Status, Field, inputCls, btnPrimary, btnGhost, card } from '../components/ui.js';
 
 type Def = { key: string; label: string; area?: boolean; type?: string };
+
+const VARS_CONTRAT = 'numero, client, adresse_client, tel_client, email_client, marque, modele, serial_vitrine, nb_vitrines, equipements, date_debut, date_fin, duree, montant, montant_fixe, caution, jour_paiement, mode_paiement, option_achat_prix, conditions, company_nom, company_adresse, company_siret, company_iban, company_bic, signataire, lieu_signature, date_contrat';
+const VARS_FACTURE = 'numero, client, adresse_client, tel_client, email_client, montant, tva, tva_pct, total_ttc, periode, date_emission, marque, modele, serial_vitrine, company_nom, company_adresse, company_siret, company_iban, company_bic';
+
 const SECTIONS: { id: string; title: string; fields: Def[] }[] = [
   {
     id: 'company', title: 'Informations entreprise',
@@ -114,9 +118,11 @@ export default function Parametres() {
               <h2 className="text-base font-semibold mb-3">{s.title}</h2>
               {s.fields.map((f) => (
                 <Field key={f.key} label={f.label}>
-                  {f.area
-                    ? <textarea rows={3} value={values[f.key] ?? ''} onChange={(e) => { setValues({ ...values, [f.key]: e.target.value }); setOk(''); }} className={inputCls} />
-                    : <input type={f.type || 'text'} step={f.type === 'number' ? 'any' : undefined} value={values[f.key] ?? ''} onChange={(e) => { setValues({ ...values, [f.key]: e.target.value }); setOk(''); }} className={inputCls} />}
+                  {f.area ? <>
+                    <textarea rows={12} value={values[f.key] ?? ''} onChange={(e) => { setValues({ ...values, [f.key]: e.target.value }); setOk(''); }} className={inputCls} style={{ fontFamily: 'monospace', fontSize: '12px' }} />
+                    {!values[f.key] && <p className="text-xs text-amber-600 mt-1">Vide — le template par défaut intégré sera utilisé.</p>}
+                    <p className="text-xs text-slate-400 mt-1">Variables : {f.key.includes('contrat') ? VARS_CONTRAT : VARS_FACTURE}</p>
+                  </> : <input type={f.type || 'text'} step={f.type === 'number' ? 'any' : undefined} value={values[f.key] ?? ''} onChange={(e) => { setValues({ ...values, [f.key]: e.target.value }); setOk(''); }} className={inputCls} />}
                 </Field>
               ))}
               {okMsg(s.id)}
