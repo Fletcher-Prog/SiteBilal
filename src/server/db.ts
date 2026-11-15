@@ -77,7 +77,7 @@ const migrations = [
   "ALTER TABLE contrats ADD COLUMN vitrine_ids TEXT DEFAULT '[]'",
   "ALTER TABLE contrats ADD COLUMN mode_facturation TEXT DEFAULT 'mensuel'",
   'ALTER TABLE contrats ADD COLUMN actif INTEGER DEFAULT 1',
-  'ALTER TABLE factures ADD COLUMN numero TEXT UNIQUE',
+  'ALTER TABLE factures ADD COLUMN numero TEXT',
   'ALTER TABLE factures ADD COLUMN adresse_client TEXT',
   'ALTER TABLE factures ADD COLUMN tel_client TEXT',
   'ALTER TABLE factures ADD COLUMN marque TEXT',
@@ -93,6 +93,7 @@ const migrations = [
 for (const sql of migrations) {
   try { db.exec(sql); } catch (e) { /* column already exists */ }
 }
+try { db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_factures_numero ON factures(numero) WHERE numero IS NOT NULL'); } catch (e) { /* already exists */ }
 
 // ---------- Generic CRUD ----------
 type Row = Record<string, unknown>;

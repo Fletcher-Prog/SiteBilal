@@ -11,3 +11,5 @@ dist/
 feedback.log
 deploy/docker/.env
 .cronforge/
+test-results/
+playwright-report/
