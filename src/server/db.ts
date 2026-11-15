@@ -87,6 +87,8 @@ const migrations = [
   'ALTER TABLE factures ADD COLUMN notes TEXT',
   'ALTER TABLE vitrines ADD COLUMN date_achat TEXT',
   'ALTER TABLE bookings ADD COLUMN date_fin TEXT',
+  'ALTER TABLE contrats ADD COLUMN qui TEXT',
+  'ALTER TABLE factures ADD COLUMN qui TEXT',
 ];
 for (const sql of migrations) {
   try { db.exec(sql); } catch (e) { /* column already exists */ }
@@ -121,12 +123,12 @@ const T = {
   ventes: crud<Vente>('ventes', ['vitrine_id', 'prix_achat', 'prix_vente', 'frais', 'commentaire', 'date_vente']),
   lieux: crud<Lieu>('lieux', ['nom', 'type', 'note']),
   actions: crud<Action>('actions', ['titre', 'fait', 'commentaire']),
-  contrats: crud<Contrat>('contrats', ['client', 'vitrine_id', 'duree', 'montant', 'caution', 'conditions', 'date_debut', 'date_fin']),
+  contrats: crud<Contrat>('contrats', ['client', 'vitrine_id', 'duree', 'montant', 'caution', 'conditions', 'date_debut', 'date_fin', 'qui']),
   frigoristes: crud<Frigoriste>('frigoristes', ['nom', 'tel', 'zone']),
   interventions: crud<Intervention>('interventions', ['vitrine_id', 'frigoriste_id', 'date', 'type', 'temperature', 'notes', 'cout']),
   prospection: crud<Prospection>('prospection', ['client', 'contact', 'notes', 'statut']),
   clients: crud<Client>('clients', ['nom', 'tel', 'email', 'adresse']),
-  factures: crud<Facture>('factures', ['contrat_id', 'periode', 'montant', 'client', 'vitrine_id', 'statut', 'date_emission']),
+  factures: crud<Facture>('factures', ['contrat_id', 'periode', 'montant', 'client', 'vitrine_id', 'statut', 'date_emission', 'qui']),
 };
 
 // ---------- Typed helpers ----------
@@ -183,7 +185,7 @@ function generateFactures() {
       .map(f => `${f.contrat_id}:${f.periode}`)
   );
   const todayStr = new Date().toISOString().slice(0, 10);
-  const insert = db.prepare('INSERT OR IGNORE INTO factures (contrat_id, periode, montant, client, vitrine_id, statut, date_emission) VALUES (?, ?, ?, ?, ?, ?, ?)');
+  const insert = db.prepare('INSERT OR IGNORE INTO factures (contrat_id, periode, montant, client, vitrine_id, statut, date_emission, qui) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
 
   db.transaction(() => {
     for (const c of contrats) {
@@ -195,7 +197,7 @@ function generateFactures() {
         const p = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
         const key = `${c.id}:${p}`;
         if (!existing.has(key)) {
-          insert.run(c.id, p, c.montant || 0, c.client || '', c.vitrine_id, 'generee', todayStr);
+          insert.run(c.id, p, c.montant || 0, c.client || '', c.vitrine_id, 'generee', todayStr, (c as any).qui || null);
           existing.add(key);
         }
         d.setMonth(d.getMonth() + 1);

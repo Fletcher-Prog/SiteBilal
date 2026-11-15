@@ -310,7 +310,7 @@ export default function Contrats() {
     save(edit.id, {
       client: f.get('client'), vitrine_id: num(String(f.get('vitrine_id') || '')), duree,
       montant: num(String(f.get('montant'))), caution: num(String(f.get('caution'))), conditions: f.get('conditions'),
-      date_debut, date_fin,
+      date_debut, date_fin, qui: f.get('qui') || null,
     });
   };
 
@@ -323,7 +323,7 @@ export default function Contrats() {
         <div className={`${card} overflow-x-auto`}>
           <table className="w-full text-sm">
             <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500">
-              <tr>{['Client', 'Vitrine', 'Début', 'Fin', 'Mensuel', 'Caution', ''].map((h) => <th key={h} className="px-3 py-2">{h}</th>)}</tr>
+              <tr>{['Client', 'Vitrine', 'Début', 'Fin', 'Mensuel', 'Caution', 'Associé', ''].map((h) => <th key={h} className="px-3 py-2">{h}</th>)}</tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {data.map((c: any) => (
@@ -334,6 +334,7 @@ export default function Contrats() {
                   <td className="px-3 py-2">{c.date_fin || '—'}</td>
                   <td className="px-3 py-2">{eur(c.montant)}</td>
                   <td className="px-3 py-2">{eur(c.caution)}</td>
+                  <td className="px-3 py-2">{c.qui || '—'}</td>
                   <td className="px-3 py-2" onClick={(e) => e.stopPropagation()}>
                     <button className={btnGhost} onClick={() => exportContratPdf(c, settings)}>Contrat PDF</button>{' '}
                     <button className={btnGhost} onClick={() => openFacture(c)}>Factures</button>{' '}
@@ -388,6 +389,13 @@ export default function Contrats() {
               <Field label="Montant mensuel (€)"><input name="montant" type="number" step="any" defaultValue={edit.montant ?? ''} className={inputCls} /></Field>
               <Field label="Caution (€)"><input name="caution" type="number" step="any" defaultValue={edit.caution ?? ''} className={inputCls} /></Field>
             </div>
+            <Field label="Associé (trésorerie)">
+              <select name="qui" defaultValue={edit.qui ?? ''} className={inputCls}>
+                <option value="">— Non assigné —</option>
+                <option value="Bilel">Bilel</option>
+                <option value="Oussama">Oussama</option>
+              </select>
+            </Field>
             <Field label="Conditions"><textarea name="conditions" rows={3} defaultValue={edit.conditions ?? ''} className={inputCls} /></Field>
             <FormActions saving={saving} error={saveErr} onCancel={() => setEdit(null)} />
           </form>

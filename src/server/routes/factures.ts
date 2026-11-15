@@ -56,8 +56,23 @@ export default function (db: any) {
 
   router.put('/:id/payer', (req, res) => {
     try {
-      if (!db.prepare('SELECT 1 FROM factures WHERE id = ?').get(req.params.id)) return res.status(404).json({ error: 'Introuvable' });
+      const facture = db.prepare('SELECT * FROM factures WHERE id = ?').get(req.params.id) as any;
+      if (!facture) return res.status(404).json({ error: 'Introuvable' });
       db.prepare('UPDATE factures SET statut = ? WHERE id = ?').run('payee', req.params.id);
+
+      // Auto-create flux entry for the payment
+      let qui = facture.qui;
+      if (!qui && facture.contrat_id) {
+        const contrat = db.prepare('SELECT qui FROM contrats WHERE id = ?').get(facture.contrat_id) as any;
+        if (contrat?.qui) qui = contrat.qui;
+      }
+      if (!qui) qui = 'Commun';
+      const mois = facture.periode || new Date().toISOString().slice(0, 7);
+      const label = `Facture ${facture.numero || '#' + facture.id} payée — ${facture.client || ''}`.trim();
+      db.prepare('INSERT INTO flux (type_flux, montant, qui, client, mois, commentaire) VALUES (?, ?, ?, ?, ?, ?)').run(
+        'location', facture.montant || 0, qui, facture.client || '', mois, label
+      );
+
       res.json(db.prepare(`${SQL} WHERE t.id = ?`).get(req.params.id));
     } catch (e: any) { res.status(400).json({ error: e.message }); }
   });
@@ -73,7 +88,7 @@ export default function (db: any) {
   router.post('/regenerate', (_req, res) => {
     const todayStr = new Date().toISOString().slice(0, 10);
     const contrats = db.prepare('SELECT * FROM contrats WHERE date_debut IS NOT NULL').all();
-    const insert = db.prepare('INSERT OR IGNORE INTO factures (contrat_id, periode, montant, client, vitrine_id, statut, date_emission) VALUES (?, ?, ?, ?, ?, ?, ?)');
+    const insert = db.prepare('INSERT OR IGNORE INTO factures (contrat_id, periode, montant, client, vitrine_id, statut, date_emission, qui) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
     let created = 0;
     db.transaction(() => {
       for (const c of contrats as any[]) {
@@ -83,13 +98,13 @@ export default function (db: any) {
         const d = new Date(start);
         while (d < end) {
           const p = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-          const r = insert.run(c.id, p, c.montant || 0, c.client || '', c.vitrine_id, 'emise', todayStr);
+          const r = insert.run(c.id, p, c.montant || 0, c.client || '', c.vitrine_id, 'emise', todayStr, c.qui || null);
           if (r.changes) created++;
           d.setMonth(d.getMonth() + 1);
         }
         if (end <= start) {
           const p = `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}`;
-          const r = insert.run(c.id, p, c.montant || 0, c.client || '', c.vitrine_id, 'emise', todayStr);
+          const r = insert.run(c.id, p, c.montant || 0, c.client || '', c.vitrine_id, 'emise', todayStr, c.qui || null);
           if (r.changes) created++;
         }
       }
