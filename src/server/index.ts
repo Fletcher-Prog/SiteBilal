@@ -3,6 +3,7 @@ import cors from 'cors';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import db from './db.js';
+import { authGuard } from './auth.js';
 import authRoutes from './routes/auth.js';
 import vitrinesRoutes from './routes/vitrines.js';
 import bookingsRoutes from './routes/bookings.js';
@@ -24,6 +25,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use('/api', authGuard(db));
+app.get('/api/health', (_req, res) => res.json({ ok: true }));
 app.use('/api/auth', authRoutes(db));
 app.use('/api/vitrines', vitrinesRoutes(db));
 app.use('/api/bookings', bookingsRoutes(db));

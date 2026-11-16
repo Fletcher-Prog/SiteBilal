@@ -114,16 +114,18 @@ export default function Dashboard() {
           <div className="text-3xl font-bold text-slate-800">{eur(data.valeur_parc)}</div>
           <div className="text-xs text-slate-500">prix d'achat cumulé</div>
         </Card>
-        <Card title="Trésorerie par associé" className="sm:col-span-2">
-          <div className="grid grid-cols-2 gap-3">
-            {associes.map((a: any) => (
-              <div key={a.qui} className="bg-slate-50 rounded-lg p-3">
-                <div className="text-sm text-slate-600">{a.qui}</div>
-                <div className="text-xl font-semibold text-teal-700">{eur(a.total)}</div>
-              </div>
-            ))}
-          </div>
-        </Card>
+        {associes.length > 0 && (
+          <Card title="Trésorerie par associé" className="sm:col-span-2">
+            <div className="grid grid-cols-2 gap-3">
+              {associes.map((a: any) => (
+                <div key={a.qui} className="bg-slate-50 rounded-lg p-3">
+                  <div className="text-sm text-slate-600">{a.qui}</div>
+                  <div className="text-xl font-semibold text-teal-700">{eur(a.total)}</div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
       </div>
 
       {impayesDetail.length > 0 && (
@@ -175,7 +177,7 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      <Card title="Dernières opérations">
+      {data.dernieres_operations && <Card title="Dernières opérations">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead><tr className="text-left text-slate-500 text-xs"><th className="py-1 pr-3">Mois</th><th className="pr-3">Type</th><th className="pr-3">Client</th><th className="pr-3">Qui</th><th className="text-right">Montant</th></tr></thead>
@@ -190,7 +192,7 @@ export default function Dashboard() {
             </tbody>
           </table>
         </div>
-      </Card>
+      </Card>}
     </div>
   );
 }

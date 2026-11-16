@@ -1,4 +1,5 @@
 import { defineConfig } from '@playwright/test';
+import { AUTH } from './e2e/helpers';
 
 export default defineConfig({
   testDir: './e2e',
@@ -17,7 +18,7 @@ export default defineConfig({
     reuseExistingServer: true,
   },
   projects: [
-    { name: 'api', testMatch: '*-api.spec.ts' },
+    { name: 'api', testMatch: '*-api.spec.ts', use: { extraHTTPHeaders: AUTH } },
     { name: 'e2e', testMatch: '*.spec.ts', testIgnore: '*-api.spec.ts' },
   ],
 });

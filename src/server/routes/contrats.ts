@@ -15,6 +15,10 @@ function generateFacturesForContrat(db: any, contratId: number) {
   const start = new Date(c.date_debut + 'T00:00:00');
   const end = c.date_fin ? new Date(c.date_fin + 'T00:00:00') : new Date(start.getFullYear(), start.getMonth() + (c.duree || 1), start.getDate());
   const insert = db.prepare('INSERT OR IGNORE INTO factures (contrat_id, periode, montant, client, vitrine_id, statut, date_emission) VALUES (?, ?, ?, ?, ?, ?, ?)');
+  if (Number(c.montant_fixe) > 0) {
+    insert.run(c.id, c.date_debut.slice(0, 7), c.montant_fixe, c.client || '', c.vitrine_id, 'generee', todayStr);
+    return;
+  }
   const d = new Date(start);
   while (d < end) {
     const p = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;

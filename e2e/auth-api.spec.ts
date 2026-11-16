@@ -47,12 +47,13 @@ test.describe('Auth API', () => {
   });
 
   test('PATCH /auth/users/:id — toggle active', async ({ request }) => {
-    const users = await (await request.get(`${BASE}/auth/users`)).json();
-    const uid = users[0].id;
-    const res = await request.patch(`${BASE}/auth/users/${uid}`, { data: { active: 0 } });
+    const u = await (await request.post(`${BASE}/auth/users`, { data: { name: 'ToggleUser', password: 'x1', role: 'user', permissions: ['planning'] } })).json();
+    const res = await request.patch(`${BASE}/auth/users/${u.id}`, { data: { active: 0 } });
     expect(res.ok()).toBeTruthy();
-    // restore
-    await request.patch(`${BASE}/auth/users/${uid}`, { data: { active: 1 } });
+    expect((await res.json()).active).toBe(0);
+    const back = await request.patch(`${BASE}/auth/users/${u.id}`, { data: { active: 1 } });
+    expect((await back.json()).active).toBe(1);
+    await request.delete(`${BASE}/auth/users/${u.id}`);
   });
 
   test('GET /auth/me — valid token', async ({ request }) => {
@@ -64,7 +65,7 @@ test.describe('Auth API', () => {
   });
 
   test('GET /auth/me — no token → 401', async ({ request }) => {
-    const res = await request.get(`${BASE}/auth/me`);
+    const res = await request.get(`${BASE}/auth/me`, { headers: { Authorization: '' } });
     expect(res.status()).toBe(401);
   });
 

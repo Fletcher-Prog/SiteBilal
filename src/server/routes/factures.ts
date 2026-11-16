@@ -94,6 +94,10 @@ export default function (db: any) {
     db.transaction(() => {
       for (const c of contrats as any[]) {
         if (!c.date_debut) continue;
+        if (Number(c.montant_fixe) > 0) {
+          if (insert.run(c.id, c.date_debut.slice(0, 7), c.montant_fixe, c.client || '', c.vitrine_id, 'emise', todayStr, c.qui || null).changes) created++;
+          continue;
+        }
         const start = new Date(c.date_debut + 'T00:00:00');
         const end = c.date_fin ? new Date(c.date_fin + 'T00:00:00') : new Date(start.getFullYear(), start.getMonth() + (c.duree || 1), start.getDate());
         const d = new Date(start);

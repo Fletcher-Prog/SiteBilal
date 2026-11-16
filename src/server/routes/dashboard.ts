@@ -83,13 +83,13 @@ export default function(db: any) {
         .map((b: any) => ({ type: 'booking_en_retard', booking: b })),
     ];
 
+    const seesTreso = ((req as any).user?.perms || []).includes('tresorerie');
     res.json({
       impayes: { count: impayes_detail.length, total: impayes_detail.reduce((a: number, r: any) => a + (Number(r.montant) || 0), 0), detail: impayes_detail },
       ca_location, ca_longue: ca_longue.s, ca_courte: ca_courte.s,
-      tresorerie_bilel: treso('Bilel'),
-      tresorerie_oussama: treso('Oussama'),
+      ...(seesTreso ? { tresorerie_bilel: treso('Bilel'), tresorerie_oussama: treso('Oussama'), dernieres_operations } : {}),
       vitrines_vacantes, valeur_parc, prochaines_reservations,
-      dernieres_operations, repartition_par_lieu, alertes,
+      repartition_par_lieu, alertes,
     });
   });
 

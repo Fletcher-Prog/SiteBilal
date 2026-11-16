@@ -1,4 +1,7 @@
 import { test, expect } from '@playwright/test';
+import { AUTH } from './helpers';
+
+test.use({ extraHTTPHeaders: AUTH });
 
 const BASE = 'http://localhost:3001/api';
 

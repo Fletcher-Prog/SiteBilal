@@ -12,13 +12,16 @@ import Lieux from './pages/Lieux.js';
 import Actions from './pages/Actions.js';
 import Parametres from './pages/Parametres.js';
 import Login from './pages/Login.js';
+import api from './lib/api.js';
+import { hasPerm, canSeeParametres, firstAllowedPath } from './lib/permissions.js';
 
-export interface User { id?: number; name?: string; email?: string; role?: string; [k: string]: any }
+export interface User { id?: number; name?: string; email?: string; role?: string; permissions?: string[]; [k: string]: any }
 interface AuthCtx {
   user: User | null;
   token: string | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
+  can: (perm: string) => boolean;
 }
 
 const AuthContext = createContext<AuthCtx>(null as unknown as AuthCtx);
@@ -54,13 +57,30 @@ function AuthProvider({ children }: { children: ReactNode }) {
     window.location.href = '/login';
   }, []);
 
-  return <AuthContext.Provider value={{ user, token, login, logout }}>{children}</AuthContext.Provider>;
+  // Les droits peuvent changer côté admin : on les relit à chaque ouverture de l'appli.
+  useEffect(() => {
+    if (!token) return;
+    api.get('/auth/me').then((u: User) => { localStorage.setItem('user', JSON.stringify(u)); setUser(u); }).catch(() => {});
+  }, [token]);
+
+  const can = useCallback((perm: string) => hasPerm(user, perm), [user]);
+
+  return <AuthContext.Provider value={{ user, token, login, logout, can }}>{children}</AuthContext.Provider>;
 }
 
 function Protected() {
   const { token } = useAuth();
   return token ? <Outlet /> : <Navigate to="/login" replace />;
 }
+
+function Guard({ allowed, children }: { allowed: (u: User | null) => boolean; children: ReactNode }) {
+  const { user } = useAuth();
+  if (allowed(user)) return <>{children}</>;
+  const home = firstAllowedPath(user);
+  if (home && home !== window.location.pathname) return <Navigate to={home} replace />;
+  return <div className="rounded-md bg-amber-50 p-4 text-sm text-amber-800">Votre compte n'a accès à aucune page. Contactez un administrateur.</div>;
+}
+const need = (perm: string) => (u: User | null) => hasPerm(u, perm);
 
 export default function App() {
   const [showInstall, setShowInstall] = useState(false);
@@ -100,16 +120,16 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route element={<Protected />}>
           <Route element={<Layout />}>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/vitrines" element={<Vitrines />} />
-            <Route path="/vitrines/:id" element={<VitrineDetail />} />
-            <Route path="/planning" element={<Planning />} />
-            <Route path="/contrats" element={<Contrats />} />
-            <Route path="/tresorerie" element={<Tresorerie />} />
-            <Route path="/ventes" element={<Ventes />} />
-            <Route path="/lieux" element={<Lieux />} />
-            <Route path="/actions" element={<Actions />} />
-            <Route path="/parametres" element={<Parametres />} />
+            <Route path="/" element={<Guard allowed={need('dashboard')}><Dashboard /></Guard>} />
+            <Route path="/vitrines" element={<Guard allowed={need('vitrines')}><Vitrines /></Guard>} />
+            <Route path="/vitrines/:id" element={<Guard allowed={need('vitrines')}><VitrineDetail /></Guard>} />
+            <Route path="/planning" element={<Guard allowed={need('planning')}><Planning /></Guard>} />
+            <Route path="/contrats" element={<Guard allowed={need('contrats')}><Contrats /></Guard>} />
+            <Route path="/tresorerie" element={<Guard allowed={need('tresorerie')}><Tresorerie /></Guard>} />
+            <Route path="/ventes" element={<Guard allowed={need('ventes')}><Ventes /></Guard>} />
+            <Route path="/lieux" element={<Guard allowed={need('lieux')}><Lieux /></Guard>} />
+            <Route path="/actions" element={<Guard allowed={need('actions')}><Actions /></Guard>} />
+            <Route path="/parametres" element={<Guard allowed={canSeeParametres}><Parametres /></Guard>} />
           </Route>
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

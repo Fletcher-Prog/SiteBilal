@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login, BASE } from './helpers';
+import { login, BASE, AUTH } from './helpers';
 
 test.describe('Frontend — Forms & Interactions', () => {
   test.beforeEach(async ({ page }) => {
@@ -84,11 +84,11 @@ test.describe('Frontend — Forms & Interactions', () => {
 
   test('Dashboard — impayés section shows factures', async ({ page }) => {
     // Create a contrat with facture via API, then check dashboard
-    const contrat = await (await page.request.post(`${BASE}/api/contrats`, {
+    const contrat = await (await page.request.post(`${BASE}/api/contrats`, { headers: AUTH,
       data: { client: 'Dashboard Impaye E2E', vitrine_id: 1, duree: 1, montant: 100, caution: 300, date_debut: '2026-11-01', date_fin: '2026-12-01', qui: 'Bilel' },
     })).json();
     // Create unpaid facture
-    await page.request.post(`${BASE}/api/factures`, {
+    await page.request.post(`${BASE}/api/factures`, { headers: AUTH,
       data: { contrat_id: contrat.id, periode: '2026-11', montant: 100, client: 'Dashboard Impaye E2E', statut: 'emise' },
     });
 
@@ -99,9 +99,9 @@ test.describe('Frontend — Forms & Interactions', () => {
     await expect(impayeCard).toBeVisible();
 
     // Cleanup
-    const factures = await (await page.request.get(`${BASE}/api/factures?contrat_id=${contrat.id}`)).json();
-    for (const f of factures) await page.request.delete(`${BASE}/api/factures/${f.id}`);
-    await page.request.delete(`${BASE}/api/contrats/${contrat.id}`);
+    const factures = await (await page.request.get(`${BASE}/api/factures?contrat_id=${contrat.id}`, { headers: AUTH })).json();
+    for (const f of factures) await page.request.delete(`${BASE}/api/factures/${f.id}`, { headers: AUTH });
+    await page.request.delete(`${BASE}/api/contrats/${contrat.id}`, { headers: AUTH });
   });
 
   test('Contrats — factures popup + PDF button exists', async ({ page }) => {
@@ -127,7 +127,7 @@ test.describe('Frontend — Forms & Interactions', () => {
 
   test('Vitrines — detail page loads with CA section', async ({ page }) => {
     // Get a vitrine ID
-    const vitrines = await (await page.request.get(`${BASE}/api/vitrines`)).json();
+    const vitrines = await (await page.request.get(`${BASE}/api/vitrines`, { headers: AUTH })).json();
     if (vitrines.length === 0) return;
     await page.goto(`${BASE}/vitrines/${vitrines[0].id}`);
     await page.waitForTimeout(500);
@@ -135,7 +135,7 @@ test.describe('Frontend — Forms & Interactions', () => {
   });
 
   test('VitrineDetail — "Générer CA" button (not "devis")', async ({ page }) => {
-    const vitrines = await (await page.request.get(`${BASE}/api/vitrines`)).json();
+    const vitrines = await (await page.request.get(`${BASE}/api/vitrines`, { headers: AUTH })).json();
     if (vitrines.length === 0) return;
     await page.goto(`${BASE}/vitrines/${vitrines[0].id}`);
     await page.waitForTimeout(500);

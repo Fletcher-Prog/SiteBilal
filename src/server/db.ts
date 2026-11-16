@@ -11,7 +11,7 @@ db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = OFF');
 
 // ---------- Types ----------
-export interface User { id: number; name: string; email: string; password: string; role: string; active: number }
+export interface User { id: number; name: string; email: string; password: string; role: string; active: number; permissions?: string | null }
 export interface Vitrine { id: number; serial: string; model: string; prix_achat: number | null; prix_reparation: number; commentaire: string; fonctionnelle: number | null; lieu_id: number | null; nfc_tag: string | null; date_achat: string | null }
 export interface Booking { id: number; vitrine_id: number; client_name: string; start_date: string; duration_months: number; montant: number; transporteur: string; etat: string; adresse_livraison: string; tel_client: string; qui: string; photo_livraison: string; photo_enlevement: string; type_duree: string; maint: number; duree_jours: number; date_fin: string | null }
 export interface Flux { id: number; type_flux: string; montant: number; qui: string; client: string; mois: string; is_transport: number; is_achat: number; commentaire: string }
@@ -92,11 +92,17 @@ const migrations = [
   'ALTER TABLE factures ADD COLUMN date_paiement TEXT',
   'ALTER TABLE bookings ADD COLUMN date_paiement TEXT',
   'ALTER TABLE contrats ADD COLUMN montant_fixe REAL',
+  'ALTER TABLE users ADD COLUMN permissions TEXT',
+  'ALTER TABLE bookings ADD COLUMN created_at TEXT',
 ];
 for (const sql of migrations) {
   try { db.exec(sql); } catch (e) { /* column already exists */ }
 }
 try { db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_factures_numero ON factures(numero) WHERE numero IS NOT NULL'); } catch (e) { /* already exists */ }
+// Factures auto-générées à 0 € pour des contrats à montant fixe (avant correction du générateur)
+db.exec(`UPDATE factures SET montant = (SELECT montant_fixe FROM contrats c WHERE c.id = factures.contrat_id)
+  WHERE COALESCE(statut, '') != 'payee' AND COALESCE(montant, 0) = 0
+    AND contrat_id IN (SELECT id FROM contrats WHERE montant_fixe > 0)`);
 
 // ---------- Seed default templates ----------
 const seedSetting = db.prepare('INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)');
@@ -358,6 +364,11 @@ function generateFactures() {
   db.transaction(() => {
     for (const c of contrats) {
       if (!c.date_debut) continue;
+      if (Number((c as any).montant_fixe) > 0) {
+        const p = c.date_debut.slice(0, 7);
+        if (!existing.has(`${c.id}:${p}`)) insert.run(c.id, p, (c as any).montant_fixe, c.client || '', c.vitrine_id, 'generee', todayStr, (c as any).qui || null);
+        continue;
+      }
       const start = new Date(c.date_debut + 'T00:00:00');
       const end = c.date_fin ? new Date(c.date_fin + 'T00:00:00') : new Date(start.getFullYear(), start.getMonth() + (c.duree || 1), start.getDate());
       const d = new Date(start);

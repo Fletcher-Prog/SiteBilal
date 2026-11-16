@@ -1,25 +1,27 @@
 import { useState, type ReactNode } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { useAuth } from '../App.js';
+import { hasPerm, canSeeParametres } from '../lib/permissions.js';
 
 const ic = (d: ReactNode) => (
   <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 shrink-0">{d}</svg>
 );
 
-const NAV: { to: string; label: string; short: string; extra?: boolean; icon: ReactNode }[] = [
-  { to: '/', label: 'Tableau de bord', short: 'Accueil', icon: ic(<><rect x="2" y="2" width="7" height="7" rx="1.5" /><rect x="11" y="2" width="7" height="4" rx="1.5" /><rect x="2" y="11" width="7" height="7" rx="1.5" /><rect x="11" y="8" width="7" height="10" rx="1.5" /></>) },
-  { to: '/vitrines', label: 'Parc vitrines', short: 'Vitrines', icon: ic(<><rect x="3" y="4" width="14" height="12" rx="2" /><path d="M3 8h14M8 16v2M12 16v2" /></>) },
-  { to: '/planning', label: 'Planning', short: 'Planning', icon: ic(<><rect x="2" y="3" width="16" height="15" rx="2" /><path d="M2 8h16M7 2v3M13 2v3" /></>) },
-  { to: '/contrats', label: 'Contrats & Factures', short: 'Contrats', extra: true, icon: ic(<><path d="M5 2h7l4 4v12H5z" /><path d="M12 2v4h4M8 10h5M8 13h5M8 16h3" /></>) },
-  { to: '/tresorerie', label: 'Trésorerie', short: 'Tréso', icon: ic(<><rect x="2" y="5" width="16" height="10" rx="2" /><circle cx="10" cy="10" r="2.5" /><path d="M5 8v4M15 8v4" /></>) },
-  { to: '/ventes', label: 'Ventes', short: 'Ventes', extra: true, icon: ic(<path d="M10 2l2.4 4.9 5.4.8-3.9 3.8.9 5.4L10 14.4l-4.8 2.5.9-5.4L2.2 7.7l5.4-.8L10 2z" />) },
-  { to: '/lieux', label: 'Lieux de stockage', short: 'Lieux', extra: true, icon: ic(<><path d="M10 18s6-5.2 6-10a6 6 0 10-12 0c0 4.8 6 10 6 10z" /><circle cx="10" cy="8" r="2.2" /></>) },
-  { to: '/actions', label: 'Actions', short: 'Actions', extra: true, icon: ic(<><path d="M4 3h12v14H4z" /><path d="M7 7h6M7 10h6M7 13h4" /></>) },
-  { to: '/parametres', label: 'Paramètres', short: 'Réglages', extra: true, icon: ic(<><circle cx="10" cy="10" r="2.8" /><circle cx="10" cy="10" r="5.6" /><path d="M10 1.8v2.4M10 15.8v2.4M1.8 10h2.4M15.8 10h2.4" /></>) },
+const NAV: { to: string; perm: string; label: string; short: string; extra?: boolean; icon: ReactNode }[] = [
+  { to: '/', perm: 'dashboard', label: 'Tableau de bord', short: 'Accueil', icon: ic(<><rect x="2" y="2" width="7" height="7" rx="1.5" /><rect x="11" y="2" width="7" height="4" rx="1.5" /><rect x="2" y="11" width="7" height="7" rx="1.5" /><rect x="11" y="8" width="7" height="10" rx="1.5" /></>) },
+  { to: '/vitrines', perm: 'vitrines', label: 'Parc vitrines', short: 'Vitrines', icon: ic(<><rect x="3" y="4" width="14" height="12" rx="2" /><path d="M3 8h14M8 16v2M12 16v2" /></>) },
+  { to: '/planning', perm: 'planning', label: 'Planning', short: 'Planning', icon: ic(<><rect x="2" y="3" width="16" height="15" rx="2" /><path d="M2 8h16M7 2v3M13 2v3" /></>) },
+  { to: '/contrats', perm: 'contrats', label: 'Contrats & Factures', short: 'Contrats', extra: true, icon: ic(<><path d="M5 2h7l4 4v12H5z" /><path d="M12 2v4h4M8 10h5M8 13h5M8 16h3" /></>) },
+  { to: '/tresorerie', perm: 'tresorerie', label: 'Trésorerie', short: 'Tréso', icon: ic(<><rect x="2" y="5" width="16" height="10" rx="2" /><circle cx="10" cy="10" r="2.5" /><path d="M5 8v4M15 8v4" /></>) },
+  { to: '/ventes', perm: 'ventes', label: 'Ventes', short: 'Ventes', extra: true, icon: ic(<path d="M10 2l2.4 4.9 5.4.8-3.9 3.8.9 5.4L10 14.4l-4.8 2.5.9-5.4L2.2 7.7l5.4-.8L10 2z" />) },
+  { to: '/lieux', perm: 'lieux', label: 'Lieux de stockage', short: 'Lieux', extra: true, icon: ic(<><path d="M10 18s6-5.2 6-10a6 6 0 10-12 0c0 4.8 6 10 6 10z" /><circle cx="10" cy="8" r="2.2" /></>) },
+  { to: '/actions', perm: 'actions', label: 'Actions', short: 'Actions', extra: true, icon: ic(<><path d="M4 3h12v14H4z" /><path d="M7 7h6M7 10h6M7 13h4" /></>) },
+  { to: '/parametres', perm: 'parametres', label: 'Paramètres', short: 'Réglages', extra: true, icon: ic(<><circle cx="10" cy="10" r="2.8" /><circle cx="10" cy="10" r="5.6" /><path d="M10 1.8v2.4M10 15.8v2.4M1.8 10h2.4M15.8 10h2.4" /></>) },
 ];
 
 export default function Layout() {
   const { user, logout } = useAuth();
+  const nav = NAV.filter((n) => (n.perm === 'parametres' ? canSeeParametres(user) : hasPerm(user, n.perm)));
   const [moreOpen, setMoreOpen] = useState(false);
   const name = user?.name || user?.email || 'Utilisateur';
   const role = user?.role || '';
@@ -48,7 +50,7 @@ export default function Layout() {
           <span className="font-bold text-xl text-teal-300">VitriTrack</span>
         </div>
         <nav className="flex-1 px-3 py-2 flex flex-col gap-0.5 overflow-y-auto">
-          {NAV.map((n) => (
+          {nav.map((n) => (
             <NavLink key={n.to} to={n.to} end={n.to === '/'} className={desktopCls}>
               {n.icon}
               {n.label}
@@ -66,7 +68,7 @@ export default function Layout() {
 
       {/* Bottom nav mobile */}
       <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 flex bg-gray-900 border-t border-gray-800 pb-[env(safe-area-inset-bottom)]">
-        {NAV.filter((n) => !n.extra).map((n) => (
+        {nav.filter((n) => !n.extra).map((n) => (
           <NavLink key={n.to} to={n.to} end={n.to === '/'} className={mobileCls}>
             {n.icon}
             {n.short}
@@ -83,7 +85,7 @@ export default function Layout() {
           <div className="md:hidden fixed inset-0 bg-black/45 z-[150]" onClick={() => setMoreOpen(false)} />
           <div role="dialog" aria-label="Plus d'options" className="md:hidden fixed bottom-0 inset-x-0 z-[200] bg-gray-900 text-gray-100 rounded-t-2xl pt-2 pb-6 max-h-[80vh] overflow-y-auto">
             <div className="w-9 h-1 rounded bg-gray-700 mx-auto mb-2" />
-            {NAV.filter((n) => n.extra).map((n) => (
+            {nav.filter((n) => n.extra).map((n) => (
               <NavLink key={n.to} to={n.to} onClick={() => setMoreOpen(false)} className="flex items-center gap-3 min-h-[48px] px-5 text-[15px] font-medium text-gray-100">
                 {n.icon}
                 {n.label}
