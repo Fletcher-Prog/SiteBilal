@@ -30,7 +30,7 @@ jobs:
         run: |
           echo "Waiting for deploy..."
           for i in $(seq 1 30); do
-            STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://vitritrack.anasdev.cloud/api/vitrines 2>/dev/null || true)
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://vitritrack.anasdev.cloud/api/health 2>/dev/null || true)
             if [ "$STATUS" = "200" ]; then
               echo "✅ Site is live!"
               exit 0
