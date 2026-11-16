@@ -281,7 +281,7 @@ function BookingForm({ vitrines, booking, onClose, onSaved }: { vitrines: any[];
         <Field label="Vitrine *">
           <select className={inputCls} required value={f.vitrine_id} onChange={set('vitrine_id')}>
             <option value="">— Choisir —</option>
-            {vitrines.filter(v => v.fonctionnelle === 1).map(v => <option key={v.id} value={v.id}>{v.serial} — {String(v.model).slice(0, 40)}</option>)}
+            {vitrines.filter(v => v.fonctionnelle === 1 && (!v.vendue || String(v.id) === String(booking?.vitrine_id))).map(v => <option key={v.id} value={v.id}>{v.serial} — {String(v.model).slice(0, 40)}</option>)}
           </select>
         </Field>
         <label className="mb-3 flex items-center gap-2 text-sm"><input type="checkbox" checked={f.maint} onChange={e => setF({ ...f, maint: e.target.checked })} />Créneau de maintenance</label>

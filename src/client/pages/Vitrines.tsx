@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../lib/api.js';
+import { useAuth } from '../App.js';
+import VenteModal from '../components/VenteModal.js';
 
 export const hasNfc = typeof window !== 'undefined' && 'NDEFReader' in window;
 
@@ -42,6 +44,8 @@ export const EtatBadge = ({ v }: { v: any }) =>
   isOk(v)
     ? <span className="inline-flex rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-800">Fonctionnelle</span>
     : <span className="inline-flex rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-800">En panne</span>;
+
+export const VenduBadge = () => <span className="inline-flex rounded-full bg-indigo-100 px-2.5 py-0.5 text-xs font-semibold text-indigo-800">Vendue</span>;
 
 export const inputCls = 'w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-100';
 export const btnPrimary = 'inline-flex min-h-[40px] items-center justify-center gap-1.5 rounded-md bg-teal-700 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800 disabled:opacity-50';
@@ -141,7 +145,12 @@ export default function Vitrines() {
   const [error, setError] = useState('');
   const [q, setQ] = useState('');
   const [lieu, setLieu] = useState('');
-  const [etat, setEtat] = useState('');
+  const [params, setParams] = useSearchParams();
+  const etat = params.get('etat') ?? '';
+  const setEtat = (e: string) => setParams(e ? { etat: e } : {}, { replace: true });
+  const { can } = useAuth();
+  const [ventes, setVentes] = useState<any[]>([]);
+  const [venteEdit, setVenteEdit] = useState<any>(null);
   const [adding, setAdding] = useState(false);
   const [nfcOpen, setNfcOpen] = useState(false);
   const [serialQ, setSerialQ] = useState('');
@@ -181,12 +190,11 @@ export default function Vitrines() {
     else setNfcMsg(`Aucune vitrine pour « ${serialQ} ».`);
   };
 
-  useEffect(() => {
-    Promise.all([api.get('/vitrines'), api.get('/lieux').catch(() => [])])
-      .then(([v, l]) => { setVitrines(v); setLieux(l); })
-      .catch(e => setError(e.message))
-      .finally(() => setLoading(false));
-  }, []);
+  const load = () => Promise.all([api.get('/vitrines'), api.get('/lieux').catch(() => []), can('ventes') ? api.get('/ventes').catch(() => []) : Promise.resolve([])])
+    .then(([v, l, s]) => { setVitrines(v); setLieux(l); setVentes(s); })
+    .catch(e => setError(e.message))
+    .finally(() => setLoading(false));
+  useEffect(() => { load(); }, []);
 
   const lieuNom = (id: any) => lieux.find(l => l.id === id)?.nom ?? '—';
   const list = useMemo(() => {
@@ -194,8 +202,14 @@ export default function Vitrines() {
     return vitrines.filter(v =>
       (!s || `${v.serial ?? ''} ${v.model ?? ''}`.toLowerCase().includes(s)) &&
       (!lieu || String(v.lieu_id) === lieu) &&
-      (!etat || (etat === 'fonctionnelle') === isOk(v)));
+      (!etat || (etat === 'vendue' ? !!v.vendue : etat === 'parc' ? !v.vendue : !v.vendue && (etat === 'fonctionnelle') === isOk(v))));
   }, [vitrines, q, lieu, etat]);
+  const sansFiche = ventes.filter(s => !s.vitrine_id);
+  const margeOf = (s: any) => (Number(s.prix_vente) || 0) - (Number(s.prix_achat) || 0) - (Number(s.frais) || 0);
+  const ventesVues = ventes.filter(s => !s.vitrine_id || list.some(v => v.id === s.vitrine_id));
+  const totalVentes = ventesVues.reduce((a, s) => a + (Number(s.prix_vente) || 0), 0);
+  const totalMarge = ventesVues.reduce((a, s) => a + margeOf(s), 0);
+  const nbVendues = vitrines.filter(v => v.vendue).length;
 
   return (
     <div>
@@ -214,9 +228,11 @@ export default function Vitrines() {
           {lieux.map(l => <option key={l.id} value={l.id}>{l.nom}</option>)}
         </select>
         <select className={inputCls + ' !w-auto'} aria-label="Filtrer par état" value={etat} onChange={e => setEtat(e.target.value)}>
-          <option value="">Tous les états</option>
+          <option value="">Toutes les vitrines</option>
+          <option value="parc">En parc (non vendues)</option>
           <option value="fonctionnelle">Fonctionnelle</option>
           <option value="panne">En panne</option>
+          <option value="vendue">Vendues ({nbVendues})</option>
         </select>
       </div>
 
@@ -263,29 +279,59 @@ export default function Vitrines() {
       )}
 
       {error && <div role="alert" className="mb-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-800">{error}</div>}
+      {etat === 'vendue' && can('ventes') && (
+        <div className="mb-4 grid grid-cols-3 gap-3" data-testid="kpi-ventes">
+          <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm"><div className="text-xs text-slate-500">Ventes</div><div className="text-xl font-semibold">{ventesVues.length}</div></div>
+          <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm"><div className="text-xs text-slate-500">Total ventes</div><div className="text-xl font-semibold tabular-nums">{eur(totalVentes)}</div></div>
+          <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm"><div className="text-xs text-slate-500">Marge totale</div><div className={`text-xl font-semibold tabular-nums ${totalMarge >= 0 ? 'text-green-700' : 'text-red-700'}`}>{eur(totalMarge)}</div></div>
+        </div>
+      )}
       <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm">
         <table className="w-full min-w-[720px] text-sm">
           <thead>
             <tr className="border-b-2 border-slate-200 text-left text-[11px] uppercase tracking-wider text-slate-500">
-              {['Serial', 'Modèle', 'Lieu', 'État', 'Prix achat', 'NFC'].map(h => <th key={h} className="whitespace-nowrap px-3 py-2.5 font-semibold">{h}</th>)}
+              {['Serial', 'Modèle', 'Lieu', 'État', 'Prix achat', 'Vente', 'NFC'].map(h => <th key={h} className="whitespace-nowrap px-3 py-2.5 font-semibold">{h}</th>)}
             </tr>
           </thead>
           <tbody>
-            {loading && <tr><td colSpan={6} className="px-3 py-6 text-center text-slate-500">Chargement…</td></tr>}
-            {!loading && !list.length && <tr><td colSpan={6} className="px-3 py-6 text-center text-slate-500">Aucune vitrine ne correspond aux filtres.</td></tr>}
+            {loading && <tr><td colSpan={7} className="px-3 py-6 text-center text-slate-500">Chargement…</td></tr>}
+            {!loading && !list.length && <tr><td colSpan={7} className="px-3 py-6 text-center text-slate-500">Aucune vitrine ne correspond aux filtres.</td></tr>}
             {list.map(v => (
               <tr key={v.id} className="cursor-pointer border-b border-slate-100 last:border-0 hover:bg-slate-50" onClick={() => nav(`/vitrines/${v.id}`)}>
                 <td className="px-3 py-2.5 font-mono font-semibold text-teal-800">{v.serial}</td>
                 <td className="max-w-[260px] px-3 py-2.5">{v.model}</td>
                 <td className="px-3 py-2.5">{lieuNom(v.lieu_id)}</td>
-                <td className="px-3 py-2.5"><EtatBadge v={v} /></td>
+                <td className="px-3 py-2.5">{v.vendue ? <VenduBadge /> : <EtatBadge v={v} />}</td>
                 <td className="px-3 py-2.5 tabular-nums">{eur(v.prix_achat)}</td>
+                <td className="px-3 py-2.5 tabular-nums">{v.vendue ? <>{eur(v.vente_prix)}{v.vente_date && <span className="block text-xs text-slate-500">{new Date(v.vente_date + 'T00:00:00').toLocaleDateString('fr-FR')}</span>}</> : '—'}</td>
                 <td className="px-3 py-2.5 font-mono text-xs text-slate-500">{v.nfc_tag || '—'}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      {etat === 'vendue' && sansFiche.length > 0 && (
+        <div className="mt-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm" data-testid="ventes-sans-fiche">
+          <h2 className="text-sm font-semibold">Ventes sans fiche vitrine ({sansFiche.length})</h2>
+          <p className="mb-2 text-xs text-slate-500">Ventes enregistrées avant le suivi par vitrine. « Modifier » permet de les rattacher à une vitrine.</p>
+          <ul className="divide-y divide-slate-100 text-sm">
+            {sansFiche.map(s => (
+              <li key={s.id} className="flex flex-wrap items-center justify-between gap-2 py-2">
+                <span className="min-w-0"><strong>{s.commentaire || `Vente #${s.id}`}</strong>{s.date_vente && <span className="text-slate-500"> · {new Date(s.date_vente + 'T00:00:00').toLocaleDateString('fr-FR')}</span>}</span>
+                <span className="flex items-center gap-3">
+                  <span className="tabular-nums">{eur(s.prix_vente)}</span>
+                  <span className={`tabular-nums text-xs ${margeOf(s) >= 0 ? 'text-green-700' : 'text-red-700'}`}>marge {eur(margeOf(s))}</span>
+                  <button type="button" className={btnSecondary} onClick={() => setVenteEdit(s)}>Modifier</button>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {venteEdit && (
+        <VenteModal vente={venteEdit} vitrines={vitrines.filter(v => !v.vendue)} onClose={() => setVenteEdit(null)} onSaved={() => { setVenteEdit(null); load(); }} />
+      )}
 
       {adding && (
         <Modal title="Ajouter une vitrine" onClose={() => { setAdding(false); setNfcPrefill(''); }}>

@@ -13,7 +13,6 @@ const NAV: { to: string; perm: string; label: string; short: string; extra?: boo
   { to: '/planning', perm: 'planning', label: 'Planning', short: 'Planning', icon: ic(<><rect x="2" y="3" width="16" height="15" rx="2" /><path d="M2 8h16M7 2v3M13 2v3" /></>) },
   { to: '/contrats', perm: 'contrats', label: 'Contrats & Factures', short: 'Contrats', extra: true, icon: ic(<><path d="M5 2h7l4 4v12H5z" /><path d="M12 2v4h4M8 10h5M8 13h5M8 16h3" /></>) },
   { to: '/tresorerie', perm: 'tresorerie', label: 'Trésorerie', short: 'Tréso', icon: ic(<><rect x="2" y="5" width="16" height="10" rx="2" /><circle cx="10" cy="10" r="2.5" /><path d="M5 8v4M15 8v4" /></>) },
-  { to: '/ventes', perm: 'ventes', label: 'Ventes', short: 'Ventes', extra: true, icon: ic(<path d="M10 2l2.4 4.9 5.4.8-3.9 3.8.9 5.4L10 14.4l-4.8 2.5.9-5.4L2.2 7.7l5.4-.8L10 2z" />) },
   { to: '/lieux', perm: 'lieux', label: 'Lieux de stockage', short: 'Lieux', extra: true, icon: ic(<><path d="M10 18s6-5.2 6-10a6 6 0 10-12 0c0 4.8 6 10 6 10z" /><circle cx="10" cy="8" r="2.2" /></>) },
   { to: '/actions', perm: 'actions', label: 'Actions', short: 'Actions', extra: true, icon: ic(<><path d="M4 3h12v14H4z" /><path d="M7 7h6M7 10h6M7 13h4" /></>) },
   { to: '/parametres', perm: 'parametres', label: 'Paramètres', short: 'Réglages', extra: true, icon: ic(<><circle cx="10" cy="10" r="2.8" /><circle cx="10" cy="10" r="5.6" /><path d="M10 1.8v2.4M10 15.8v2.4M1.8 10h2.4M15.8 10h2.4" /></>) },

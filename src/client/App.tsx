@@ -7,7 +7,6 @@ import VitrineDetail from './pages/VitrineDetail.js';
 import Planning from './pages/Planning.js';
 import Contrats from './pages/Contrats.js';
 import Tresorerie from './pages/Tresorerie.js';
-import Ventes from './pages/Ventes.js';
 import Lieux from './pages/Lieux.js';
 import Actions from './pages/Actions.js';
 import Parametres from './pages/Parametres.js';
@@ -126,7 +125,7 @@ export default function App() {
             <Route path="/planning" element={<Guard allowed={need('planning')}><Planning /></Guard>} />
             <Route path="/contrats" element={<Guard allowed={need('contrats')}><Contrats /></Guard>} />
             <Route path="/tresorerie" element={<Guard allowed={need('tresorerie')}><Tresorerie /></Guard>} />
-            <Route path="/ventes" element={<Guard allowed={need('ventes')}><Ventes /></Guard>} />
+            <Route path="/ventes" element={<Navigate to="/vitrines?etat=vendue" replace />} />
             <Route path="/lieux" element={<Guard allowed={need('lieux')}><Lieux /></Guard>} />
             <Route path="/actions" element={<Guard allowed={need('actions')}><Actions /></Guard>} />
             <Route path="/parametres" element={<Guard allowed={canSeeParametres}><Parametres /></Guard>} />

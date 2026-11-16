@@ -8,28 +8,34 @@ export default function(db: any) {
     return Object.keys(body || {}).filter(k => k !== 'id' && allowed.includes(k));
   };
 
+  // Statut « vendue » = la vitrine a une vente associée (dernière vente si plusieurs).
+  const SELECT = `SELECT v.*, s.id AS vente_id, s.prix_vente AS vente_prix, s.date_vente AS vente_date, s.frais AS vente_frais,
+      s.prix_achat AS vente_prix_achat, s.date_achat AS vente_date_achat, s.commentaire AS vente_commentaire,
+      CASE WHEN s.id IS NULL THEN 0 ELSE 1 END AS vendue
+    FROM vitrines v LEFT JOIN ventes s ON s.id = (SELECT MAX(id) FROM ventes WHERE vitrine_id = v.id)`;
+
   router.get('/', (req, res) => {
-    const { q, lieu_id, fonctionnelle } = req.query as any;
+    const { q, lieu_id, fonctionnelle, vendue } = req.query as any;
     const where: string[] = [];
     const params: any[] = [];
     if (q) {
       const like = `%${q}%`;
       const searchable = cols().filter(c => ['serial', 'model', 'nfc_tag', 'commentaire'].includes(c));
       if (searchable.length) {
-        where.push('(' + searchable.map(c => `${c} LIKE ?`).join(' OR ') + ')');
+        where.push('(' + searchable.map(c => `v.${c} LIKE ?`).join(' OR ') + ')');
         searchable.forEach(() => params.push(like));
       }
     }
-    if (lieu_id) { where.push('lieu_id = ?'); params.push(lieu_id); }
+    if (lieu_id) { where.push('v.lieu_id = ?'); params.push(lieu_id); }
     if (fonctionnelle !== undefined && fonctionnelle !== '') {
-      where.push(fonctionnelle === 'true' || fonctionnelle === '1' ? '(fonctionnelle IS NULL OR fonctionnelle = 1)' : 'fonctionnelle = 0');
+      where.push(fonctionnelle === 'true' || fonctionnelle === '1' ? '(v.fonctionnelle IS NULL OR v.fonctionnelle = 1)' : 'v.fonctionnelle = 0');
     }
-    const sql = 'SELECT * FROM vitrines' + (where.length ? ' WHERE ' + where.join(' AND ') : '');
-    res.json(db.prepare(sql).all(...params));
+    if (vendue !== undefined && vendue !== '') where.push(vendue === 'true' || vendue === '1' ? 's.id IS NOT NULL' : 's.id IS NULL');
+    res.json(db.prepare(SELECT + (where.length ? ' WHERE ' + where.join(' AND ') : '') + ' ORDER BY v.id').all(...params));
   });
 
   router.get('/:id', (req, res) => {
-    const v = db.prepare('SELECT * FROM vitrines WHERE id = ?').get(req.params.id);
+    const v = db.prepare(`${SELECT} WHERE v.id = ?`).get(req.params.id);
     if (!v) return res.status(404).json({ error: 'Vitrine introuvable' });
     const bookings = db.prepare('SELECT b.* FROM bookings b JOIN vitrines v ON v.id = b.vitrine_id WHERE v.id = ?').all(req.params.id);
     const interventions = db.prepare('SELECT i.* FROM interventions i JOIN vitrines v ON v.id = i.vitrine_id WHERE v.id = ?').all(req.params.id);

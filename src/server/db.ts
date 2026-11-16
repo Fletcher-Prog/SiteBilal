@@ -94,6 +94,7 @@ const migrations = [
   'ALTER TABLE contrats ADD COLUMN montant_fixe REAL',
   'ALTER TABLE users ADD COLUMN permissions TEXT',
   'ALTER TABLE bookings ADD COLUMN created_at TEXT',
+  'ALTER TABLE ventes ADD COLUMN date_achat TEXT',
 ];
 for (const sql of migrations) {
   try { db.exec(sql); } catch (e) { /* column already exists */ }
@@ -294,7 +295,7 @@ const T = {
   vitrines: crud<Vitrine>('vitrines', ['serial', 'model', 'prix_achat', 'prix_reparation', 'commentaire', 'fonctionnelle', 'lieu_id', 'nfc_tag', 'date_achat']),
   bookings: crud<Booking>('bookings', ['vitrine_id', 'client_name', 'start_date', 'duration_months', 'montant', 'transporteur', 'etat', 'adresse_livraison', 'tel_client', 'qui', 'photo_livraison', 'photo_enlevement', 'type_duree', 'maint', 'duree_jours', 'date_fin']),
   flux: crud<Flux>('flux', ['type_flux', 'montant', 'qui', 'client', 'mois', 'is_transport', 'is_achat', 'commentaire']),
-  ventes: crud<Vente>('ventes', ['vitrine_id', 'prix_achat', 'prix_vente', 'frais', 'commentaire', 'date_vente']),
+  ventes: crud<Vente>('ventes', ['vitrine_id', 'prix_achat', 'prix_vente', 'frais', 'commentaire', 'date_vente', 'date_achat']),
   lieux: crud<Lieu>('lieux', ['nom', 'type', 'note']),
   actions: crud<Action>('actions', ['titre', 'fait', 'commentaire']),
   contrats: crud<Contrat>('contrats', ['client', 'vitrine_id', 'duree', 'montant', 'montant_fixe', 'caution', 'conditions', 'date_debut', 'date_fin', 'qui']),

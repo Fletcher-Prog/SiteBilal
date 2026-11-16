@@ -54,9 +54,11 @@ test.describe('Frontend — Protected pages (authenticated)', () => {
     await expect(page.locator('body')).toContainText(/Trésorerie|flux|opération|Aucun/i);
   });
 
-  test('Ventes (/ventes) — loads', async ({ page }) => {
+  test('Ancienne page /ventes → liste des vitrines filtrée sur « Vendues »', async ({ page }) => {
     await page.goto(`${BASE}/ventes`);
-    await expect(page.locator('body')).toContainText(/Vente|Aucune vente/i);
+    await expect(page).toHaveURL(/\/vitrines\?etat=vendue$/);
+    await expect(page.getByLabel('Filtrer par état')).toHaveValue('vendue');
+    await expect(page.locator('aside nav')).not.toContainText('Ventes');
   });
 
   test('Lieux (/lieux) — loads', async ({ page }) => {

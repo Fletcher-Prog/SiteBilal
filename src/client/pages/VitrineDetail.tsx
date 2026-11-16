@@ -1,7 +1,9 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../lib/api.js';
-import { EtatBadge, Field, Modal, VitrineForm, btnDanger, btnPrimary, btnSecondary, eur, hasNfc, inputCls, isOk, scanNfc, writeNfc } from './Vitrines.js';
+import VenteModal from '../components/VenteModal.js';
+import { useAuth } from '../App.js';
+import { EtatBadge, VenduBadge, Field, Modal, VitrineForm, btnDanger, btnPrimary, btnSecondary, eur, hasNfc, inputCls, isOk, scanNfc, writeNfc } from './Vitrines.js';
 
 const esc = (s: any) => String(s ?? '').replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
 
@@ -23,7 +25,10 @@ export default function VitrineDetail() {
   const [showIosGuide, setShowIosGuide] = useState(false);
   const [addingIntervention, setAddingIntervention] = useState(false);
   const [intBusy, setIntBusy] = useState(false);
+  const [selling, setSelling] = useState(false);
+  const { can } = useAuth();
 
+  const reload = () => api.get(`/vitrines/${id}`).then(setV).catch(e => setError(e.message));
   useEffect(() => {
     setV(null);
     setError('');
@@ -98,6 +103,7 @@ export default function VitrineDetail() {
     ['Modèle', v.model],
     ["Prix d'achat", eur(v.prix_achat)],
     ['Prix de réparation', eur(v.prix_reparation)],
+    ["Date d'achat", fmtDate(v.date_achat)],
     ['Lieu', lieu],
     ['Tag NFC', v.nfc_tag || '—'],
     ['Commentaire', v.commentaire || '—'],
@@ -108,7 +114,7 @@ export default function VitrineDetail() {
       {back}
       {error && <div role="alert" className="mb-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-800">{error}</div>}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h1 className="flex items-center gap-3 text-2xl font-semibold">{v.serial} <EtatBadge v={v} /></h1>
+        <h1 className="flex flex-wrap items-center gap-3 text-2xl font-semibold">{v.serial} {v.vendue ? <VenduBadge /> : <EtatBadge v={v} />}</h1>
         <div className="flex flex-wrap gap-2">
           <button className={btnSecondary} disabled={busy} onClick={toggle}>{isOk(v) ? 'Marquer en panne' : 'Marquer fonctionnelle'}</button>
           <button className={btnPrimary} onClick={() => setEditing(true)}>Modifier</button>
@@ -224,10 +230,45 @@ export default function VitrineDetail() {
         </div>
       </div>
 
+
+      <div className="mt-5 rounded-lg border border-slate-200 bg-white p-5 shadow-sm" data-testid="bloc-vente">
+        <h2 className="mb-3 text-sm font-semibold">Vente</h2>
+        {v.vendue ? (
+          <>
+            {[
+              ['Vendue le', fmtDate(v.vente_date)],
+              ['Prix de vente', eur(v.vente_prix)],
+              ["Prix d'achat", eur(v.vente_prix_achat)],
+              ['Frais', eur(v.vente_frais)],
+              ['Marge', eur((Number(v.vente_prix) || 0) - (Number(v.vente_prix_achat) || 0) - (Number(v.vente_frais) || 0))],
+              ...(v.vente_commentaire ? [['Commentaire', v.vente_commentaire]] : []),
+            ].map(([k, val]) => (
+              <div key={k} className="flex justify-between gap-4 border-b border-slate-100 py-2 text-sm last:border-0">
+                <span className="text-slate-500">{k}</span><span className="text-right font-semibold">{val}</span>
+              </div>
+            ))}
+            {can('ventes') && <button className={btnSecondary + ' mt-3'} onClick={() => setSelling(true)}>Modifier la vente</button>}
+          </>
+        ) : can('ventes') ? (
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-slate-500">Cette vitrine n'est pas vendue.</p>
+            <button className={btnPrimary} onClick={() => setSelling(true)}>Vendre cette vitrine</button>
+          </div>
+        ) : <p className="text-sm text-slate-500">Cette vitrine n'est pas vendue.</p>}
+      </div>
+
       {editing && (
         <Modal title={`Modifier ${v.serial}`} onClose={() => setEditing(false)}>
           <VitrineForm initial={v} lieux={lieux} onCancel={() => setEditing(false)} onSaved={u => { setV({ ...v, ...u }); setEditing(false); }} />
         </Modal>
+      )}
+      {selling && (
+        <VenteModal
+          vitrine={v}
+          vente={v.vendue ? { id: v.vente_id, vitrine_id: v.id, prix_vente: v.vente_prix, date_vente: v.vente_date, frais: v.vente_frais, prix_achat: v.vente_prix_achat, date_achat: v.vente_date_achat, commentaire: v.vente_commentaire } : undefined}
+          onClose={() => setSelling(false)}
+          onSaved={() => { setSelling(false); reload(); }}
+        />
       )}
       {confirming && (
         <Modal title="Supprimer la vitrine" onClose={() => setConfirming(false)}>

@@ -4,7 +4,7 @@ export const PERMISSIONS: { key: string; label: string; path: string }[] = [
   { key: 'planning', label: 'Planning', path: '/planning' },
   { key: 'contrats', label: 'Contrats & Factures', path: '/contrats' },
   { key: 'tresorerie', label: 'Trésorerie', path: '/tresorerie' },
-  { key: 'ventes', label: 'Ventes', path: '/ventes' },
+  { key: 'ventes', label: 'Vendre des vitrines', path: '/vitrines' },
   { key: 'lieux', label: 'Lieux de stockage', path: '/lieux' },
   { key: 'actions', label: 'Actions', path: '/actions' },
   { key: 'parametres', label: 'Paramètres (entreprise, templates)', path: '/parametres' },

@@ -57,10 +57,10 @@ export default function(db: any) {
 
     // --- Vitrines vacantes ---
     const vitrines_vacantes = all(
-      `SELECT * FROM vitrines v WHERE NOT EXISTS (
+      `SELECT * FROM vitrines v WHERE NOT EXISTS (SELECT 1 FROM ventes s WHERE s.vitrine_id = v.id) AND NOT EXISTS (
          SELECT 1 FROM bookings b WHERE b.vitrine_id = v.id AND b.etat IS NOT 'annulee'
            AND b.start_date <= ? AND date(b.start_date, '+' || COALESCE(b.duration_months,1) || ' months') > ?)`, to, from);
-    const valeur_parc = one('SELECT COALESCE(SUM(prix_achat),0) AS s FROM vitrines').s;
+    const valeur_parc = one('SELECT COALESCE(SUM(prix_achat),0) AS s FROM vitrines v WHERE NOT EXISTS (SELECT 1 FROM ventes s WHERE s.vitrine_id = v.id)').s;
 
     // --- Prochaines réservations (from TODAY, not from filter) ---
     const prochaines_reservations = all(
